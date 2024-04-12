@@ -5,7 +5,6 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	"sync"
 
 	"github.com/mangofeet/netrunner-alt-gen/internal/prng"
 	"github.com/mangofeet/nrdb-go"
@@ -18,9 +17,8 @@ func drawArt(img draw.Image, card *nrdb.Printing) error {
 	startX := prng.Next(seed, canvasWidth)
 	startY := prng.Next(seed, canvasHeight)
 
-	wg := &sync.WaitGroup{}
+	var walkers []*Walker
 	for i := 0; i < 10; i++ {
-		wg.Add(1)
 		wlk := Walker{
 			Seed: seed,
 			X:    startX,
@@ -33,13 +31,11 @@ func drawArt(img draw.Image, card *nrdb.Printing) error {
 			},
 			Velocity: 1,
 		}
-		go func(wlk *Walker) {
-			wlk.Walk(img)
-			wg.Done()
-		}(&wlk)
+		walkers = append(walkers, &wlk)
 	}
-
-	wg.Wait()
+	for _, wlk := range walkers {
+		wlk.Walk(img)
+	}
 
 	return nil
 }
