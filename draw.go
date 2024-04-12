@@ -31,6 +31,7 @@ func drawArt(img draw.Image, card *nrdb.Printing) error {
 				B: uint8(prng.Next(seed, 256)),
 				A: 155,
 			},
+			Velocity: 1,
 		}
 		go func(wlk *Walker) {
 			wlk.Walk(img)
@@ -56,6 +57,14 @@ func (wlk Walker) String() string {
 
 func (wlk Walker) Draw(img draw.Image) {
 	img.Set(int(wlk.X), int(wlk.Y), wlk.Color)
+	// img.Set(int(wlk.X+1), int(wlk.Y), wlk.Color)
+	// img.Set(int(wlk.X-1), int(wlk.Y), wlk.Color)
+	// img.Set(int(wlk.X), int(wlk.Y+1), wlk.Color)
+	// img.Set(int(wlk.X), int(wlk.Y-1), wlk.Color)
+	// img.Set(int(wlk.X+1), int(wlk.Y+1), wlk.Color)
+	// img.Set(int(wlk.X-1), int(wlk.Y-1), wlk.Color)
+	// img.Set(int(wlk.X-1), int(wlk.Y+1), wlk.Color)
+	// img.Set(int(wlk.X+1), int(wlk.Y-1), wlk.Color)
 }
 
 func (wlk Walker) Walk(img draw.Image) {
