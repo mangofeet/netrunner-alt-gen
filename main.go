@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/mangofeet/netrunner-alt-gen/frame/netrunner"
 	"github.com/mangofeet/nrdb-go"
 )
 
@@ -71,6 +72,17 @@ func generateCard(cardName string, drawBleedLines bool) error {
 
 	if err := drawArt(img, printing); err != nil {
 		return fmt.Errorf("drawing art: %w", err)
+	}
+
+	bgColor := color.RGBA{
+		R: 0xff,
+		G: 0xff,
+		B: 0xff,
+		A: 0x55,
+	}
+
+	if err := netrunner.DrawFrameProgram(img, printing, bgColor, color.Black); err != nil {
+		return fmt.Errorf("drawing frame: %w", err)
 	}
 
 	outFile, err := os.Create("out.png")
