@@ -45,6 +45,15 @@ func drawArt(img draw.Image, card *nrdb.Printing) error {
 
 	baseColor := getFactionBaseColor(card.Attributes.FactionID)
 
+	cardBGColor := color.RGBA{
+		R: uint8(math.Max(0, math.Min(float64(int64(baseColor.R)-96), 255))),
+		G: uint8(math.Max(0, math.Min(float64(int64(baseColor.G)-96), 255))),
+		B: uint8(math.Max(0, math.Min(float64(int64(baseColor.B)-96), 255))),
+		A: 0xff,
+	}
+
+	draw.Draw(img, img.Bounds(), image.NewUniform(cardBGColor), image.Point{}, draw.Src)
+
 	noise := opensimplex.New(prng.Next(seed, math.MaxInt64))
 
 	var walkers []*Walker
