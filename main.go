@@ -86,7 +86,7 @@ func generateCard(cardName string, drawBleedLines bool) error {
 }
 
 func initImage(width, height int) *image.CMYK {
-	bg := image.White
+	bg := image.Black
 	cmyk := image.NewCMYK(image.Rect(0, 0, width, height))
 	draw.Draw(cmyk, cmyk.Bounds(), bg, image.Point{}, draw.Src)
 
@@ -94,7 +94,7 @@ func initImage(width, height int) *image.CMYK {
 }
 
 func drawBorder(img draw.Image, marginLR, marginTB int) {
-	ruler := color.RGBA{0x00, 0x00, 0x00, 0xff}
+	ruler := color.RGBA{0xff, 0xff, 0xff, 0xff}
 
 	bounds := img.Bounds()
 

@@ -1,2 +1,6 @@
+github.com/StephaneBunel/bresenham v0.0.0-20211027152503-ec76d7b8e923 h1:tiBl/Mvf7sSO5y3OVK7wznaQkLOCfHhX9KReDeN9WjE=
+github.com/StephaneBunel/bresenham v0.0.0-20211027152503-ec76d7b8e923/go.mod h1:IEPPVq1llBFm+OeVCgoAyFiTqK5aE2c2tH4QEsjnQCM=
 github.com/mangofeet/nrdb-go v0.1.0 h1:8uP6u+8TPVL78mEoh+nP3z6RpFJ+iigIK5y0oT28Mw4=
 github.com/mangofeet/nrdb-go v0.1.0/go.mod h1:g90VzQd5ypfs2mwKskxKNFpeP63MtB4wJ+VYikeG6v0=
+github.com/ojrac/opensimplex-go v1.0.2 h1:l4vs0D+JCakcu5OV0kJ99oEaWJfggSc9jiLpxaWvSzs=
+github.com/ojrac/opensimplex-go v1.0.2/go.mod h1:NwbXFFbXcdGgIFdiA7/REME+7n/lOf1TuEbLiZYOWnM=
