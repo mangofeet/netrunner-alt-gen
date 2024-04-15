@@ -304,7 +304,7 @@ func getFactionBaseColor(factionID string) color.RGBA {
 			A: 0xff,
 		}
 
-	case "hass_bioroid":
+	case "haas_bioroid":
 		return color.RGBA{
 			R: 0xc0,
 			G: 0xbe,
