@@ -168,24 +168,26 @@ func (wlk Walker) drawLine(img draw.Image, x1, y1, x2, y2 float64) {
 
 func (wlk Walker) drawPoint(img draw.Image, x, y float64) {
 
-	const size = 5
+	img.Set(int(x), int(y), wlk.Color)
 
-	for xp, yp := x-size, y-size; xp < x+size && yp < y+size; xp, yp = xp+1, yp+1 {
-		img.Set(int(xp), int(yp), wlk.Color)
-	}
+	// const size = 5
 
-	for xp, yp := x-size, y+size; xp < x+size && yp > y-size; xp, yp = xp+1, yp-1 {
-		img.Set(int(xp), int(yp), wlk.Color)
+	// for xp, yp := x-size, y-size; xp < x+size && yp < y+size; xp, yp = xp+1, yp+1 {
+	// 	img.Set(int(xp), int(yp), wlk.Color)
+	// }
 
-	}
+	// for xp, yp := x-size, y+size; xp < x+size && yp > y-size; xp, yp = xp+1, yp-1 {
+	// 	img.Set(int(xp), int(yp), wlk.Color)
 
-	for xp := x - size; xp < x+size; xp = xp + 1 {
-		img.Set(int(xp), int(y), wlk.Color)
-	}
+	// }
 
-	for yp := y - size; yp < y+size; yp = yp + 1 {
-		img.Set(int(x), int(yp), wlk.Color)
-	}
+	// for xp := x - size; xp < x+size; xp = xp + 1 {
+	// 	img.Set(int(xp), int(y), wlk.Color)
+	// }
+
+	// for yp := y - size; yp < y+size; yp = yp + 1 {
+	// 	img.Set(int(x), int(yp), wlk.Color)
+	// }
 
 }
 
