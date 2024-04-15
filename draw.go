@@ -106,7 +106,8 @@ func drawArt(img draw.Image, card *nrdb.Printing) error {
 	for _, wlk := range walkers {
 		wg.Add(1)
 		go func(wlk *Walker) {
-			newPath := wlk.Walk(img.Bounds())
+			// newPath := wlk.Walk(img.Bounds())
+			newPath := wlk.Walk(img)
 			if wlk.stepCount < maxSteps {
 				lock.Lock()
 				walkerPaths = append(walkerPaths, newPath)
@@ -120,11 +121,11 @@ func drawArt(img draw.Image, card *nrdb.Printing) error {
 	}
 	wg.Wait()
 
-	log.Println("overlaying paths")
-	for _, path := range walkerPaths {
-		draw.Draw(img, img.Bounds(), path, image.Point{}, draw.Over)
-	}
-	log.Println("done overlaying paths")
+	// log.Println("overlaying paths")
+	// for _, path := range walkerPaths {
+	// 	draw.Draw(img, img.Bounds(), path, image.Point{}, draw.Over)
+	// }
+	// log.Println("done overlaying paths")
 
 	return nil
 }
@@ -200,9 +201,11 @@ func (wlk Walker) drawPoint(img draw.Image, x, y float64) {
 
 }
 
-func (wlk *Walker) Walk(bounds image.Rectangle) image.Image {
+// func (wlk *Walker) Walk(bounds image.Rectangle) image.Image {
+func (wlk *Walker) Walk(img draw.Image) image.Image {
 
-	img := image.NewRGBA(bounds)
+	// img := image.NewRGBA(bounds)
+	bounds := img.Bounds()
 
 	for wlk.inBounds(bounds) && wlk.stepCount < maxSteps {
 
