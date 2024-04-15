@@ -8,7 +8,6 @@ import (
 	"log"
 	"math"
 	"strings"
-	"sync"
 
 	"github.com/StephaneBunel/bresenham"
 	"github.com/mangofeet/netrunner-alt-gen/internal/prng"
@@ -57,25 +56,31 @@ func drawArt(img draw.Image, card *nrdb.Printing) error {
 	noise := opensimplex.New(prng.Next(seed, math.MaxInt64))
 
 	var walkers []*Walker
+
+	nGrid := prng.Next(seed, int64(float64(numWalkers)*0.02))
+
 	for i := 0; i < numWalkers; i++ {
 
 		colorFactor := prng.Next(seed, 128) - 64
 
 		var direction string
 		var grid = false
-		dirSeed := prng.Next(seed, 41)
 
-		if dirSeed <= 10 {
-			direction = "up"
-		} else if dirSeed <= 20 {
-			direction = "down"
-		} else if dirSeed <= 30 {
-			direction = "left"
-		} else if dirSeed <= 40 {
-			direction = "right"
-		} else {
+		if int64(i) < nGrid {
 			colorFactor = -1 * int64(math.Abs(float64(colorFactor)))
 			grid = true
+		} else {
+			dirSeed := prng.Next(seed, 40)
+
+			if dirSeed <= 10 {
+				direction = "up"
+			} else if dirSeed <= 20 {
+				direction = "down"
+			} else if dirSeed <= 30 {
+				direction = "left"
+			} else if dirSeed <= 40 {
+				direction = "right"
+			}
 		}
 
 		wlk := Walker{
@@ -102,25 +107,25 @@ func drawArt(img draw.Image, card *nrdb.Printing) error {
 
 	var walkerPaths []image.Image
 
-	var wg sync.WaitGroup
-	var lock sync.Mutex
+	// var wg sync.WaitGroup
+	// var lock sync.Mutex
 	for _, wlk := range walkers {
-		wg.Add(1)
-		go func(wlk *Walker) {
-			// newPath := wlk.Walk(img.Bounds())
-			newPath := wlk.Walk(img)
-			if wlk.stepCount < maxSteps {
-				lock.Lock()
-				walkerPaths = append(walkerPaths, newPath)
-				lock.Unlock()
-				log.Printf("done %s", wlk)
-			} else {
-				log.Printf("ignoring incomplete: %s", wlk)
-			}
-			wg.Done()
-		}(wlk)
+		// wg.Add(1)
+		// go func(wlk *Walker) {
+		// newPath := wlk.Walk(img.Bounds())
+		newPath := wlk.Walk(img)
+		if wlk.stepCount < maxSteps {
+			// lock.Lock()
+			walkerPaths = append(walkerPaths, newPath)
+			// lock.Unlock()
+			log.Printf("done %s", wlk)
+		} else {
+			log.Printf("ignoring incomplete: %s", wlk)
+		}
+		// wg.Done()
+		// }(wlk)
 	}
-	wg.Wait()
+	// wg.Wait()
 
 	// log.Println("overlaying paths")
 	// for _, path := range walkerPaths {
