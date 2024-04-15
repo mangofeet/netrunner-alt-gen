@@ -74,6 +74,7 @@ func drawArt(img draw.Image, card *nrdb.Printing) error {
 		} else if dirSeed <= 40 {
 			direction = "right"
 		} else {
+			colorFactor = -1 * int64(math.Abs(float64(colorFactor)))
 			grid = true
 		}
 
