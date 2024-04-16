@@ -74,7 +74,14 @@ func generateCard(cardName string, drawBleedLines bool) error {
 		return fmt.Errorf("drawing art: %w", err)
 	}
 
-	bgColor := getFactionBaseColor(printing.Attributes.FactionID)
+	// bgColor := getFactionBaseColor(printing.Attributes.FactionID)
+	// bgColor.A = 0x44
+	bgColor := color.RGBA{
+		R: 0xbb,
+		G: 0xbb,
+		B: 0xbb,
+		A: 0xcc,
+	}
 
 	if err := netrunner.DrawFrameProgram(img, printing, bgColor, color.Black); err != nil {
 		return fmt.Errorf("drawing frame: %w", err)
