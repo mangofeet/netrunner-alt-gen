@@ -13,7 +13,8 @@ import (
 )
 
 // number of walkers to draw
-const numWalkers = 2000
+const numWalkersMin = 1000
+const numWalkersMax = 10000
 
 func drawArt(ctx *canvas.Context, card *nrdb.Printing) error {
 
@@ -22,6 +23,8 @@ func drawArt(ctx *canvas.Context, card *nrdb.Printing) error {
 	// need them as vars instead of const to do type conversion
 	canvasWidth := canvasWidth
 	canvasHeight := canvasHeight
+
+	numWalkers := int(math.Max(float64(numWalkersMin), float64(prng.Next(seed, int64(numWalkersMax)))))
 
 	startX := prng.Next(seed, int64(canvasWidth/2)) + int64(canvasWidth/4)
 	startY := prng.Next(seed, int64(canvasHeight/4)) + (int64(canvasHeight/8) * 5)
@@ -54,7 +57,7 @@ func drawArt(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	var walkers []*walker.Walker
 
-	nGrid := prng.Next(seed, int64(float64(numWalkers)*0.02))
+	nGrid := math.Max(float64(numWalkers)*0.01, float64(prng.Next(seed, int64(float64(numWalkers)*0.02))))
 
 	for i := 0; i < numWalkers; i++ {
 
@@ -62,12 +65,12 @@ func drawArt(ctx *canvas.Context, card *nrdb.Printing) error {
 
 		var direction string
 		var grid = false
-		var strokeWidth = 0.5
+		var strokeWidth = 0.3
 
-		if int64(i) < nGrid {
+		if float64(i) < nGrid {
 			colorFactor = -1 * int64(math.Abs(float64(colorFactor)))
 			grid = true
-			strokeWidth = 1.0
+			strokeWidth = 1.5
 		} else {
 			dirSeed := prng.Next(seed, 4)
 
