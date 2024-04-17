@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"image/color"
 	"log"
 	"os"
 	"strings"
@@ -76,21 +75,7 @@ func generateCard(cardName string, drawBleedLines bool) error {
 		return err
 	}
 
-	textBoxColor := color.RGBA{
-		R: 0x1c,
-		G: 0x1c,
-		B: 0x1c,
-		A: 0xcc,
-	}
-
-	textColor := color.RGBA{
-		R: 0xdc,
-		G: 0xdc,
-		B: 0xcc,
-		A: 0xff,
-	}
-
-	if err := netrunner.DrawFrameProgram(drawCtx, printing, textBoxColor, textColor); err != nil {
+	if err := netrunner.DrawFrameProgram(drawCtx, printing); err != nil {
 		return err
 	}
 
