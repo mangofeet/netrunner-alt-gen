@@ -24,7 +24,7 @@ func drawArt(ctx *canvas.Context, card *nrdb.Printing) error {
 	canvasHeight := canvasHeight
 
 	startX := prng.Next(seed, int64(canvasWidth/2)) + int64(canvasWidth/4)
-	startY := prng.Next(seed, int64(canvasHeight/4)) + (int64(canvasHeight / 2))
+	startY := prng.Next(seed, int64(canvasHeight/4)) + (int64(canvasHeight/8) * 5)
 
 	if card.Attributes.CardTypeID == "ice" {
 		startY = prng.Next(seed, int64(canvasHeight/4)) + (int64(canvasHeight / 6))
