@@ -1,11 +1,11 @@
-package main
+package netspace
 
 import (
 	"image/color"
 	"log"
 	"math"
 
-	"github.com/mangofeet/netrunner-alt-gen/art/walker"
+	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/netrunner-alt-gen/internal/prng"
 	"github.com/mangofeet/nrdb-go"
 	"github.com/ojrac/opensimplex-go"
@@ -16,13 +16,12 @@ import (
 const numWalkersMin = 1000
 const numWalkersMax = 10000
 
-func drawArt(ctx *canvas.Context, card *nrdb.Printing) error {
+func Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	seed := card.Attributes.Title + card.Attributes.Text + card.Attributes.CardTypeID + card.Attributes.FactionID
 
 	// need them as vars instead of const to do type conversion
-	canvasWidth := canvasWidth
-	canvasHeight := canvasHeight
+	canvasWidth, canvasHeight := ctx.Size()
 
 	numWalkers := int(math.Max(float64(numWalkersMin), float64(prng.Next(seed, int64(numWalkersMax)))))
 
@@ -55,7 +54,7 @@ func drawArt(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	noise := opensimplex.New(prng.Next(seed, math.MaxInt64))
 
-	var walkers []*walker.Walker
+	var walkers []*art.Walker
 
 	nGrid := math.Max(float64(numWalkers)*0.01, float64(prng.Next(seed, int64(float64(numWalkers)*0.02))))
 
@@ -85,7 +84,7 @@ func drawArt(ctx *canvas.Context, card *nrdb.Printing) error {
 			}
 		}
 
-		wlk := walker.Walker{
+		wlk := art.Walker{
 			Seed:              seed,
 			Sequence:          i,
 			Direction:         direction,

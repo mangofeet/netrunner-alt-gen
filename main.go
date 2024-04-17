@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/mangofeet/netrunner-alt-gen/art/netspace"
 	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
 	"github.com/tdewolff/canvas/renderers"
@@ -69,7 +70,9 @@ func generateCard(cardName string, drawBleedLines bool) error {
 
 	drawCtx := canvas.NewContext(cnv)
 
-	drawArt(drawCtx, printing)
+	if err := netspace.Draw(drawCtx, printing); err != nil {
+		return err
+	}
 
 	// if err := renderers.Write("out.png", cnv, canvas.DPI(1200)); err != nil {
 	if err := renderers.Write("out.png", cnv, canvas.DPMM(1)); err != nil {

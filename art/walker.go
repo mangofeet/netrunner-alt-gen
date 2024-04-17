@@ -1,4 +1,4 @@
-package walker
+package art
 
 import (
 	"fmt"
