@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image/color"
 	"log"
 	"os"
 	"strings"
@@ -69,14 +70,33 @@ func generateCard(cardName string, drawBleedLines bool) error {
 
 	cnv := canvas.New(canvasWidth, canvasHeight)
 
-	drawCtx := canvas.NewContext(cnv)
+	ctx := canvas.NewContext(cnv)
 
-	if err := netspace.Draw(drawCtx, printing); err != nil {
+	if err := netspace.Draw(ctx, printing); err != nil {
 		return err
 	}
 
-	if err := netrunner.DrawFrameProgram(drawCtx, printing); err != nil {
+	if err := netrunner.DrawFrameProgram(ctx, printing); err != nil {
 		return err
+	}
+
+	if drawBleedLines {
+
+		marginX := (canvasWidth - cardWidth) / 2
+		marginY := (canvasHeight - cardHeight) / 2
+
+		ctx.Push()
+		ctx.SetStrokeColor(color.White)
+		ctx.SetStrokeWidth(5)
+		ctx.MoveTo(marginX, marginY)
+		ctx.LineTo(marginX, marginY+cardHeight)
+		ctx.LineTo(marginX+cardWidth, marginY+cardHeight)
+		ctx.LineTo(marginX+cardWidth, marginY)
+		ctx.Close()
+		ctx.SetDashes(0, 10, 20)
+		ctx.Stroke()
+		ctx.Pop()
+
 	}
 
 	// if err := renderers.Write("out.png", cnv, canvas.DPI(1200)); err != nil {
