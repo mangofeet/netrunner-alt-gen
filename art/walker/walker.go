@@ -18,21 +18,22 @@ type point struct {
 }
 
 type Walker struct {
-	Seed          string
-	Sequence      int
-	Direction     string
-	X, Y, Vx, Vy  float64
-	Color         color.Color
-	Noise         opensimplex.Noise
-	Grid          bool
-	StrokeWidth   float64
-	stepCount     int
-	dirChangeStep float64
-	prev          *point
+	Seed              string
+	Sequence          int
+	Direction         string
+	DirectionVariance int64
+	X, Y, Vx, Vy      float64
+	Color             color.Color
+	Noise             opensimplex.Noise
+	Grid              bool
+	StrokeWidth       float64
+	stepCount         int
+	dirChangeStep     float64
+	prev              *point
 }
 
 func (wlk Walker) String() string {
-	return fmt.Sprintf("walker %d at (%f, %f), direction=%s, grid=%t, steps=%d", wlk.Sequence, wlk.X, wlk.Y, wlk.Direction, wlk.Grid, wlk.stepCount)
+	return fmt.Sprintf("walker %d at (%f, %f), direction=%s, grid=%t, steps=%d, directionVariance=%d", wlk.Sequence, wlk.X, wlk.Y, wlk.Direction, wlk.Grid, wlk.stepCount, wlk.DirectionVariance)
 }
 
 func (wlk *Walker) Draw(ctx *canvas.Context) {
@@ -135,7 +136,13 @@ func (wlk *Walker) maybeChangeDirection() {
 	// 		wlk.Direction = "up"
 	// 	}
 
-	switch prng.Sample(wlk.Seed, int64(wlk.stepCount), 3) {
+	if wlk.DirectionVariance > 4 {
+		wlk.DirectionVariance = 4
+	}
+	if wlk.DirectionVariance <= 0 {
+		wlk.DirectionVariance = 1
+	}
+	switch prng.Sample(wlk.Seed, int64(wlk.stepCount), wlk.DirectionVariance) {
 	case 1:
 		switch wlk.Direction {
 		case "up":

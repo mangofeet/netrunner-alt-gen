@@ -83,13 +83,14 @@ func drawArt(ctx *canvas.Context, card *nrdb.Printing) error {
 		}
 
 		wlk := walker.Walker{
-			Seed:      seed,
-			Sequence:  i,
-			Direction: direction,
-			X:         float64(startX),
-			Y:         float64(startY),
-			Vx:        (float64(prng.Next(seed, 100)) / 100) - 0.5,
-			Vy:        (float64(prng.Next(seed, 100)) / 100) - 0.5,
+			Seed:              seed,
+			Sequence:          i,
+			Direction:         direction,
+			DirectionVariance: prng.Next(seed, 4),
+			X:                 float64(startX),
+			Y:                 float64(startY),
+			Vx:                (float64(prng.Next(seed, 100)) / 100) - 0.5,
+			Vy:                (float64(prng.Next(seed, 100)) / 100) - 0.5,
 			Color: color.RGBA{
 				R: uint8(math.Max(0, math.Min(float64(int64(baseColor.R)+colorFactor), 255))),
 				G: uint8(math.Max(0, math.Min(float64(int64(baseColor.G)+colorFactor), 255))),
