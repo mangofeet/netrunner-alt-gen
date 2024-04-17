@@ -69,15 +69,15 @@ func drawArt(ctx *canvas.Context, card *nrdb.Printing) error {
 			grid = true
 			strokeWidth = 1.0
 		} else {
-			dirSeed := prng.Next(seed, 40)
+			dirSeed := prng.Next(seed, 4)
 
-			if dirSeed <= 10 {
+			if dirSeed <= 1 {
 				direction = "up"
-			} else if dirSeed <= 20 {
+			} else if dirSeed <= 2 {
 				direction = "down"
-			} else if dirSeed <= 30 {
+			} else if dirSeed <= 3 {
 				direction = "left"
-			} else if dirSeed <= 40 {
+			} else if dirSeed <= 4 {
 				direction = "right"
 			}
 		}
