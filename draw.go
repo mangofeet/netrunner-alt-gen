@@ -54,7 +54,7 @@ func drawArt(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	var walkers []*walker.Walker
 
-	nGrid := prng.Next(seed, int64(float64(numWalkers)*0.04))
+	nGrid := prng.Next(seed, int64(float64(numWalkers)*0.02))
 
 	for i := 0; i < numWalkers; i++ {
 
@@ -62,12 +62,12 @@ func drawArt(ctx *canvas.Context, card *nrdb.Printing) error {
 
 		var direction string
 		var grid = false
-		var strokeWidth = 0.02
+		var strokeWidth = 0.5
 
 		if int64(i) < nGrid {
 			colorFactor = -1 * int64(math.Abs(float64(colorFactor)))
 			grid = true
-			strokeWidth = 0.06
+			strokeWidth = 1.0
 		} else {
 			dirSeed := prng.Next(seed, 40)
 

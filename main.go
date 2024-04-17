@@ -12,17 +12,17 @@ import (
 )
 
 // sizes in pixels, this is ~1200 DPI
-// const canvasWidth = 3288
-// const canvasHeight = 4488
+const canvasWidth = 3288.0
+const canvasHeight = 4488.0
 
-// const cardWidth = 3064
-// const cardHeight = 4212
+const cardWidth = 3064.0
+const cardHeight = 4212.0
 
-const canvasWidth = 69.35
-const canvasHeight = 94.35
+// const canvasWidth = 69.35
+// const canvasHeight = 94.35
 
-const cardWidth = 63.0
-const cardHeight = 88.0
+// const cardWidth = 63.0
+// const cardHeight = 88.0
 
 func main() {
 
@@ -71,7 +71,8 @@ func generateCard(cardName string, drawBleedLines bool) error {
 
 	drawArt(drawCtx, printing)
 
-	if err := renderers.Write("out.png", cnv, canvas.DPI(1200)); err != nil {
+	// if err := renderers.Write("out.png", cnv, canvas.DPI(1200)); err != nil {
+	if err := renderers.Write("out.png", cnv, canvas.DPMM(1)); err != nil {
 		return err
 	}
 

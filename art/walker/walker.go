@@ -11,7 +11,7 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
-const noiseStepFactor = 0.05
+const noiseStepFactor = 0.005
 
 type point struct {
 	x, y float64
@@ -62,8 +62,8 @@ func (wlk Walker) drawLine(ctx *canvas.Context, x1, y1, x2, y2 float64) {
 }
 
 func (wlk *Walker) Velocity() {
-	deltaX := wlk.Noise.Eval2(wlk.X*noiseStepFactor, wlk.Y*noiseStepFactor) / 4
-	deltaY := wlk.Noise.Eval2(wlk.Y*noiseStepFactor, wlk.X*noiseStepFactor) / 4
+	deltaX := wlk.Noise.Eval2(wlk.X*noiseStepFactor, wlk.Y*noiseStepFactor)
+	deltaY := wlk.Noise.Eval2(wlk.Y*noiseStepFactor, wlk.X*noiseStepFactor)
 
 	switch strings.ToLower(wlk.Direction) {
 	case "down":
