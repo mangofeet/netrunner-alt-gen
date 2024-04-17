@@ -16,11 +16,13 @@ import (
 const numWalkersMin = 1000
 const numWalkersMax = 10000
 
+// const numWalkersMin = 100
+// const numWalkersMax = 100
+
 func Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	seed := card.Attributes.Title + card.Attributes.Text + card.Attributes.CardTypeID + card.Attributes.FactionID
 
-	// need them as vars instead of const to do type conversion
 	canvasWidth, canvasHeight := ctx.Size()
 
 	numWalkers := int(math.Max(float64(numWalkersMin), float64(prng.Next(seed, int64(numWalkersMax)))))
