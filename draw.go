@@ -1,46 +1,34 @@
 package main
 
 import (
-	"fmt"
-	"image"
 	"image/color"
-	"image/draw"
 	"log"
 	"math"
-	"strings"
 
-	"github.com/StephaneBunel/bresenham"
+	"github.com/mangofeet/netrunner-alt-gen/art/walker"
 	"github.com/mangofeet/netrunner-alt-gen/internal/prng"
 	"github.com/mangofeet/nrdb-go"
 	"github.com/ojrac/opensimplex-go"
+	"github.com/tdewolff/canvas"
 )
 
 // number of walkers to draw
-const numWalkers = 1000
+const numWalkers = 2000
 
-// the default factor for corrdinates in the noise map
-const noiseStepFactor = 0.005
-
-// max total steps to try to escape the canvas, walker will be discarded
-// if it does not make it out by this count
-const maxSteps = 100_000_000
-
-// the point at which the noise factor will change if the walkers are
-// not escaping the canvas
-const noiseStepChangeThreshold = 10_000
-
-func drawArt(img draw.Image, card *nrdb.Printing) error {
+func drawArt(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	seed := card.Attributes.Title + card.Attributes.Text + card.Attributes.CardTypeID + card.Attributes.FactionID
 
-	startX := prng.Next(seed, canvasWidth/2) + canvasWidth/4
-	startY := prng.Next(seed, canvasHeight/4) + (canvasHeight / 6)
+	// need them as vars instead of const to do type conversion
+	canvasWidth := canvasWidth
+	canvasHeight := canvasHeight
+
+	startX := prng.Next(seed, int64(canvasWidth/2)) + int64(canvasWidth/4)
+	startY := prng.Next(seed, int64(canvasHeight/4)) + (int64(canvasHeight / 2))
 
 	if card.Attributes.CardTypeID == "ice" {
-		startY = prng.Next(seed, canvasHeight/4) + ((canvasHeight / 3) * 2)
+		startY = prng.Next(seed, int64(canvasHeight/4)) + (int64(canvasHeight / 6))
 	}
-	// startX := img.Bounds().Max.X / 2
-	// startY := img.Bounds().Max.Y / 2
 
 	baseColor := getFactionBaseColor(card.Attributes.FactionID)
 
@@ -51,13 +39,22 @@ func drawArt(img draw.Image, card *nrdb.Printing) error {
 		A: 0xff,
 	}
 
-	draw.Draw(img, img.Bounds(), image.NewUniform(cardBGColor), image.Point{}, draw.Src)
+	// fill background
+	ctx.Push()
+	ctx.SetFillColor(cardBGColor)
+	ctx.MoveTo(0, 0)
+	ctx.LineTo(0, canvasHeight)
+	ctx.LineTo(canvasWidth, canvasHeight)
+	ctx.LineTo(canvasWidth, 0)
+	ctx.Close()
+	ctx.Fill()
+	ctx.Pop()
 
 	noise := opensimplex.New(prng.Next(seed, math.MaxInt64))
 
-	var walkers []*Walker
+	var walkers []*walker.Walker
 
-	nGrid := prng.Next(seed, int64(float64(numWalkers)*0.02))
+	nGrid := prng.Next(seed, int64(float64(numWalkers)*0.04))
 
 	for i := 0; i < numWalkers; i++ {
 
@@ -65,10 +62,12 @@ func drawArt(img draw.Image, card *nrdb.Printing) error {
 
 		var direction string
 		var grid = false
+		var strokeWidth = 0.02
 
 		if int64(i) < nGrid {
 			colorFactor = -1 * int64(math.Abs(float64(colorFactor)))
 			grid = true
+			strokeWidth = 0.06
 		} else {
 			dirSeed := prng.Next(seed, 40)
 
@@ -83,208 +82,44 @@ func drawArt(img draw.Image, card *nrdb.Printing) error {
 			}
 		}
 
-		wlk := Walker{
+		wlk := walker.Walker{
 			Seed:      seed,
 			Sequence:  i,
 			Direction: direction,
 			X:         float64(startX),
 			Y:         float64(startY),
-			Vx:        (float64(prng.Next(seed, 200)) / 100) - 1,
-			Vy:        (float64(prng.Next(seed, 200)) / 100) - 1,
+			Vx:        (float64(prng.Next(seed, 100)) / 100) - 0.5,
+			Vy:        (float64(prng.Next(seed, 100)) / 100) - 0.5,
 			Color: color.RGBA{
 				R: uint8(math.Max(0, math.Min(float64(int64(baseColor.R)+colorFactor), 255))),
 				G: uint8(math.Max(0, math.Min(float64(int64(baseColor.G)+colorFactor), 255))),
 				B: uint8(math.Max(0, math.Min(float64(int64(baseColor.B)+colorFactor), 255))),
 				A: 0xff,
 			},
-			Noise: noise,
-			Grid:  grid,
-			// Grid:  prng.Next(seed, 10) <= 3,
-			// Grid: true,
+			Noise:       noise,
+			Grid:        grid,
+			StrokeWidth: strokeWidth,
 		}
 		walkers = append(walkers, &wlk)
 	}
 
-	var walkerPaths []image.Image
-
-	// var wg sync.WaitGroup
-	// var lock sync.Mutex
 	for _, wlk := range walkers {
-		// wg.Add(1)
-		// go func(wlk *Walker) {
-		// newPath := wlk.Walk(img.Bounds())
-		newPath := wlk.Walk(img)
-		if wlk.stepCount < maxSteps {
-			// lock.Lock()
-			walkerPaths = append(walkerPaths, newPath)
-			// lock.Unlock()
-			log.Printf("done %s", wlk)
-		} else {
-			log.Printf("ignoring incomplete: %s", wlk)
+		wlk.Draw(ctx)
+		for wlk.InBounds(ctx) {
+			wlk.Velocity()
+			wlk.Move()
+			wlk.Draw(ctx)
 		}
-		// wg.Done()
-		// }(wlk)
+		log.Printf("finished %s", wlk)
 	}
-	// wg.Wait()
-
-	// log.Println("overlaying paths")
-	// for _, path := range walkerPaths {
-	// 	draw.Draw(img, img.Bounds(), path, image.Point{}, draw.Over)
-	// }
-	// log.Println("done overlaying paths")
 
 	return nil
-}
-
-type point struct {
-	x, y float64
-}
-
-type Walker struct {
-	Seed         string
-	Sequence     int
-	Direction    string
-	X, Y, Vx, Vy float64
-	Color        color.Color
-	Noise        opensimplex.Noise
-	stepCount    int
-	prev         *point
-	Grid         bool
-}
-
-func (wlk Walker) String() string {
-	return fmt.Sprintf("walker %d at (%f, %f), step %d", wlk.Sequence, wlk.X, wlk.Y, wlk.stepCount)
-}
-
-func (wlk *Walker) Draw(img draw.Image) {
-
-	if wlk.prev == nil {
-		wlk.drawPoint(img, wlk.X, wlk.Y)
-		goto SET_PREV
-	}
-
-	wlk.drawLine(img, wlk.X, wlk.Y, wlk.prev.x, wlk.prev.y)
-
-SET_PREV:
-
-	wlk.prev = &point{wlk.X, wlk.Y}
-}
-
-func (wlk Walker) drawLine(img draw.Image, x1, y1, x2, y2 float64) {
-	bresenham.DrawLine(img, int(x1), int(y1), int(x2), int(y2), wlk.Color)
-
-	// bresenham.DrawLine(img, int(x1+1), int(y1+1), int(x2+1), int(y2+1), wlk.Color)
-	// bresenham.DrawLine(img, int(x1), int(y1+1), int(x2), int(y2+1), wlk.Color)
-	// bresenham.DrawLine(img, int(x1+1), int(y1), int(x2+1), int(y2), wlk.Color)
-
-	// bresenham.DrawLine(img, int(x1-1), int(y1-1), int(x2-1), int(y2-1), wlk.Color)
-	// bresenham.DrawLine(img, int(x1), int(y1-1), int(x2), int(y2-1), wlk.Color)
-	// bresenham.DrawLine(img, int(x1-1), int(y1), int(x2-1), int(y2), wlk.Color)
-}
-
-func (wlk Walker) drawPoint(img draw.Image, x, y float64) {
-
-	img.Set(int(x), int(y), wlk.Color)
-
-	// const size = 5
-
-	// for xp, yp := x-size, y-size; xp < x+size && yp < y+size; xp, yp = xp+1, yp+1 {
-	// 	img.Set(int(xp), int(yp), wlk.Color)
-	// }
-
-	// for xp, yp := x-size, y+size; xp < x+size && yp > y-size; xp, yp = xp+1, yp-1 {
-	// 	img.Set(int(xp), int(yp), wlk.Color)
-
-	// }
-
-	// for xp := x - size; xp < x+size; xp = xp + 1 {
-	// 	img.Set(int(xp), int(y), wlk.Color)
-	// }
-
-	// for yp := y - size; yp < y+size; yp = yp + 1 {
-	// 	img.Set(int(x), int(yp), wlk.Color)
-	// }
-
-}
-
-// func (wlk *Walker) Walk(bounds image.Rectangle) image.Image {
-func (wlk *Walker) Walk(img draw.Image) image.Image {
-
-	// img := image.NewRGBA(bounds)
-	bounds := img.Bounds()
-
-	for wlk.inBounds(bounds) && wlk.stepCount < maxSteps {
-
-		wlk.stepCount++
-
-		thisNoiseStepFactor := float64(int(wlk.stepCount/1_000)+1) * noiseStepFactor
-
-		deltaX := wlk.Noise.Eval2(wlk.X*thisNoiseStepFactor, wlk.Y*thisNoiseStepFactor)
-		deltaY := wlk.Noise.Eval2(wlk.Y*thisNoiseStepFactor, wlk.X*thisNoiseStepFactor)
-
-		switch strings.ToLower(wlk.Direction) {
-		case "up":
-			wlk.Vx += deltaX
-			wlk.Vy += -1 * math.Abs(deltaY)
-		case "down":
-			wlk.Vx += deltaX
-			wlk.Vy += math.Abs(deltaY)
-		case "left":
-			wlk.Vx += -1 * math.Abs(deltaX)
-			wlk.Vy += deltaY
-		case "right":
-			wlk.Vx += math.Abs(deltaX)
-			wlk.Vy += deltaY
-		default:
-			wlk.Vx += deltaX
-			wlk.Vy += deltaY
-		}
-
-		if wlk.Grid {
-
-			switch prng.SequenceNext(wlk.Sequence, wlk.Seed, 4) {
-			case 1:
-				wlk.X += wlk.Vx
-			case 2:
-				wlk.Y += wlk.Vy
-			case 3:
-				wlk.Y -= wlk.Vy
-			case 4:
-				wlk.X -= wlk.Vx
-			}
-
-		} else {
-			wlk.X += wlk.Vx
-			wlk.Y += wlk.Vy
-		}
-
-		wlk.Draw(img)
-	}
-
-	return img
-}
-
-func (wlk Walker) inBounds(bounds image.Rectangle) bool {
-	if int(wlk.X) > bounds.Max.X {
-		return false
-	}
-	if int(wlk.X) < bounds.Min.X {
-		return false
-	}
-	if int(wlk.Y) > bounds.Max.Y {
-		return false
-	}
-	if int(wlk.Y) < bounds.Min.Y {
-		return false
-	}
-
-	return true
 }
 
 func getFactionBaseColor(factionID string) color.RGBA {
 
 	switch factionID {
-	case "shaper", "weyland":
+	case "shaper", "weyland_consortium":
 		return color.RGBA{
 			R: 0x7f,
 			G: 0x9f,

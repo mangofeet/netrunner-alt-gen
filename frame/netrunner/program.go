@@ -15,6 +15,11 @@ import (
 
 func DrawFrameProgram(img draw.Image, card *nrdb.Printing, bgColor, textColor color.Color) error {
 
+	return nil
+}
+
+func DrawFrameProgramOld(img draw.Image, card *nrdb.Printing, bgColor, textColor color.Color) error {
+
 	bg := image.NewUniform(bgColor)
 	fg := image.NewUniform(textColor)
 
