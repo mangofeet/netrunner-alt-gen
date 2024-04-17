@@ -18,19 +18,21 @@ type point struct {
 }
 
 type Walker struct {
-	Seed         string
-	Sequence     int
-	Direction    string
-	X, Y, Vx, Vy float64
-	Color        color.Color
-	Noise        opensimplex.Noise
-	Grid         bool
-	StrokeWidth  float64
-	prev         *point
+	Seed          string
+	Sequence      int
+	Direction     string
+	X, Y, Vx, Vy  float64
+	Color         color.Color
+	Noise         opensimplex.Noise
+	Grid          bool
+	StrokeWidth   float64
+	stepCount     int
+	dirChangeStep float64
+	prev          *point
 }
 
 func (wlk Walker) String() string {
-	return fmt.Sprintf("walker %d at (%f, %f), direction=%s, grid=%t", wlk.Sequence, wlk.X, wlk.Y, wlk.Direction, wlk.Grid)
+	return fmt.Sprintf("walker %d at (%f, %f), direction=%s, grid=%t, steps=%d", wlk.Sequence, wlk.X, wlk.Y, wlk.Direction, wlk.Grid, wlk.stepCount)
 }
 
 func (wlk *Walker) Draw(ctx *canvas.Context) {
@@ -86,6 +88,8 @@ func (wlk *Walker) Velocity() {
 }
 
 func (wlk *Walker) Move() {
+	wlk.stepCount++
+
 	if wlk.Grid {
 		switch prng.SequenceNext(wlk.Sequence, wlk.Seed, 4) {
 		case 1:
@@ -101,6 +105,72 @@ func (wlk *Walker) Move() {
 		wlk.X += wlk.Vx
 		wlk.Y += wlk.Vy
 	}
+
+	wlk.maybeChangeDirection()
+}
+
+func (wlk *Walker) maybeChangeDirection() {
+	if wlk.Direction == "" {
+		return
+	}
+
+	if wlk.dirChangeStep == 0 {
+		wlk.dirChangeStep = 30
+	}
+
+	if wlk.stepCount%int(wlk.dirChangeStep*(math.Ceil(float64(wlk.stepCount)/wlk.dirChangeStep))) != 0 {
+		return
+	}
+
+	wlk.dirChangeStep *= 3
+
+	// 	switch wlk.Direction {
+	// 	case "up":
+	// 		wlk.Direction = "right"
+	// 	case "right":
+	// 		wlk.Direction = "down"
+	// 	case "down":
+	// 		wlk.Direction = "left"
+	// 	case "left":
+	// 		wlk.Direction = "up"
+	// 	}
+
+	switch prng.Sample(wlk.Seed, int64(wlk.stepCount), 3) {
+	case 1:
+		switch wlk.Direction {
+		case "up":
+			wlk.Direction = "right"
+		case "right":
+			wlk.Direction = "down"
+		case "down":
+			wlk.Direction = "left"
+		case "left":
+			wlk.Direction = "up"
+		}
+	case 2:
+		switch wlk.Direction {
+		case "up":
+			wlk.Direction = "left"
+		case "right":
+			wlk.Direction = "up"
+		case "down":
+			wlk.Direction = "right"
+		case "left":
+			wlk.Direction = "down"
+		}
+	case 3:
+		switch wlk.Direction {
+		case "up":
+			wlk.Direction = "down"
+		case "right":
+			wlk.Direction = "left"
+		case "down":
+			wlk.Direction = "up"
+		case "left":
+			wlk.Direction = "right"
+		}
+	}
+
 }
 
 func (wlk Walker) InBounds(ctx *canvas.Context) bool {
