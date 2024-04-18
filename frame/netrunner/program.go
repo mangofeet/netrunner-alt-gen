@@ -225,14 +225,19 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	var leftoverText string
 
-	i := 0
 	_, lastLineH := cText.Heights()
 
-	for lastLineH > cardTextBoxH {
+	log.Printf("lastLineH=%f, cardTextBoxH=%f", lastLineH, cardTextBoxH)
+
+	for lastLineH > cardTextBoxH*0.8 {
 		fontSizeCard -= strokeWidth
 		cText = getCardText(card.Attributes.Text, fontSizeCard, cardTextBoxW, cardTextBoxH)
+		_, lastLineH = cText.Heights()
+		log.Printf("lastLineH=%f, cardTextBoxH=%f", lastLineH, cardTextBoxH)
 	}
 
+	i := 0
+	_, lastLineH = cText.Heights()
 	for lastLineH > cardTextBoxCutoff {
 
 		i++
