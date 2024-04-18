@@ -30,7 +30,7 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	titleBoxTop := canvasHeight - (canvasHeight / 12)
 	titleBoxBottom := titleBoxTop - titleBoxHeight
-	titleBoxArcStart := canvasWidth - (canvasWidth / 2)
+	titleBoxArcStart := canvasWidth - (canvasWidth / 3)
 	titleBoxRight := canvasWidth - (canvasWidth / 16)
 	titleBoxArcCP1 := titleBoxRight - (canvasWidth / 48)
 
@@ -77,8 +77,8 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetStrokeWidth(10)
 
 	textBoxHeight := canvasHeight / 3
-	textBoxLeft := canvasWidth / 12
-	textBoxRight := canvasWidth - (canvasWidth / 18)
+	textBoxLeft := canvasWidth / 8
+	textBoxRight := canvasWidth - (canvasWidth / 12)
 	textBoxArcRadius := (canvasHeight / 32)
 	textBoxArc1StartY := textBoxHeight - textBoxArcRadius
 	textBoxArc1EndX := textBoxLeft + textBoxArcRadius
@@ -103,7 +103,7 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(10)
 
-	influenceHeight := textBoxHeight * 0.75
+	influenceHeight := textBoxHeight * 0.55
 	influenceWidth := canvasHeight / 48
 
 	influenceCost := 0
@@ -111,6 +111,21 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 		influenceCost = *card.Attributes.InfluenceCost
 	}
 	ctx.DrawPath(textBoxRight-(influenceWidth/2), 0, influence(influenceHeight, influenceWidth, influenceCost))
+
+	ctx.Pop()
+
+	// program strength
+	ctx.Push()
+
+	ctx.SetFillColor(factionColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(10)
+
+	ctx.MoveTo(0, canvasHeight/8)
+	ctx.CubeTo(canvasWidth/6, canvasHeight/4, canvasWidth/4, canvasHeight/12, canvasWidth/8, 0)
+	ctx.LineTo(0, 0)
+	ctx.Close()
+	ctx.FillStroke()
 
 	ctx.Pop()
 
