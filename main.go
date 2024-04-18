@@ -5,6 +5,7 @@ import (
 	"image/color"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/mangofeet/netrunner-alt-gen/art/netspace"
@@ -41,29 +42,51 @@ func main() {
 
 }
 
-func generateCard(cardName string, drawBleedLines bool) error {
-
+func getCardData(cardName string) (*nrdb.Printing, error) {
 	nrClient := nrdb.NewClient()
+
+	if printingID, err := strconv.Atoi(cardName); err == nil {
+		printing, err := nrClient.Printing(cardName)
+		if err != nil {
+			return nil, fmt.Errorf("no result for printing ID %d", printingID)
+		}
+		return printing, nil
+	}
 
 	cards, err := nrClient.Cards(&nrdb.CardFilter{
 		Search: &cardName,
 	})
 	if err != nil {
-		return fmt.Errorf("getting card data: %w", err)
+		return nil, fmt.Errorf("getting card data: %w", err)
+	}
+
+	if len(cards) == 0 {
+		return nil, fmt.Errorf("no results")
 	}
 
 	if len(cards) != 1 {
 		for _, card := range cards {
-			log.Printf("%s", card.Title())
+			log.Printf("%s - %s", card.Title(), card.LatestPrintingID())
 		}
-		return fmt.Errorf("mulitple results")
+		return nil, fmt.Errorf("mulitple results")
 	}
 
 	card := cards[0]
 
 	printing, err := nrClient.Printing(card.LatestPrintingID())
 	if err != nil {
-		return fmt.Errorf("getting latest printing data: %w", err)
+		return nil, fmt.Errorf("getting latest printing data: %w", err)
+	}
+
+	return printing, nil
+
+}
+
+func generateCard(cardName string, drawBleedLines bool) error {
+
+	printing, err := getCardData(cardName)
+	if err != nil {
+		return err
 	}
 
 	log.Printf("%s - %s", printing.Attributes.Title, printing.Attributes.Text)
