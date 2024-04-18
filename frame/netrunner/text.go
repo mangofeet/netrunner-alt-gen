@@ -1,6 +1,7 @@
 package netrunner
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/tdewolff/canvas"
@@ -63,13 +64,15 @@ func writeTextPart(rt *canvas.RichText, text string, regFace, boldFace, italicFa
 
 }
 
+var replacementCheck = regexp.MustCompile(`\[[a-z-]+\]`)
+
 func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
 
 	if strings.Contains(text, "[credit]") {
 		subParts := strings.Split(text, "[credit]")
 		rt.WriteFace(face, subParts[0])
 
-		rt.WritePath(mustLoadGameAsset("CREDIT").Scale(0.0025, 0.0025).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-0.8)), textColor, canvas.FontMiddle)
+		rt.WritePath(mustLoadGameAsset("CREDIT").Scale(face.Size*0.000025, face.Size*0.000025).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-0.8)), textColor, canvas.FontMiddle)
 		text = subParts[1]
 		if len(text) > 0 && text[0] != ' ' {
 			text = " " + text
@@ -80,7 +83,7 @@ func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
 		subParts := strings.Split(text, "[recurring-credit]")
 		rt.WriteFace(face, subParts[0])
 
-		rt.WritePath(mustLoadGameAsset("RECURRING_CREDIT").Scale(0.017, 0.017).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-0.8)), textColor, canvas.FontMiddle)
+		rt.WritePath(mustLoadGameAsset("RECURRING_CREDIT").Scale(face.Size*0.00014, face.Size*0.00014).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-0.8)), textColor, canvas.FontMiddle)
 		text = subParts[1]
 		if len(text) > 0 && text[0] != ' ' {
 			text = " " + text
@@ -91,7 +94,7 @@ func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
 		subParts := strings.Split(text, "[click]")
 		rt.WriteFace(face, subParts[0])
 
-		rt.WritePath(mustLoadGameAsset("CLICK").Scale(0.025, 0.025).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1)), textColor, canvas.FontMiddle)
+		rt.WritePath(mustLoadGameAsset("CLICK").Scale(face.Size*0.0002, face.Size*0.0002).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1)), textColor, canvas.FontMiddle)
 		text = subParts[1]
 		if len(text) > 0 && text[0] != ' ' {
 			text = " " + text
@@ -100,5 +103,37 @@ func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
 		text = " " + text
 	}
 
+	if strings.Contains(text, "[subroutine]") {
+		subParts := strings.Split(text, "[subroutine]")
+		rt.WriteFace(face, subParts[0])
+
+		rt.WritePath(mustLoadGameAsset("SUBROUTINE").Scale(face.Size*0.0002, face.Size*0.0002).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1)), textColor, canvas.FontMiddle)
+		text = subParts[1]
+		if len(text) > 0 && text[0] != ' ' {
+			text = " " + text
+		}
+		// always add a space for this icon
+		text = " " + text
+	}
+
+	if strings.Contains(text, "[trash-ability]") {
+		subParts := strings.Split(text, "[trash-ability]")
+		rt.WriteFace(face, subParts[0])
+
+		rt.WritePath(mustLoadGameAsset("TRASH_ABILITY").Scale(face.Size*0.0002, face.Size*0.0002).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1)), textColor, canvas.FontMiddle)
+		text = subParts[1]
+		if len(text) > 0 && text[0] != ' ' {
+			text = " " + text
+		}
+		// always add a space for this icon
+		text = " " + text
+	}
+
+	if replacementCheck.MatchString(text) {
+		writeChunk(rt, text, face)
+		return
+	}
+
 	rt.WriteFace(face, text)
+
 }
