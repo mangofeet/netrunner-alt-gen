@@ -71,7 +71,7 @@ func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
 
 		rt.WritePath(mustLoadGameAsset("CREDIT").Scale(0.0025, 0.0025).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-0.8)), textColor, canvas.FontMiddle)
 		text = subParts[1]
-		if text[0] != ' ' {
+		if len(text) > 0 && text[0] != ' ' {
 			text = " " + text
 		}
 	}
@@ -82,7 +82,7 @@ func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
 
 		rt.WritePath(mustLoadGameAsset("RECURRING_CREDIT").Scale(0.017, 0.017).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-0.8)), textColor, canvas.FontMiddle)
 		text = subParts[1]
-		if text[0] != ' ' {
+		if len(text) > 0 && text[0] != ' ' {
 			text = " " + text
 		}
 	}
@@ -93,7 +93,7 @@ func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
 
 		rt.WritePath(mustLoadGameAsset("CLICK").Scale(0.025, 0.025).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1)), textColor, canvas.FontMiddle)
 		text = subParts[1]
-		if text[0] != ' ' {
+		if len(text) > 0 && text[0] != ' ' {
 			text = " " + text
 		}
 	}
