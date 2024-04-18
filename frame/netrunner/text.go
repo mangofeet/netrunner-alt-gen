@@ -20,9 +20,7 @@ func getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64) *can
 	strongParts := strings.Split(text, "<strong>")
 	for _, p := range strongParts {
 		emParts := strings.Split(p, "<em>")
-		for _, p := range emParts {
-			parts = append(parts, p)
-		}
+		parts = append(parts, emParts...)
 	}
 
 	for _, part := range parts {
@@ -67,6 +65,17 @@ func writeTextPart(rt *canvas.RichText, text string, regFace, boldFace, italicFa
 var replacementCheck = regexp.MustCompile(`\[[a-z-]+\]`)
 
 func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
+
+	if strings.Contains(text, "[mu]") {
+		subParts := strings.Split(text, "[mu]")
+		rt.WriteFace(face, subParts[0])
+
+		rt.WritePath(mustLoadGameAsset("Mu").Scale(face.Size*0.0002, face.Size*0.0002).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-0.8)), textColor, canvas.FontMiddle)
+		text = subParts[1]
+		if len(text) > 0 && text[0] != ' ' {
+			text = " " + text
+		}
+	}
 
 	if strings.Contains(text, "[credit]") {
 		subParts := strings.Split(text, "[credit]")
@@ -116,8 +125,8 @@ func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
 		text = " " + text
 	}
 
-	if strings.Contains(text, "[trash-ability]") {
-		subParts := strings.Split(text, "[trash-ability]")
+	if strings.Contains(text, "[trash]") {
+		subParts := strings.Split(text, "[trash]")
 		rt.WriteFace(face, subParts[0])
 
 		rt.WritePath(mustLoadGameAsset("TRASH_ABILITY").Scale(face.Size*0.0002, face.Size*0.0002).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1)), textColor, canvas.FontMiddle)
