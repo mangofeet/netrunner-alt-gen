@@ -5,16 +5,15 @@ import (
 	"image/color"
 	"log"
 	"math"
-	"strings"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
 )
 
-type FrameProgram struct{}
+type FrameHardware struct{}
 
-func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
+func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	canvasWidth, canvasHeight := ctx.Size()
 
@@ -153,64 +152,12 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	ctx.Pop()
 
-	// program strength
-	ctx.Push()
-
-	ctx.SetFillColor(factionColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
-
-	ctx.DrawPath(0, 0, strength(canvasWidth, canvasHeight))
-
-	ctx.Pop()
-
-	// mu icon
-	muImage, err := loadGameAsset("Mu")
-	if err != nil {
-		return err
-	}
-	muImage = muImage.Transform(canvas.Identity.ReflectY()).Scale(0.05, 0.05)
-
-	ctx.Push()
-
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
-
-	muBoxX := costContainerStart + costContainerR*0.25
-	muBoxY := titleBoxBottom - (muImage.Bounds().H * 0.7)
-	muBoxW := muImage.Bounds().W + muImage.Bounds().W*0.35
-	muBoxH := muImage.Bounds().H + muImage.Bounds().H*0.45
-
-	boxPath := &canvas.Path{}
-
-	boxPath.MoveTo(0, 0)
-	boxPath.LineTo(muBoxW, 0)
-	boxPath.LineTo(muBoxW, -1*muBoxH)
-	boxPath.LineTo(0, -1*muBoxH)
-	boxPath.Close()
-
-	ctx.DrawPath(muBoxX, muBoxY, boxPath)
-
-	ctx.Pop()
-
-	ctx.Push()
-	ctx.SetFillColor(textColor)
-
-	muIconX := muBoxX
-	muIconY := muBoxY + (muImage.Bounds().H * 0.2)
-
-	ctx.DrawPath(muIconX, muIconY, muImage)
-
-	ctx.Pop()
-
 	// render card text
 
 	// not sure how these sizes actually correlate to the weird
 	// pixel/mm setup I'm using, but these work
 	fontSizeTitle := titleBoxHeight * 2
 	fontSizeCost := titleBoxHeight * 3
-	fontSizeStr := titleBoxHeight * 4
 	fontSizeCard := titleBoxHeight * 1.2
 
 	titleTextX := costContainerStart + (costContainerR * 2) + (costContainerR / 2)
@@ -226,30 +173,6 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			canvas.Center, canvas.Center, 0, 0))
 	}
 
-	strengthText := "-"
-	if card.Attributes.Strength != nil {
-		strengthText = fmt.Sprint(*card.Attributes.Strength)
-	}
-
-	strTextX := 0.0
-	strTextY := canvasHeight / 10
-	ctx.DrawText(strTextX, strTextY, canvas.NewTextBox(
-		getFont(fontSizeStr, canvas.FontBlack), strengthText,
-		canvasWidth/5, 0,
-		canvas.Center, canvas.Center, 0, 0))
-
-	muText := ""
-	if card.Attributes.MemoryCost != nil {
-		muText = fmt.Sprint(*card.Attributes.MemoryCost)
-	}
-
-	muTextX := muBoxX - muBoxW*0.08
-	muTextY := muBoxY
-	ctx.DrawText(muTextX, muTextY, canvas.NewTextBox(
-		getFont(fontSizeCard, canvas.FontBlack), muText,
-		muBoxW, muBoxH,
-		canvas.Center, canvas.Center, 0, 0))
-
 	cardTextPadding := canvasWidth * 0.02
 	cardTextX := textBoxLeft + cardTextPadding
 	cardTextY := textBoxHeight - cardTextPadding
@@ -259,7 +182,6 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	cardTextBoxH := textBoxHeight
 	typeTextBoxW := typeBoxRight - typeBoxLeft - (cardTextPadding * 2)
 	typeTextBoxH := typeBoxHeight
-	cardTextBoxCutoff := textBoxHeight * 0.45
 
 	var tText *canvas.Text
 
@@ -275,8 +197,6 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	cText := getCardText(card.Attributes.Text, fontSizeCard, cardTextBoxW, cardTextBoxH)
 
-	var leftoverText string
-
 	_, lastLineH := cText.Heights()
 
 	for lastLineH > cardTextBoxH*0.75 {
@@ -285,91 +205,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		_, lastLineH = cText.Heights()
 	}
 
-	i := 0
-	_, lastLineH = cText.Heights()
-	for lastLineH > cardTextBoxCutoff {
-
-		i++
-
-		lines := strings.Split(card.Attributes.Text, "\n")
-
-		leftoverText = strings.Join(lines[len(lines)-i:], "\n")
-		newText := strings.Join(lines[:len(lines)-i], "\n")
-
-		log.Printf("---new---\n%s\n\n---leftover---\n\n%s", newText, leftoverText)
-
-		cText = getCardText(newText, fontSizeCard, cardTextBoxW, cardTextBoxH)
-
-		_, lastLineH = cText.Heights()
-
-	}
-
 	ctx.DrawText(cardTextX, cardTextY, cText)
 
-	if leftoverText != "" {
-		newCardTextX := cardTextX + cardTextPadding*3
-		if !cText.Empty() {
-			cardTextY = cardTextY - (lastLineH + fontSizeCard*0.4)
-		}
-
-		cText := getCardText(leftoverText, fontSizeCard, cardTextBoxW-(newCardTextX-cardTextX)-cardTextBoxW*0.03, cardTextBoxH)
-		ctx.DrawText(newCardTextX, cardTextY, cText)
-	}
-
-	// test something
-
-	ctx.Push()
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
-
-	trashCost := mustLoadGameSVG("TRASH_COST bw")
-	trashCost.RenderViewTo(ctx, canvas.Identity.Translate(1000, 1000))
-	ctx.Pop()
-
 	return nil
-}
-
-func strength(canvasWidth, canvasHeight float64) *canvas.Path {
-	path := &canvas.Path{}
-
-	path.MoveTo(0, canvasHeight/8)
-	path.CubeTo(canvasWidth/6, canvasHeight/4, canvasWidth/4, canvasHeight/12, canvasWidth/8, 0)
-	path.LineTo(0, 0)
-	path.Close()
-
-	return path
-}
-
-func influence(height, width float64, pips int) *canvas.Path {
-
-	path := &canvas.Path{}
-
-	curveRadius := width / 2
-	curveStart := height - curveRadius
-
-	path.MoveTo(0, 0)
-	path.LineTo(0, curveStart)
-	path.CubeTo(0, height, width, height, width, curveStart)
-	path.LineTo(width, 0)
-	path.Close()
-
-	pipR := curveRadius * 0.6
-	pipX := width - ((width - (pipR * 2)) / 2)
-
-	for i := 0.0; i < 5; i += 1 {
-
-		pipY := height - (pipR * ((i + 1) * 4)) + (pipR / 2)
-
-		path.MoveTo(pipX, pipY)
-
-		if i >= 5-float64(pips) {
-			path.Arc(pipR, pipR, 0, 0, 360)
-		} else {
-			path.Arc(pipR, pipR, 0, 360, 0)
-		}
-	}
-
-	return path
-
 }

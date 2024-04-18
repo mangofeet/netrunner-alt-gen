@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/netrunner-alt-gen/art/netspace"
 	"github.com/mangofeet/netrunner-alt-gen/frame/netrunner"
 	"github.com/mangofeet/nrdb-go"
@@ -99,15 +100,18 @@ func generateCard(cardName string, drawBleedLines bool) error {
 		return err
 	}
 
+	var framer art.Drawer
 	switch printing.Attributes.CardTypeID {
 	case "program":
-		if err := netrunner.DrawFrameProgram(ctx, printing); err != nil {
-			return err
-		}
+		framer = netrunner.FrameProgram{}
 	case "resource":
-		if err := netrunner.DrawFrameResource(ctx, printing); err != nil {
-			return err
-		}
+		framer = netrunner.FrameResource{}
+	case "hardware":
+		framer = netrunner.FrameHardware{}
+	}
+
+	if err := framer.Draw(ctx, printing); err != nil {
+		return err
 	}
 
 	if drawBleedLines {

@@ -11,7 +11,9 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
-func DrawFrameResource(ctx *canvas.Context, card *nrdb.Printing) error {
+type FrameResource struct{}
+
+func (FrameResource) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	canvasWidth, canvasHeight := ctx.Size()
 

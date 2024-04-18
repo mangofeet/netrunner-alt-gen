@@ -106,6 +106,8 @@ func getTypeName(typeID string) string {
 		return "Program"
 	case "resource":
 		return "Resource"
+	case "hardware":
+		return "Hardware"
 	}
 
 	return typeID
