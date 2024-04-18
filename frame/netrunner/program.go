@@ -207,7 +207,7 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 	cardTextBoxH := textBoxHeight
 	typeTextBoxW := typeBoxRight - typeBoxLeft - (cardTextPadding * 2)
 	typeTextBoxH := typeBoxHeight
-	cardTextBoxCutoff := textBoxHeight / 2
+	cardTextBoxCutoff := textBoxHeight * 0.45
 
 	var tText *canvas.Text
 
@@ -227,13 +227,10 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	_, lastLineH := cText.Heights()
 
-	log.Printf("lastLineH=%f, cardTextBoxH=%f", lastLineH, cardTextBoxH)
-
 	for lastLineH > cardTextBoxH*0.8 {
 		fontSizeCard -= strokeWidth
 		cText = getCardText(card.Attributes.Text, fontSizeCard, cardTextBoxW, cardTextBoxH)
 		_, lastLineH = cText.Heights()
-		log.Printf("lastLineH=%f, cardTextBoxH=%f", lastLineH, cardTextBoxH)
 	}
 
 	i := 0
@@ -261,7 +258,7 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 		newCardTextX := cardTextX + cardTextPadding*3
 		cardTextY := cardTextY - (lastLineH + fontSizeCard*0.4)
 
-		cText := getCardText(leftoverText, fontSizeCard, cardTextBoxW-(newCardTextX-cardTextX), cardTextBoxH)
+		cText := getCardText(leftoverText, fontSizeCard, cardTextBoxW-(newCardTextX-cardTextX)-cardTextBoxW*0.03, cardTextBoxH)
 		ctx.DrawText(newCardTextX, cardTextY, cText)
 	}
 
