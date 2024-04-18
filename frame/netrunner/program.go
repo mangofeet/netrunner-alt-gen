@@ -128,7 +128,7 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 
-	typeBoxHeight := textBoxHeight * 0.15
+	typeBoxHeight := textBoxHeight * 0.17
 	typeBoxBottom := textBoxHeight + strokeWidth*0.5
 	typeBoxLeft := textBoxLeft
 	typeBoxRight := canvasWidth - (canvasWidth / 6)
