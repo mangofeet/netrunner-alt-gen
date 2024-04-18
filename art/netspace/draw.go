@@ -69,7 +69,7 @@ func Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		var strokeWidth = 0.3
 
 		if float64(i) < nGrid {
-			colorFactor = -1 * int64(math.Abs(float64(colorFactor)))
+			colorFactor = -2 * int64(math.Abs(float64(colorFactor)))
 			grid = true
 			strokeWidth = 1.5
 		} else {
