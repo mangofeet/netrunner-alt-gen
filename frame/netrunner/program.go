@@ -227,7 +227,7 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	_, lastLineH := cText.Heights()
 
-	for lastLineH > cardTextBoxH*0.8 {
+	for lastLineH > cardTextBoxH*0.75 {
 		fontSizeCard -= strokeWidth
 		cText = getCardText(card.Attributes.Text, fontSizeCard, cardTextBoxW, cardTextBoxH)
 		_, lastLineH = cText.Heights()
