@@ -67,7 +67,6 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.Pop()
 
 	// outline for cost circle
-
 	ctx.Push()
 	ctx.SetFillColor(transparent)
 	ctx.SetStrokeColor(textColor)
@@ -77,7 +76,6 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.Pop()
 
 	// bottom text box
-
 	ctx.Push()
 	ctx.SetFillColor(bgColor)
 	ctx.SetStrokeColor(textColor)
@@ -164,6 +162,46 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	ctx.Pop()
 
+	// mu icon
+	muImage, err := loadGameAsset("Mu")
+	if err != nil {
+		return err
+	}
+	muImage = muImage.Transform(canvas.Identity.ReflectY()).Scale(0.05, 0.05)
+
+	ctx.Push()
+
+	ctx.SetFillColor(bgColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
+
+	muBoxX := costContainerStart + costContainerR*0.25
+	muBoxY := titleBoxBottom - (muImage.Bounds().H * 0.7)
+	muBoxW := muImage.Bounds().W + muImage.Bounds().W*0.35
+	muBoxH := muImage.Bounds().H + muImage.Bounds().H*0.45
+
+	boxPath := &canvas.Path{}
+
+	boxPath.MoveTo(0, 0)
+	boxPath.LineTo(muBoxW, 0)
+	boxPath.LineTo(muBoxW, -1*muBoxH)
+	boxPath.LineTo(0, -1*muBoxH)
+	boxPath.Close()
+
+	ctx.DrawPath(muBoxX, muBoxY, boxPath)
+
+	ctx.Pop()
+
+	ctx.Push()
+	ctx.SetFillColor(textColor)
+
+	muIconX := muBoxX
+	muIconY := muBoxY + (muImage.Bounds().H * 0.2)
+
+	ctx.DrawPath(muIconX, muIconY, muImage)
+
+	ctx.Pop()
+
 	// render card text
 
 	// not sure how these sizes actually correlate to the weird
@@ -196,6 +234,18 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.DrawText(strTextX, strTextY, canvas.NewTextBox(
 		getFont(fontSizeStr, canvas.FontBlack), strengthText,
 		canvasWidth/5, 0,
+		canvas.Center, canvas.Center, 0, 0))
+
+	muText := ""
+	if card.Attributes.MemoryCost != nil {
+		muText = fmt.Sprint(*card.Attributes.MemoryCost)
+	}
+
+	muTextX := muBoxX - muBoxW*0.08
+	muTextY := muBoxY
+	ctx.DrawText(muTextX, muTextY, canvas.NewTextBox(
+		getFont(fontSizeCard, canvas.FontBlack), muText,
+		muBoxW, muBoxH,
 		canvas.Center, canvas.Center, 0, 0))
 
 	cardTextPadding := canvasWidth * 0.02
@@ -263,36 +313,6 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 	}
 
 	return nil
-}
-
-func getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64) *canvas.Text {
-
-	regFace := getFont(fontSize, canvas.FontRegular)
-	boldFace := getFont(fontSize, canvas.FontBold)
-
-	rt := canvas.NewRichText(regFace)
-
-	strongParts := strings.Split(text, "<strong>")
-
-	for _, part := range strongParts {
-
-		if strings.Contains(part, "</strong>") {
-			subParts := strings.Split(part, "</strong>")
-			rt.WriteFace(boldFace, subParts[0])
-			part = subParts[1]
-
-		}
-
-		part = strings.ReplaceAll(part, "\n", "\n\n")
-
-		rt.WriteFace(regFace, part)
-	}
-
-	return rt.ToText(
-		cardTextBoxW, cardTextBoxH,
-		canvas.Left, canvas.Top,
-		0, 0)
-
 }
 
 func strength(canvasWidth, canvasHeight float64) *canvas.Path {
