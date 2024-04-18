@@ -64,79 +64,32 @@ func writeTextPart(rt *canvas.RichText, text string, regFace, boldFace, italicFa
 
 var replacementCheck = regexp.MustCompile(`\[[a-z-]+\]`)
 
+func replaceSymbol(rt *canvas.RichText, symbol, svgName, text string, face *canvas.FontFace, scaleFactor, translateFactor float64) string {
+	if strings.Contains(text, symbol) {
+		subParts := strings.Split(text, symbol)
+		rt.WriteFace(face, subParts[0])
+
+		path := mustLoadGameAsset(svgName).Scale(face.Size*scaleFactor, face.Size*scaleFactor).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1*translateFactor))
+
+		rt.WritePath(path, textColor, canvas.FontMiddle)
+		text = subParts[1]
+		if len(text) == 0 || (text[0] != ' ' && text[0] != ',') {
+			text = " " + text
+		}
+	}
+
+	return text
+
+}
+
 func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
 
-	if strings.Contains(text, "[mu]") {
-		subParts := strings.Split(text, "[mu]")
-		rt.WriteFace(face, subParts[0])
-
-		rt.WritePath(mustLoadGameAsset("Mu").Scale(face.Size*0.0002, face.Size*0.0002).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-0.8)), textColor, canvas.FontMiddle)
-		text = subParts[1]
-		if len(text) > 0 && text[0] != ' ' {
-			text = " " + text
-		}
-	}
-
-	if strings.Contains(text, "[credit]") {
-		subParts := strings.Split(text, "[credit]")
-		rt.WriteFace(face, subParts[0])
-
-		rt.WritePath(mustLoadGameAsset("CREDIT").Scale(face.Size*0.000025, face.Size*0.000025).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-0.8)), textColor, canvas.FontMiddle)
-		text = subParts[1]
-		if len(text) > 0 && text[0] != ' ' {
-			text = " " + text
-		}
-	}
-
-	if strings.Contains(text, "[recurring-credit]") {
-		subParts := strings.Split(text, "[recurring-credit]")
-		rt.WriteFace(face, subParts[0])
-
-		rt.WritePath(mustLoadGameAsset("RECURRING_CREDIT").Scale(face.Size*0.00014, face.Size*0.00014).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-0.8)), textColor, canvas.FontMiddle)
-		text = subParts[1]
-		if len(text) > 0 && text[0] != ' ' {
-			text = " " + text
-		}
-	}
-
-	if strings.Contains(text, "[click]") {
-		subParts := strings.Split(text, "[click]")
-		rt.WriteFace(face, subParts[0])
-
-		rt.WritePath(mustLoadGameAsset("CLICK").Scale(face.Size*0.0002, face.Size*0.0002).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1)), textColor, canvas.FontMiddle)
-		text = subParts[1]
-		if len(text) > 0 && text[0] != ' ' {
-			text = " " + text
-		}
-		// always add a space for this icon
-		text = " " + text
-	}
-
-	if strings.Contains(text, "[subroutine]") {
-		subParts := strings.Split(text, "[subroutine]")
-		rt.WriteFace(face, subParts[0])
-
-		rt.WritePath(mustLoadGameAsset("SUBROUTINE").Scale(face.Size*0.0002, face.Size*0.0002).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1)), textColor, canvas.FontMiddle)
-		text = subParts[1]
-		if len(text) > 0 && text[0] != ' ' {
-			text = " " + text
-		}
-		// always add a space for this icon
-		text = " " + text
-	}
-
-	if strings.Contains(text, "[trash]") {
-		subParts := strings.Split(text, "[trash]")
-		rt.WriteFace(face, subParts[0])
-
-		rt.WritePath(mustLoadGameAsset("TRASH_ABILITY").Scale(face.Size*0.0002, face.Size*0.0002).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1)), textColor, canvas.FontMiddle)
-		text = subParts[1]
-		if len(text) > 0 && text[0] != ' ' {
-			text = " " + text
-		}
-		// always add a space for this icon
-		text = " " + text
-	}
+	text = replaceSymbol(rt, "[mu]", "Mu", text, face, 0.0002, 0.8)
+	text = replaceSymbol(rt, "[credit]", "CREDIT", text, face, 0.000025, 0.8)
+	text = replaceSymbol(rt, "[recurring-credit]", "RECURRING_CREDIT", text, face, 0.00014, 0.8)
+	text = replaceSymbol(rt, "[click]", "CLICK", text, face, 0.0002, 1)
+	text = replaceSymbol(rt, "[subroutine]", "SUBROUTINE", text, face, 0.0002, 1)
+	text = replaceSymbol(rt, "[trash]", "TRASH_ABILITY", text, face, 0.0002, 1)
 
 	if replacementCheck.MatchString(text) {
 		writeChunk(rt, text, face)
