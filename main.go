@@ -85,15 +85,17 @@ func generateCard(cardName string, drawBleedLines bool) error {
 		marginX := (canvasWidth - cardWidth) / 2
 		marginY := (canvasHeight - cardHeight) / 2
 
+		dash := canvasHeight * 0.0021
+
 		ctx.Push()
 		ctx.SetStrokeColor(color.White)
-		ctx.SetStrokeWidth(5)
+		ctx.SetStrokeWidth(dash / 2)
 		ctx.MoveTo(marginX, marginY)
 		ctx.LineTo(marginX, marginY+cardHeight)
 		ctx.LineTo(marginX+cardWidth, marginY+cardHeight)
 		ctx.LineTo(marginX+cardWidth, marginY)
 		ctx.Close()
-		ctx.SetDashes(0, 10, 20)
+		ctx.SetDashes(0, dash, dash*2)
 		ctx.Stroke()
 		ctx.Pop()
 
