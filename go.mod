@@ -6,7 +6,7 @@ toolchain go1.22.2
 
 require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
-	github.com/mangofeet/nrdb-go v0.1.0
+	github.com/mangofeet/nrdb-go v0.1.1
 	github.com/ojrac/opensimplex-go v1.0.2
 	github.com/tdewolff/canvas v0.0.0-20240416135154-b731d221d135
 	golang.org/x/image v0.15.0
