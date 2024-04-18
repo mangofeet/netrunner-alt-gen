@@ -99,8 +99,15 @@ func generateCard(cardName string, drawBleedLines bool) error {
 		return err
 	}
 
-	if err := netrunner.DrawFrameProgram(ctx, printing); err != nil {
-		return err
+	switch printing.Attributes.CardTypeID {
+	case "program":
+		if err := netrunner.DrawFrameProgram(ctx, printing); err != nil {
+			return err
+		}
+	case "resource":
+		if err := netrunner.DrawFrameResource(ctx, printing); err != nil {
+			return err
+		}
 	}
 
 	if drawBleedLines {

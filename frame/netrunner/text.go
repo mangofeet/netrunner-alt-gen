@@ -99,3 +99,14 @@ func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
 	rt.WriteFace(face, text)
 
 }
+
+func getTypeName(typeID string) string {
+	switch typeID {
+	case "program":
+		return "Program"
+	case "resource":
+		return "Resource"
+	}
+
+	return typeID
+}
