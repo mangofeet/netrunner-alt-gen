@@ -96,6 +96,8 @@ func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
 		if len(text) > 0 && text[0] != ' ' {
 			text = " " + text
 		}
+		// always add a space for this icon
+		text = " " + text
 	}
 
 	rt.WriteFace(face, text)
