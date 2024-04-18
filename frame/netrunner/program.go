@@ -213,9 +213,10 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	fontSizeStr := titleBoxHeight * 4
 	fontSizeCard := titleBoxHeight * 1.2
 
-	titleTextX := costContainerStart + (costContainerR * 2) + (costContainerR / 2)
-	titleTextY := titleBoxBottom + (titleBoxHeight / 4)
-	ctx.DrawText(titleTextX, titleTextY, canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), card.Attributes.Title, canvas.Left))
+	titleTextX := costContainerStart + (costContainerR * 2) + (costContainerR / 3)
+	titleTextY := titleBoxTop - titleBoxHeight*0.1
+	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitleText(card), fontSizeTitle, titleBoxRight, titleBoxHeight))
+	// ctx.DrawText(titleTextX, titleTextY, canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
 
 	if card.Attributes.Cost != nil {
 		costTextX := costContainerStart

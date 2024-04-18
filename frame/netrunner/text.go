@@ -1,9 +1,11 @@
 package netrunner
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
+	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
 )
 
@@ -29,6 +31,13 @@ func getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64) *can
 			subParts := strings.Split(part, "→")
 			writeTextPart(rt, subParts[0], regFace, boldFace, italicFace)
 			rt.WriteFace(arrowFace, "→")
+			part = subParts[1]
+		}
+
+		if strings.Contains(part, "♦") {
+			subParts := strings.Split(part, "♦")
+			writeTextPart(rt, subParts[0], regFace, boldFace, italicFace)
+			rt.WriteFace(arrowFace, "♦")
 			part = subParts[1]
 		}
 
@@ -111,4 +120,13 @@ func getTypeName(typeID string) string {
 	}
 
 	return typeID
+}
+
+func getTitleText(card *nrdb.Printing) string {
+
+	if !card.Attributes.IsUnique {
+		return card.Attributes.Title
+	}
+
+	return fmt.Sprintf("♦ %s", card.Attributes.Title)
 }
