@@ -306,7 +306,9 @@ func DrawFrameProgram(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	if leftoverText != "" {
 		newCardTextX := cardTextX + cardTextPadding*3
-		cardTextY := cardTextY - (lastLineH + fontSizeCard*0.4)
+		if !cText.Empty() {
+			cardTextY = cardTextY - (lastLineH + fontSizeCard*0.4)
+		}
 
 		cText := getCardText(leftoverText, fontSizeCard, cardTextBoxW-(newCardTextX-cardTextX)-cardTextBoxW*0.03, cardTextBoxH)
 		ctx.DrawText(newCardTextX, cardTextY, cText)
