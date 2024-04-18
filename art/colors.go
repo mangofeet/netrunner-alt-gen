@@ -56,9 +56,9 @@ func GetFactionBaseColor(factionID string) color.RGBA {
 	}
 
 	return color.RGBA{
-		R: 0xee,
-		G: 0xee,
-		B: 0xee,
+		R: 0xaa,
+		G: 0xaa,
+		B: 0xaa,
 		A: 0xff,
 	}
 
