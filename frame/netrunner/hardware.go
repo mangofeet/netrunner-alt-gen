@@ -174,7 +174,7 @@ func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			canvas.Center, canvas.Center, 0, 0))
 	}
 
-	if err := drawCardText(ctx, card, fontSizeCard, canvasHeight, 0, textBoxDimensions{
+	drawCardText(ctx, card, fontSizeCard, canvasHeight, 0, textBoxDimensions{
 		left:   textBoxLeft,
 		right:  textBoxRight,
 		height: textBoxHeight,
@@ -183,9 +183,7 @@ func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		right:  typeBoxRight,
 		height: typeBoxHeight,
 		bottom: typeBoxBottom,
-	}); err != nil {
-		return err
-	}
+	})
 
 	return nil
 

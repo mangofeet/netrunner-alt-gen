@@ -135,7 +135,7 @@ type textBoxDimensions struct {
 	left, right, height, bottom, top float64
 }
 
-func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCutoff, indent float64, box, typeBox textBoxDimensions) error {
+func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCutoff, indent float64, box, typeBox textBoxDimensions) {
 
 	canvasWidth, canvasHeight := ctx.Size()
 	strokeWidth := canvasHeight * 0.0023
@@ -203,5 +203,4 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 		ctx.DrawText(newCardTextX, cardTextY, cText)
 	}
 
-	return nil
 }
