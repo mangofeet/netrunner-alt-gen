@@ -36,7 +36,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	titleBoxArcCP1 := titleBoxRight - (canvasWidth / 48)
 
 	costContainerR := getCostContainerRadius(ctx)
-	costContainerStart := costContainerR
+	costContainerStart := getCostContainerStart(ctx)
 
 	titlePath := &canvas.Path{}
 	titlePath.MoveTo(0, titleBoxTop)

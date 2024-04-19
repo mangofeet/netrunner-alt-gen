@@ -32,7 +32,7 @@ func (FrameResource) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetStrokeWidth(strokeWidth)
 
 	costContainerR := getCostContainerRadius(ctx)
-	costContainerStart := costContainerR
+	costContainerStart := getCostContainerStart(ctx)
 
 	titleBoxHeight := getTitleBoxHeight(ctx)
 

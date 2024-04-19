@@ -26,6 +26,10 @@ func getCostContainerRadius(ctx *canvas.Context) float64 {
 	return getTitleBoxHeight(ctx) * 0.667
 }
 
+func getCostContainerStart(ctx *canvas.Context) float64 {
+	return getCostContainerRadius(ctx) * 1.3
+}
+
 func getTextBoxHeight(ctx *canvas.Context) float64 {
 	_, canvasHeight := ctx.Size()
 	return (canvasHeight / 3)
@@ -35,6 +39,7 @@ func drawCostCircle(ctx *canvas.Context, bgColor color.Color) {
 
 	strokeWidth := getStrokeWidth(ctx)
 	costContainerR := getCostContainerRadius(ctx)
+	costContainerStart := getCostContainerStart(ctx)
 	titleBoxHeight := getTitleBoxHeight(ctx)
 	titleBoxTop := getTitleBoxTop(ctx)
 
@@ -44,7 +49,7 @@ func drawCostCircle(ctx *canvas.Context, bgColor color.Color) {
 	ctx.SetStrokeWidth(strokeWidth)
 
 	path := canvas.Circle(costContainerR)
-	ctx.DrawPath(costContainerR+(costContainerR), titleBoxTop-(titleBoxHeight*0.5), path)
+	ctx.DrawPath(costContainerStart+(costContainerR), titleBoxTop-(titleBoxHeight*0.5), path)
 
 	ctx.Pop()
 
