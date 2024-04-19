@@ -16,23 +16,25 @@ import (
 	"github.com/tdewolff/canvas/renderers"
 )
 
-// sizes in pixels, this is ~1200 DPI
-
 // old values
+
 // const canvasWidth = 3288.0
 // const canvasHeight = 4488.0
 // const cardWidth = 3064.0
 // const cardHeight = 4212.0
 
 // based on NSG pdf sizes
+
 const canvasWidth = 3199.0
 const canvasHeight = 4432.0
 const cardWidth = 2975.0
 const cardHeight = 4156.0
 
+// real card MM, doesn't work currently, need higehr res for
+// generation
+
 // const canvasWidth = 69.35
 // const canvasHeight = 94.35
-
 // const cardWidth = 63.0
 // const cardHeight = 88.0
 
