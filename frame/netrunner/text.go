@@ -77,13 +77,13 @@ var replacementCheck = regexp.MustCompile(`\[[a-z-]+\]`)
 func replaceSymbol(rt *canvas.RichText, symbol, svgName, text string, face *canvas.FontFace, scaleFactor, translateFactor float64) string {
 	if strings.Contains(text, symbol) {
 		subParts := strings.Split(text, symbol)
-		rt.WriteFace(face, subParts[0])
+		writeChunk(rt, subParts[0], face)
 
 		path := mustLoadGameAsset(svgName).Scale(face.Size*scaleFactor, face.Size*scaleFactor).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1*translateFactor))
 
 		rt.WritePath(path, textColor, canvas.FontMiddle)
 		text = subParts[1]
-		if len(text) == 0 || (text[0] != ' ' && text[0] != ',') {
+		if len(text) == 0 || (text[0] != ' ' && text[0] != ',' && text[0] != '.') {
 			text = " " + text
 		}
 	}
