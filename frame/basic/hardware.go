@@ -41,8 +41,8 @@ func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	titleBoxTop := getTitleBoxTop(ctx)
 	titleBoxBottom := titleBoxTop - titleBoxHeight
-	titleBoxLeftOut := costContainerR * 3.25
-	titleBoxLeftIn := costContainerR * 3.75
+	titleBoxLeftOut := costContainerStart + costContainerR*2.5
+	titleBoxLeftIn := titleBoxLeftOut + costContainerR*0.5
 
 	titlePath := &canvas.Path{}
 	titlePath.MoveTo(titleBoxLeftIn, titleBoxTop)
@@ -129,7 +129,7 @@ func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	titleTextX := titleBoxLeftIn + costContainerR*0.25
 	if card.Attributes.IsUnique { // unique diamon fits better in the angled end here
-		titleTextX = costContainerStart + (costContainerR * 2) + (costContainerR / 3)
+		titleTextX = titleBoxLeftIn - costContainerR*0.25
 	}
 
 	titleTextY := titleBoxTop - titleBoxHeight*0.1
