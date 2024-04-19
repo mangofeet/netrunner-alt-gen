@@ -55,6 +55,8 @@ func Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	nGrid := math.Max(float64(numWalkers)*0.01, float64(prng.Next(seed, int64(float64(numWalkers)*0.02))))
 
+	dirChangeStep := 30.0
+
 	for i := 0; i < numWalkers; i++ {
 
 		colorFactor := prng.Next(seed, 128) - 64
@@ -68,6 +70,7 @@ func Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			grid = true
 			strokeWidth = 1.5
 		} else {
+
 			dirSeed := prng.Next(seed, 4)
 
 			if dirSeed <= 1 {
@@ -82,14 +85,15 @@ func Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		}
 
 		wlk := art.Walker{
-			Seed:              seed,
-			Sequence:          i,
-			Direction:         direction,
-			DirectionVariance: prng.Next(seed, 4),
-			X:                 float64(startX),
-			Y:                 float64(startY),
-			Vx:                (float64(prng.Next(seed, 100)) / 100) - 0.5,
-			Vy:                (float64(prng.Next(seed, 100)) / 100) - 0.5,
+			Seed:                seed,
+			Sequence:            i,
+			Direction:           direction,
+			DirectionVariance:   prng.Next(seed, 4),
+			DirectionChangeStep: dirChangeStep,
+			X:                   float64(startX),
+			Y:                   float64(startY),
+			Vx:                  (float64(prng.Next(seed, 100)) / 100) - 0.5,
+			Vy:                  (float64(prng.Next(seed, 100)) / 100) - 0.5,
 			Color: color.RGBA{
 				R: uint8(math.Max(0, math.Min(float64(int64(baseColor.R)+colorFactor), 255))),
 				G: uint8(math.Max(0, math.Min(float64(int64(baseColor.G)+colorFactor), 255))),

@@ -18,18 +18,18 @@ type point struct {
 }
 
 type Walker struct {
-	Seed              string
-	Sequence          int
-	Direction         string
-	DirectionVariance int64
-	X, Y, Vx, Vy      float64
-	Color             color.Color
-	Noise             opensimplex.Noise
-	Grid              bool
-	StrokeWidth       float64
-	stepCount         int
-	dirChangeStep     float64
-	prev              *point
+	Seed                string
+	Sequence            int
+	Direction           string
+	DirectionVariance   int64
+	X, Y, Vx, Vy        float64
+	Color               color.Color
+	Noise               opensimplex.Noise
+	Grid                bool
+	StrokeWidth         float64
+	stepCount           int
+	DirectionChangeStep float64
+	prev                *point
 }
 
 func (wlk Walker) String() string {
@@ -115,15 +115,20 @@ func (wlk *Walker) maybeChangeDirection() {
 		return
 	}
 
-	if wlk.dirChangeStep == 0 {
-		wlk.dirChangeStep = 30
-	}
-
-	if wlk.stepCount%int(wlk.dirChangeStep*(math.Ceil(float64(wlk.stepCount)/wlk.dirChangeStep))) != 0 {
+	// if no variance, just return here
+	if wlk.DirectionVariance == 0 {
 		return
 	}
 
-	wlk.dirChangeStep *= 3
+	if wlk.DirectionChangeStep == 0 {
+		wlk.DirectionChangeStep = 30
+	}
+
+	if wlk.stepCount%int(wlk.DirectionChangeStep) != 0 {
+		return
+	}
+
+	wlk.DirectionChangeStep *= 3
 
 	// 	switch wlk.Direction {
 	// 	case "up":
