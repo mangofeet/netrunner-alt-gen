@@ -129,8 +129,10 @@ func generateCard(cardName string, drawBleedLines bool) error {
 		framer = netrunner.FrameEvent{}
 	}
 
-	if err := framer.Draw(ctx, printing); err != nil {
-		return err
+	if framer != nil {
+		if err := framer.Draw(ctx, printing); err != nil {
+			return err
+		}
 	}
 
 	if drawBleedLines {
