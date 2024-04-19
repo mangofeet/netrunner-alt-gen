@@ -43,7 +43,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	// background for cost, top
 	titlePath.LineTo(costContainerStart, titleBoxTop)
-	titlePath.QuadTo(costContainerStart+costContainerR, titleBoxTop+(costContainerR*0.8), costContainerStart+(costContainerR*2), titleBoxTop)
+	titlePath.QuadTo(costContainerStart+costContainerR, titleBoxTop+(costContainerR), costContainerStart+(costContainerR*2), titleBoxTop)
 
 	// arc down on right side
 	titlePath.LineTo(titleBoxArcStart, titleBoxTop)
@@ -51,7 +51,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	// background for cost, bottom
 	titlePath.LineTo(costContainerStart+(costContainerR*2), titleBoxBottom)
-	titlePath.QuadTo(costContainerStart+costContainerR, titleBoxBottom-(costContainerR*0.8), costContainerStart, titleBoxBottom)
+	titlePath.QuadTo(costContainerStart+costContainerR, titleBoxBottom-(costContainerR), costContainerStart, titleBoxBottom)
 
 	// finish title box
 	titlePath.LineTo(0, titleBoxBottom)
@@ -149,7 +149,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetStrokeWidth(strokeWidth)
 
 	muBoxX := costContainerStart + costContainerR*0.25
-	muBoxY := titleBoxBottom - (muImage.Bounds().H * 0.7)
+	muBoxY := titleBoxBottom - (muImage.Bounds().H * 0.8)
 	muBoxW := muImage.Bounds().W + muImage.Bounds().W*0.35
 	muBoxH := muImage.Bounds().H + muImage.Bounds().H*0.45
 
