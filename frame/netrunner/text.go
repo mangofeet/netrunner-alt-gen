@@ -118,6 +118,8 @@ func getTypeName(typeID string) string {
 		return "Resource"
 	case "hardware":
 		return "Hardware"
+	case "event":
+		return "Event"
 	}
 
 	return typeID

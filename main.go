@@ -117,6 +117,7 @@ func generateCard(cardName string, drawBleedLines bool) error {
 	}
 
 	var framer art.Drawer
+	log.Println("card type:", printing.Attributes.CardTypeID)
 	switch printing.Attributes.CardTypeID {
 	case "program":
 		framer = netrunner.FrameProgram{}
@@ -124,6 +125,8 @@ func generateCard(cardName string, drawBleedLines bool) error {
 		framer = netrunner.FrameResource{}
 	case "hardware":
 		framer = netrunner.FrameHardware{}
+	case "event":
+		framer = netrunner.FrameEvent{}
 	}
 
 	if err := framer.Draw(ctx, printing); err != nil {
