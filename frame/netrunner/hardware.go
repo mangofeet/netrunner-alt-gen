@@ -174,39 +174,19 @@ func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			canvas.Center, canvas.Center, 0, 0))
 	}
 
-	cardTextPadding := canvasWidth * 0.02
-	cardTextX := textBoxLeft + cardTextPadding
-	cardTextY := textBoxHeight - cardTextPadding
-	typeTextX := cardTextX
-	typeTextY := typeBoxBottom + typeBoxHeight - cardTextPadding
-	cardTextBoxW := textBoxRight - textBoxLeft - (cardTextPadding * 2)
-	cardTextBoxH := textBoxHeight
-	typeTextBoxW := typeBoxRight - typeBoxLeft - (cardTextPadding * 2)
-	typeTextBoxH := typeBoxHeight
-
-	var tText *canvas.Text
-
-	typeName := getTypeName(card.Attributes.CardTypeID)
-
-	if card.Attributes.DisplaySubtypes != nil {
-		tText = getCardText(fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSizeCard, typeTextBoxW, typeTextBoxH)
-	} else {
-		tText = getCardText(fmt.Sprintf("<strong>%s</strong>", typeName), fontSizeCard, typeTextBoxW, typeTextBoxH)
+	if err := drawCardText(ctx, card, fontSizeCard, canvasHeight, 0, textBoxDimensions{
+		left:   textBoxLeft,
+		right:  textBoxRight,
+		height: textBoxHeight,
+	}, textBoxDimensions{
+		left:   typeBoxLeft,
+		right:  typeBoxRight,
+		height: typeBoxHeight,
+		bottom: typeBoxBottom,
+	}); err != nil {
+		return err
 	}
-
-	ctx.DrawText(typeTextX, typeTextY, tText)
-
-	cText := getCardText(card.Attributes.Text, fontSizeCard, cardTextBoxW, cardTextBoxH)
-
-	_, lastLineH := cText.Heights()
-
-	for lastLineH > cardTextBoxH*0.75 {
-		fontSizeCard -= strokeWidth
-		cText = getCardText(card.Attributes.Text, fontSizeCard, cardTextBoxW, cardTextBoxH)
-		_, lastLineH = cText.Heights()
-	}
-
-	ctx.DrawText(cardTextX, cardTextY, cText)
 
 	return nil
+
 }

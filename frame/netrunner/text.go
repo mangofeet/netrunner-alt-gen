@@ -2,6 +2,7 @@ package netrunner
 
 import (
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 
@@ -129,4 +130,81 @@ func getTitleText(card *nrdb.Printing) string {
 	}
 
 	return fmt.Sprintf("♦ %s", card.Attributes.Title)
+}
+
+type textBoxDimensions struct {
+	left, right, height, bottom, top float64
+}
+
+func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCutoff, indent float64, box, typeBox textBoxDimensions) error {
+
+	canvasWidth, canvasHeight := ctx.Size()
+	strokeWidth := canvasHeight * 0.0023
+
+	cardTextPadding := canvasWidth * 0.02
+	cardTextX := box.left + cardTextPadding
+	cardTextY := box.height - cardTextPadding
+	typeTextX := cardTextX
+	typeTextY := typeBox.bottom + typeBox.height - cardTextPadding
+	cardTextBoxW := box.right - box.left - (cardTextPadding * 2.5)
+	cardTextBoxH := box.height
+	typeTextBoxW := typeBox.right - typeBox.left - (cardTextPadding * 2)
+	typeTextBoxH := typeBox.height
+
+	var tText *canvas.Text
+
+	typeName := getTypeName(card.Attributes.CardTypeID)
+
+	if card.Attributes.DisplaySubtypes != nil {
+		tText = getCardText(fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSize, typeTextBoxW, typeTextBoxH)
+	} else {
+		tText = getCardText(fmt.Sprintf("<strong>%s</strong>", typeName), fontSize, typeTextBoxW, typeTextBoxH)
+	}
+
+	ctx.DrawText(typeTextX, typeTextY, tText)
+
+	cText := getCardText(card.Attributes.Text, fontSize, cardTextBoxW, cardTextBoxH)
+
+	var leftoverText string
+
+	_, lastLineH := cText.Heights()
+
+	for lastLineH > cardTextBoxH*0.75 {
+		fontSize -= strokeWidth
+		cText = getCardText(card.Attributes.Text, fontSize, cardTextBoxW, cardTextBoxH)
+		_, lastLineH = cText.Heights()
+	}
+
+	i := 0
+	_, lastLineH = cText.Heights()
+	for lastLineH > indentCutoff {
+
+		i++
+
+		lines := strings.Split(card.Attributes.Text, "\n")
+
+		leftoverText = strings.Join(lines[len(lines)-i:], "\n")
+		newText := strings.Join(lines[:len(lines)-i], "\n")
+
+		log.Printf("---new---\n%s\n\n---leftover---\n\n%s", newText, leftoverText)
+
+		cText = getCardText(newText, fontSize, cardTextBoxW, cardTextBoxH)
+
+		_, lastLineH = cText.Heights()
+
+	}
+
+	ctx.DrawText(cardTextX, cardTextY, cText)
+
+	if leftoverText != "" {
+		newCardTextX := cardTextX + indent
+		if !cText.Empty() {
+			cardTextY = cardTextY - (lastLineH + fontSize*0.4)
+		}
+
+		cText := getCardText(leftoverText, fontSize, cardTextBoxW-(newCardTextX-cardTextX)-cardTextBoxW*0.03, cardTextBoxH)
+		ctx.DrawText(newCardTextX, cardTextY, cText)
+	}
+
+	return nil
 }

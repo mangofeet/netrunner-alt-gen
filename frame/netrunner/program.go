@@ -5,7 +5,6 @@ import (
 	"image/color"
 	"log"
 	"math"
-	"strings"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/nrdb-go"
@@ -251,70 +250,17 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		muBoxW, muBoxH,
 		canvas.Center, canvas.Center, 0, 0))
 
-	cardTextPadding := canvasWidth * 0.02
-	cardTextX := textBoxLeft + cardTextPadding
-	cardTextY := textBoxHeight - cardTextPadding
-	typeTextX := cardTextX
-	typeTextY := typeBoxBottom + typeBoxHeight - cardTextPadding
-	cardTextBoxW := textBoxRight - textBoxLeft - (cardTextPadding * 2)
-	cardTextBoxH := textBoxHeight
-	typeTextBoxW := typeBoxRight - typeBoxLeft - (cardTextPadding * 2)
-	typeTextBoxH := typeBoxHeight
-	cardTextBoxCutoff := textBoxHeight * 0.45
-
-	var tText *canvas.Text
-
-	typeName := getTypeName(card.Attributes.CardTypeID)
-
-	if card.Attributes.DisplaySubtypes != nil {
-		tText = getCardText(fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSizeCard, typeTextBoxW, typeTextBoxH)
-	} else {
-		tText = getCardText(fmt.Sprintf("<strong>%s</strong>", typeName), fontSizeCard, typeTextBoxW, typeTextBoxH)
-	}
-
-	ctx.DrawText(typeTextX, typeTextY, tText)
-
-	cText := getCardText(card.Attributes.Text, fontSizeCard, cardTextBoxW, cardTextBoxH)
-
-	var leftoverText string
-
-	_, lastLineH := cText.Heights()
-
-	for lastLineH > cardTextBoxH*0.75 {
-		fontSizeCard -= strokeWidth
-		cText = getCardText(card.Attributes.Text, fontSizeCard, cardTextBoxW, cardTextBoxH)
-		_, lastLineH = cText.Heights()
-	}
-
-	i := 0
-	_, lastLineH = cText.Heights()
-	for lastLineH > cardTextBoxCutoff {
-
-		i++
-
-		lines := strings.Split(card.Attributes.Text, "\n")
-
-		leftoverText = strings.Join(lines[len(lines)-i:], "\n")
-		newText := strings.Join(lines[:len(lines)-i], "\n")
-
-		log.Printf("---new---\n%s\n\n---leftover---\n\n%s", newText, leftoverText)
-
-		cText = getCardText(newText, fontSizeCard, cardTextBoxW, cardTextBoxH)
-
-		_, lastLineH = cText.Heights()
-
-	}
-
-	ctx.DrawText(cardTextX, cardTextY, cText)
-
-	if leftoverText != "" {
-		newCardTextX := cardTextX + cardTextPadding*3
-		if !cText.Empty() {
-			cardTextY = cardTextY - (lastLineH + fontSizeCard*0.4)
-		}
-
-		cText := getCardText(leftoverText, fontSizeCard, cardTextBoxW-(newCardTextX-cardTextX)-cardTextBoxW*0.03, cardTextBoxH)
-		ctx.DrawText(newCardTextX, cardTextY, cText)
+	if err := drawCardText(ctx, card, fontSizeCard, textBoxHeight*0.45, canvasWidth*0.06, textBoxDimensions{
+		left:   textBoxLeft,
+		right:  textBoxRight,
+		height: textBoxHeight,
+	}, textBoxDimensions{
+		left:   typeBoxLeft,
+		right:  typeBoxRight,
+		height: typeBoxHeight,
+		bottom: typeBoxBottom,
+	}); err != nil {
+		return err
 	}
 
 	return nil
