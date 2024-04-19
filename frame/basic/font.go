@@ -1,4 +1,4 @@
-package netrunner
+package basic
 
 import "github.com/tdewolff/canvas"
 

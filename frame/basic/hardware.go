@@ -1,8 +1,9 @@
-package netrunner
+package basic
 
 import (
 	"fmt"
 	"image/color"
+	"log"
 	"math"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
@@ -10,13 +11,15 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
-type FrameResource struct{}
+type FrameHardware struct{}
 
-func (FrameResource) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
+func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	canvasWidth, canvasHeight := ctx.Size()
 
 	strokeWidth := getStrokeWidth(ctx)
+
+	log.Printf("strokeWidth: %f", strokeWidth)
 
 	factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
 	factionColor := color.RGBA{
@@ -38,19 +41,20 @@ func (FrameResource) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	titleBoxTop := getTitleBoxTop(ctx)
 	titleBoxBottom := titleBoxTop - titleBoxHeight
-	titleBoxLeft := costContainerR * 3.25
+	titleBoxLeftOut := costContainerR * 3.25
+	titleBoxLeftIn := costContainerR * 3.75
 
 	titlePath := &canvas.Path{}
-	titlePath.MoveTo(titleBoxLeft, titleBoxTop)
-	titlePath.QuadTo(titleBoxLeft+(costContainerR*0.5), titleBoxBottom+(titleBoxHeight*0.5), titleBoxLeft, titleBoxBottom)
-	titlePath.LineTo(canvasWidth, titleBoxBottom)
+	titlePath.MoveTo(titleBoxLeftIn, titleBoxTop)
 	titlePath.LineTo(canvasWidth, titleBoxTop)
+	titlePath.LineTo(canvasWidth, titleBoxBottom)
+	titlePath.LineTo(titleBoxLeftIn, titleBoxBottom)
+	titlePath.LineTo(titleBoxLeftOut, titleBoxBottom+(titleBoxHeight*0.5))
 	titlePath.Close()
 
 	ctx.DrawPath(0, 0, titlePath)
 	ctx.Pop()
 
-	// outline for cost circle
 	drawCostCircle(ctx, bgColor)
 
 	// bottom text box
@@ -123,13 +127,14 @@ func (FrameResource) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	fontSizeCost := titleBoxHeight * 3
 	fontSizeCard := titleBoxHeight * 1.2
 
-	titleTextX := titleBoxLeft + costContainerR*0.5
-	if card.Attributes.IsUnique {
-		titleTextX = titleBoxLeft + (costContainerR * 0.4)
+	titleTextX := titleBoxLeftIn + costContainerR*0.25
+	if card.Attributes.IsUnique { // unique diamon fits better in the angled end here
+		titleTextX = costContainerStart + (costContainerR * 2) + (costContainerR / 3)
 	}
+
 	titleTextY := titleBoxTop - titleBoxHeight*0.1
 	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitleText(card), fontSizeTitle, canvasWidth, titleBoxHeight))
-	// ctx.DrawText(titleTextX, titleTextY, canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
+	// canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
 
 	if card.Attributes.Cost != nil {
 		costTextX := costContainerStart
@@ -152,4 +157,5 @@ func (FrameResource) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	})
 
 	return nil
+
 }

@@ -10,7 +10,7 @@ import (
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/netrunner-alt-gen/art/netspace"
-	"github.com/mangofeet/netrunner-alt-gen/frame/netrunner"
+	"github.com/mangofeet/netrunner-alt-gen/frame/basic"
 	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
 	"github.com/tdewolff/canvas/renderers"
@@ -120,13 +120,13 @@ func generateCard(cardName string, drawBleedLines bool) error {
 	log.Println("card type:", printing.Attributes.CardTypeID)
 	switch printing.Attributes.CardTypeID {
 	case "program":
-		framer = netrunner.FrameProgram{}
+		framer = basic.FrameProgram{}
 	case "resource":
-		framer = netrunner.FrameResource{}
+		framer = basic.FrameResource{}
 	case "hardware":
-		framer = netrunner.FrameHardware{}
+		framer = basic.FrameHardware{}
 	case "event":
-		framer = netrunner.FrameEvent{}
+		framer = basic.FrameEvent{}
 	}
 
 	if framer != nil {

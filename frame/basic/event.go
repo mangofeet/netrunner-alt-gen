@@ -1,19 +1,17 @@
-package netrunner
+package basic
 
 import (
 	"fmt"
-	"image/color"
 	"log"
-	"math"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
 )
 
-type FrameHardware struct{}
+type FrameEvent struct{}
 
-func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
+func (FrameEvent) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	canvasWidth, canvasHeight := ctx.Size()
 
@@ -22,40 +20,52 @@ func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	log.Printf("strokeWidth: %f", strokeWidth)
 
 	factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
-	factionColor := color.RGBA{
-		R: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.R)-48), 255))),
-		G: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.G)-48), 255))),
-		B: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.B)-48), 255))),
-		A: 0xff,
-	}
+	factionColor := art.Darken(factionBaseColor, 0.811)
 
 	ctx.Push()
 	ctx.SetFillColor(bgColor)
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 
-	costContainerR := getCostContainerRadius(ctx)
-	costContainerStart := getCostContainerStart(ctx)
-
 	titleBoxHeight := getTitleBoxHeight(ctx)
 
 	titleBoxTop := getTitleBoxTop(ctx)
 	titleBoxBottom := titleBoxTop - titleBoxHeight
-	titleBoxLeftOut := costContainerR * 3.25
-	titleBoxLeftIn := costContainerR * 3.75
+	titleBoxRight := canvasWidth - (canvasWidth / 16)
+	titleBoxRadius := (canvasHeight / 48)
+	titleBoxArc1StartX := titleBoxRight - titleBoxRadius
+	titleBoxArc1EndY := titleBoxTop - titleBoxRadius
+	titleBoxArc2StartY := titleBoxBottom + titleBoxRadius
+	titleBoxArc2EndX := titleBoxRight - titleBoxRadius
+
+	costContainerR := getCostContainerRadius(ctx)
+	costContainerStart := getCostContainerStart(ctx)
 
 	titlePath := &canvas.Path{}
-	titlePath.MoveTo(titleBoxLeftIn, titleBoxTop)
-	titlePath.LineTo(canvasWidth, titleBoxTop)
-	titlePath.LineTo(canvasWidth, titleBoxBottom)
-	titlePath.LineTo(titleBoxLeftIn, titleBoxBottom)
-	titlePath.LineTo(titleBoxLeftOut, titleBoxBottom+(titleBoxHeight*0.5))
+	titlePath.MoveTo(0, titleBoxTop)
+
+	// background for cost, top
+	titlePath.LineTo(costContainerStart, titleBoxTop)
+	titlePath.QuadTo(costContainerStart+costContainerR, titleBoxTop+(costContainerR), costContainerStart+(costContainerR*2), titleBoxTop)
+
+	// right side
+	titlePath.LineTo(titleBoxArc1StartX, titleBoxTop)
+	titlePath.QuadTo(titleBoxRight, titleBoxTop, titleBoxRight, titleBoxArc1EndY)
+	titlePath.LineTo(titleBoxRight, titleBoxArc2StartY)
+	titlePath.QuadTo(titleBoxRight, titleBoxBottom, titleBoxArc2EndX, titleBoxBottom)
+
+	// background for cost, bottom
+	titlePath.LineTo(costContainerStart+(costContainerR*2), titleBoxBottom)
+	titlePath.QuadTo(costContainerStart+costContainerR, titleBoxBottom-(costContainerR), costContainerStart, titleBoxBottom)
+
+	// finish title box
+	titlePath.LineTo(0, titleBoxBottom)
 	titlePath.Close()
 
 	ctx.DrawPath(0, 0, titlePath)
 	ctx.Pop()
 
-	drawCostCircle(ctx, bgColor)
+	drawCostCircle(ctx, transparent)
 
 	// bottom text box
 	ctx.Push()
@@ -127,14 +137,10 @@ func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	fontSizeCost := titleBoxHeight * 3
 	fontSizeCard := titleBoxHeight * 1.2
 
-	titleTextX := titleBoxLeftIn + costContainerR*0.25
-	if card.Attributes.IsUnique { // unique diamon fits better in the angled end here
-		titleTextX = costContainerStart + (costContainerR * 2) + (costContainerR / 3)
-	}
-
+	titleTextX := costContainerStart + (costContainerR * 2) + (costContainerR / 3)
 	titleTextY := titleBoxTop - titleBoxHeight*0.1
-	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitleText(card), fontSizeTitle, canvasWidth, titleBoxHeight))
-	// canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
+	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitleText(card), fontSizeTitle, titleBoxRight, titleBoxHeight))
+	// ctx.DrawText(titleTextX, titleTextY, canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
 
 	if card.Attributes.Cost != nil {
 		costTextX := costContainerStart
@@ -157,5 +163,4 @@ func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	})
 
 	return nil
-
 }

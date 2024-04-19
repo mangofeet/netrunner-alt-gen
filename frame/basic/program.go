@@ -1,4 +1,4 @@
-package netrunner
+package basic
 
 import (
 	"fmt"
@@ -9,9 +9,9 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
-type FrameEvent struct{}
+type FrameProgram struct{}
 
-func (FrameEvent) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
+func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	canvasWidth, canvasHeight := ctx.Size()
 
@@ -31,12 +31,9 @@ func (FrameEvent) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	titleBoxTop := getTitleBoxTop(ctx)
 	titleBoxBottom := titleBoxTop - titleBoxHeight
+	titleBoxArcStart := canvasWidth - (canvasWidth / 3)
 	titleBoxRight := canvasWidth - (canvasWidth / 16)
-	titleBoxRadius := (canvasHeight / 48)
-	titleBoxArc1StartX := titleBoxRight - titleBoxRadius
-	titleBoxArc1EndY := titleBoxTop - titleBoxRadius
-	titleBoxArc2StartY := titleBoxBottom + titleBoxRadius
-	titleBoxArc2EndX := titleBoxRight - titleBoxRadius
+	titleBoxArcCP1 := titleBoxRight - (canvasWidth / 48)
 
 	costContainerR := getCostContainerRadius(ctx)
 	costContainerStart := getCostContainerStart(ctx)
@@ -48,11 +45,9 @@ func (FrameEvent) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	titlePath.LineTo(costContainerStart, titleBoxTop)
 	titlePath.QuadTo(costContainerStart+costContainerR, titleBoxTop+(costContainerR), costContainerStart+(costContainerR*2), titleBoxTop)
 
-	// right side
-	titlePath.LineTo(titleBoxArc1StartX, titleBoxTop)
-	titlePath.QuadTo(titleBoxRight, titleBoxTop, titleBoxRight, titleBoxArc1EndY)
-	titlePath.LineTo(titleBoxRight, titleBoxArc2StartY)
-	titlePath.QuadTo(titleBoxRight, titleBoxBottom, titleBoxArc2EndX, titleBoxBottom)
+	// arc down on right side
+	titlePath.LineTo(titleBoxArcStart, titleBoxTop)
+	titlePath.QuadTo(titleBoxArcCP1, titleBoxTop, titleBoxRight, titleBoxBottom)
 
 	// background for cost, bottom
 	titlePath.LineTo(costContainerStart+(costContainerR*2), titleBoxBottom)
@@ -129,12 +124,64 @@ func (FrameEvent) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	ctx.Pop()
 
+	// program strength
+	ctx.Push()
+
+	ctx.SetFillColor(factionColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
+
+	ctx.DrawPath(0, 0, strength(canvasWidth, canvasHeight))
+
+	ctx.Pop()
+
+	// mu icon
+	muImage, err := loadGameAsset("Mu")
+	if err != nil {
+		return err
+	}
+	muImage = muImage.Transform(canvas.Identity.ReflectY()).Scale(0.05, 0.05)
+
+	ctx.Push()
+
+	ctx.SetFillColor(bgColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
+
+	muBoxX := costContainerStart + costContainerR*0.25
+	muBoxY := titleBoxBottom - (muImage.Bounds().H * 0.8)
+	muBoxW := muImage.Bounds().W + muImage.Bounds().W*0.35
+	muBoxH := muImage.Bounds().H + muImage.Bounds().H*0.45
+
+	boxPath := &canvas.Path{}
+
+	boxPath.MoveTo(0, 0)
+	boxPath.LineTo(muBoxW, 0)
+	boxPath.LineTo(muBoxW, -1*muBoxH)
+	boxPath.LineTo(0, -1*muBoxH)
+	boxPath.Close()
+
+	ctx.DrawPath(muBoxX, muBoxY, boxPath)
+
+	ctx.Pop()
+
+	ctx.Push()
+	ctx.SetFillColor(textColor)
+
+	muIconX := muBoxX
+	muIconY := muBoxY + (muImage.Bounds().H * 0.2)
+
+	ctx.DrawPath(muIconX, muIconY, muImage)
+
+	ctx.Pop()
+
 	// render card text
 
 	// not sure how these sizes actually correlate to the weird
 	// pixel/mm setup I'm using, but these work
 	fontSizeTitle := titleBoxHeight * 2
 	fontSizeCost := titleBoxHeight * 3
+	fontSizeStr := titleBoxHeight * 4
 	fontSizeCard := titleBoxHeight * 1.2
 
 	titleTextX := costContainerStart + (costContainerR * 2) + (costContainerR / 3)
@@ -151,7 +198,31 @@ func (FrameEvent) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			canvas.Center, canvas.Center, 0, 0))
 	}
 
-	drawCardText(ctx, card, fontSizeCard, canvasHeight, 0, textBoxDimensions{
+	strengthText := "-"
+	if card.Attributes.Strength != nil {
+		strengthText = fmt.Sprint(*card.Attributes.Strength)
+	}
+
+	strTextX := 0.0
+	strTextY := canvasHeight / 10
+	ctx.DrawText(strTextX, strTextY, canvas.NewTextBox(
+		getFont(fontSizeStr, canvas.FontBlack), strengthText,
+		canvasWidth/5, 0,
+		canvas.Center, canvas.Center, 0, 0))
+
+	muText := ""
+	if card.Attributes.MemoryCost != nil {
+		muText = fmt.Sprint(*card.Attributes.MemoryCost)
+	}
+
+	muTextX := muBoxX - muBoxW*0.08
+	muTextY := muBoxY
+	ctx.DrawText(muTextX, muTextY, canvas.NewTextBox(
+		getFont(fontSizeCard, canvas.FontBlack), muText,
+		muBoxW, muBoxH,
+		canvas.Center, canvas.Center, 0, 0))
+
+	drawCardText(ctx, card, fontSizeCard, textBoxHeight*0.45, canvasWidth*0.06, textBoxDimensions{
 		left:   textBoxLeft,
 		right:  textBoxRight,
 		height: textBoxHeight,
