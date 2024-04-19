@@ -317,17 +317,6 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		ctx.DrawText(newCardTextX, cardTextY, cText)
 	}
 
-	// test something
-
-	ctx.Push()
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
-
-	trashCost := mustLoadGameSVG("TRASH_COST bw")
-	trashCost.RenderViewTo(ctx, canvas.Identity.Translate(1000, 1000))
-	ctx.Pop()
-
 	return nil
 }
 
