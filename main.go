@@ -17,11 +17,18 @@ import (
 )
 
 // sizes in pixels, this is ~1200 DPI
-const canvasWidth = 3288.0
-const canvasHeight = 4488.0
 
-const cardWidth = 3064.0
-const cardHeight = 4212.0
+// old values
+// const canvasWidth = 3288.0
+// const canvasHeight = 4488.0
+// const cardWidth = 3064.0
+// const cardHeight = 4212.0
+
+// based on NSG pdf sizes
+const canvasWidth = 3199.0
+const canvasHeight = 4432.0
+const cardWidth = 2975.0
+const cardHeight = 4156.0
 
 // const canvasWidth = 69.35
 // const canvasHeight = 94.35

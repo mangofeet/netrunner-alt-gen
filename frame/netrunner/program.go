@@ -17,7 +17,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	canvasWidth, canvasHeight := ctx.Size()
 
-	strokeWidth := canvasHeight * 0.0023
+	strokeWidth := canvasHeight * 0.002
 
 	log.Printf("strokeWidth: %f", strokeWidth)
 
