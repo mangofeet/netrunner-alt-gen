@@ -3,7 +3,6 @@ package netrunner
 import (
 	"fmt"
 	"image/color"
-	"log"
 	"math"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
@@ -17,9 +16,7 @@ func (FrameResource) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	canvasWidth, canvasHeight := ctx.Size()
 
-	strokeWidth := canvasHeight * 0.0023
-
-	log.Printf("strokeWidth: %f", strokeWidth)
+	strokeWidth := getStrokeWidth(ctx)
 
 	factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
 	factionColor := color.RGBA{
@@ -34,47 +31,28 @@ func (FrameResource) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 
-	titleBoxHeight := (canvasHeight / 16)
-
-	titleBoxTop := canvasHeight - (canvasHeight / 12)
-	titleBoxBottom := titleBoxTop - titleBoxHeight
-	titleBoxArcStart := canvasWidth - (canvasWidth / 3)
-	titleBoxRight := canvasWidth - (canvasWidth / 16)
-	titleBoxArcCP1 := titleBoxRight - (canvasWidth / 48)
-
-	costContainerR := titleBoxHeight * 0.667
+	costContainerR := getCostContainerRadius(ctx)
 	costContainerStart := costContainerR
 
+	titleBoxHeight := getTitleBoxHeight(ctx)
+
+	titleBoxTop := getTitleBoxTop(ctx)
+	titleBoxBottom := titleBoxTop - titleBoxHeight
+	titleBoxLeftTop := costContainerR * 3
+	titleBoxLeftBottom := costContainerR * 3
+
 	titlePath := &canvas.Path{}
-	titlePath.MoveTo(0, titleBoxTop)
-
-	// background for cost, top
-	titlePath.LineTo(costContainerStart, titleBoxTop)
-	titlePath.QuadTo(costContainerStart+costContainerR, titleBoxTop+(costContainerR*0.8), costContainerStart+(costContainerR*2), titleBoxTop)
-
-	// arc down on right side
-	titlePath.LineTo(titleBoxArcStart, titleBoxTop)
-	titlePath.QuadTo(titleBoxArcCP1, titleBoxTop, titleBoxRight, titleBoxBottom)
-
-	// background for cost, bottom
-	titlePath.LineTo(costContainerStart+(costContainerR*2), titleBoxBottom)
-	titlePath.QuadTo(costContainerStart+costContainerR, titleBoxBottom-(costContainerR*0.8), costContainerStart, titleBoxBottom)
-
-	// finish title box
-	titlePath.LineTo(0, titleBoxBottom)
+	titlePath.MoveTo(titleBoxLeftTop, titleBoxTop)
+	titlePath.QuadTo(titleBoxLeftBottom+(costContainerR*0.5), titleBoxBottom+(titleBoxHeight*0.5), titleBoxLeftBottom, titleBoxBottom)
+	titlePath.LineTo(canvasWidth, titleBoxBottom)
+	titlePath.LineTo(canvasWidth, titleBoxTop)
 	titlePath.Close()
 
 	ctx.DrawPath(0, 0, titlePath)
 	ctx.Pop()
 
 	// outline for cost circle
-	ctx.Push()
-	ctx.SetFillColor(transparent)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
-	costOutline := canvas.Circle(costContainerR)
-	ctx.DrawPath(costContainerStart+(costContainerR), titleBoxTop-(titleBoxHeight*0.5), costOutline)
-	ctx.Pop()
+	drawCostCircle(ctx, bgColor)
 
 	// bottom text box
 	ctx.Push()
@@ -162,7 +140,7 @@ func (FrameResource) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	titleTextX := costContainerStart + (costContainerR * 2) + (costContainerR / 3)
 	titleTextY := titleBoxTop - titleBoxHeight*0.1
-	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitleText(card), fontSizeTitle, titleBoxRight, titleBoxHeight))
+	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitleText(card), fontSizeTitle, canvasWidth, titleBoxHeight))
 	// ctx.DrawText(titleTextX, titleTextY, canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
 
 	if card.Attributes.Cost != nil {

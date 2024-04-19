@@ -17,7 +17,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	canvasWidth, canvasHeight := ctx.Size()
 
-	strokeWidth := canvasHeight * 0.002
+	strokeWidth := getStrokeWidth(ctx)
 
 	log.Printf("strokeWidth: %f", strokeWidth)
 
@@ -34,15 +34,15 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 
-	titleBoxHeight := (canvasHeight / 16)
+	titleBoxHeight := getTitleBoxHeight(ctx)
 
-	titleBoxTop := canvasHeight - (canvasHeight / 12)
+	titleBoxTop := getTitleBoxTop(ctx)
 	titleBoxBottom := titleBoxTop - titleBoxHeight
 	titleBoxArcStart := canvasWidth - (canvasWidth / 3)
 	titleBoxRight := canvasWidth - (canvasWidth / 16)
 	titleBoxArcCP1 := titleBoxRight - (canvasWidth / 48)
 
-	costContainerR := titleBoxHeight * 0.667
+	costContainerR := getCostContainerRadius(ctx)
 	costContainerStart := costContainerR
 
 	titlePath := &canvas.Path{}
@@ -67,14 +67,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.DrawPath(0, 0, titlePath)
 	ctx.Pop()
 
-	// outline for cost circle
-	ctx.Push()
-	ctx.SetFillColor(transparent)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
-	costOutline := canvas.Circle(costContainerR)
-	ctx.DrawPath(costContainerStart+(costContainerR), titleBoxTop-(titleBoxHeight*0.5), costOutline)
-	ctx.Pop()
+	drawCostCircle(ctx, transparent)
 
 	// bottom text box
 	ctx.Push()
