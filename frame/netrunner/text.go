@@ -2,7 +2,6 @@ package netrunner
 
 import (
 	"fmt"
-	"log"
 	"regexp"
 	"strings"
 
@@ -185,8 +184,6 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 
 		leftoverText = strings.Join(lines[len(lines)-i:], "\n")
 		newText := strings.Join(lines[:len(lines)-i], "\n")
-
-		log.Printf("---new---\n%s\n\n---leftover---\n\n%s", newText, leftoverText)
 
 		cText = getCardText(newText, fontSize, cardTextBoxW, cardTextBoxH)
 
