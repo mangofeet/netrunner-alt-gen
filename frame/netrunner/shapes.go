@@ -3,6 +3,7 @@ package netrunner
 import (
 	"image/color"
 
+	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
 )
 
@@ -25,6 +26,11 @@ func getCostContainerRadius(ctx *canvas.Context) float64 {
 	return getTitleBoxHeight(ctx) * 0.667
 }
 
+func getTextBoxHeight(ctx *canvas.Context) float64 {
+	_, canvasHeight := ctx.Size()
+	return (canvasHeight / 3)
+}
+
 func drawCostCircle(ctx *canvas.Context, bgColor color.Color) {
 
 	strokeWidth := getStrokeWidth(ctx)
@@ -44,6 +50,58 @@ func drawCostCircle(ctx *canvas.Context, bgColor color.Color) {
 
 }
 
+func drawInflence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor color.RGBA) {
+
+	if card.Attributes.InfluenceCost == nil {
+		return
+	}
+	influenceCost := *card.Attributes.InfluenceCost
+	strokeWidth := getStrokeWidth(ctx)
+
+	_, canvasHeight := ctx.Size()
+
+	ctx.Push()
+	ctx.SetFillColor(bgColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
+
+	influenceHeight := getTextBoxHeight(ctx) * 0.55
+	influenceWidth := canvasHeight / 44
+
+	// center around the give point
+	boxX := x - (influenceWidth / 2)
+
+	ctx.DrawPath(boxX, 0, influenceBox(influenceHeight, influenceWidth, influenceCost))
+
+	ctx.Pop()
+
+	curveRadius := influenceWidth / 2
+
+	pipR := curveRadius * 0.6
+
+	for i := 0.0; i < 5; i += 1 {
+
+		pipY := influenceHeight - (pipR * ((i + 1) * 4)) + (pipR / 2)
+
+		ctx.Push()
+		ctx.SetStrokeWidth(strokeWidth * 0.75)
+		ctx.SetStrokeColor(textColor)
+
+		if i >= 5-float64(influenceCost) {
+			ctx.SetFill(textColor)
+		} else {
+			ctx.SetFill(transparent)
+		}
+
+		pip := canvas.Circle(pipR)
+		ctx.DrawPath(x, pipY, pip)
+
+		ctx.Pop()
+
+	}
+
+}
+
 func strength(canvasWidth, canvasHeight float64) *canvas.Path {
 	path := &canvas.Path{}
 
@@ -55,7 +113,7 @@ func strength(canvasWidth, canvasHeight float64) *canvas.Path {
 	return path
 }
 
-func influence(height, width float64, pips int) *canvas.Path {
+func influenceBox(height, width float64, pips int) *canvas.Path {
 
 	path := &canvas.Path{}
 
@@ -68,22 +126,5 @@ func influence(height, width float64, pips int) *canvas.Path {
 	path.LineTo(width, 0)
 	path.Close()
 
-	pipR := curveRadius * 0.6
-	pipX := width - ((width - (pipR * 2)) / 2)
-
-	for i := 0.0; i < 5; i += 1 {
-
-		pipY := height - (pipR * ((i + 1) * 4)) + (pipR / 2)
-
-		path.MoveTo(pipX, pipY)
-
-		if i >= 5-float64(pips) {
-			path.Arc(pipR, pipR, 0, 0, 360)
-		} else {
-			path.Arc(pipR, pipR, 0, 360, 0)
-		}
-	}
-
 	return path
-
 }

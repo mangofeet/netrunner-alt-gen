@@ -38,12 +38,11 @@ func (FrameResource) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	titleBoxTop := getTitleBoxTop(ctx)
 	titleBoxBottom := titleBoxTop - titleBoxHeight
-	titleBoxLeftTop := costContainerR * 3
-	titleBoxLeftBottom := costContainerR * 3
+	titleBoxLeft := costContainerR * 3.25
 
 	titlePath := &canvas.Path{}
-	titlePath.MoveTo(titleBoxLeftTop, titleBoxTop)
-	titlePath.QuadTo(titleBoxLeftBottom+(costContainerR*0.5), titleBoxBottom+(titleBoxHeight*0.5), titleBoxLeftBottom, titleBoxBottom)
+	titlePath.MoveTo(titleBoxLeft, titleBoxTop)
+	titlePath.QuadTo(titleBoxLeft+(costContainerR*0.5), titleBoxBottom+(titleBoxHeight*0.5), titleBoxLeft, titleBoxBottom)
 	titlePath.LineTo(canvasWidth, titleBoxBottom)
 	titlePath.LineTo(canvasWidth, titleBoxTop)
 	titlePath.Close()
@@ -60,7 +59,7 @@ func (FrameResource) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 
-	textBoxHeight := canvasHeight / 3
+	textBoxHeight := getTextBoxHeight(ctx)
 	textBoxLeft := canvasWidth / 8
 	textBoxRight := canvasWidth - (canvasWidth / 12)
 	textBoxArcRadius := (canvasHeight / 32)
@@ -83,21 +82,7 @@ func (FrameResource) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.FillStroke()
 	ctx.Pop()
 
-	ctx.Push()
-	ctx.SetFillColor(factionColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
-
-	influenceHeight := textBoxHeight * 0.55
-	influenceWidth := canvasHeight / 48
-
-	influenceCost := 0
-	if card.Attributes.InfluenceCost != nil {
-		influenceCost = *card.Attributes.InfluenceCost
-	}
-	ctx.DrawPath(textBoxRight-(influenceWidth/2), 0, influence(influenceHeight, influenceWidth, influenceCost))
-
-	ctx.Pop()
+	drawInflence(ctx, card, textBoxRight, factionColor)
 
 	// type box
 	ctx.Push()
@@ -138,7 +123,10 @@ func (FrameResource) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	fontSizeCost := titleBoxHeight * 3
 	fontSizeCard := titleBoxHeight * 1.2
 
-	titleTextX := costContainerStart + (costContainerR * 2) + (costContainerR / 3)
+	titleTextX := titleBoxLeft + costContainerR*0.5
+	if card.Attributes.IsUnique {
+		titleTextX = titleBoxLeft + (costContainerR * 0.4)
+	}
 	titleTextY := titleBoxTop - titleBoxHeight*0.1
 	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitleText(card), fontSizeTitle, canvasWidth, titleBoxHeight))
 	// ctx.DrawText(titleTextX, titleTextY, canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))

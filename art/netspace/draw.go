@@ -36,12 +36,7 @@ func Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	baseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
 
-	cardBGColor := color.RGBA{
-		R: uint8(math.Max(0, math.Min(float64(int64(baseColor.R)-96), 255))),
-		G: uint8(math.Max(0, math.Min(float64(int64(baseColor.G)-96), 255))),
-		B: uint8(math.Max(0, math.Min(float64(int64(baseColor.B)-96), 255))),
-		A: 0xff,
-	}
+	cardBGColor := art.Darken(baseColor, 0.623)
 
 	// fill background
 	ctx.Push()

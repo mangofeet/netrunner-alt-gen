@@ -15,6 +15,7 @@ func getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64) *can
 	boldFace := getFont(fontSize, canvas.FontBold)
 	italicFace := getFont(fontSize, canvas.FontItalic)
 	arrowFace := getFont(fontSize, canvas.FontExtraBold)
+	uniqueFace := getFont(fontSize, canvas.FontExtraBold)
 
 	rt := canvas.NewRichText(regFace)
 
@@ -37,7 +38,7 @@ func getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64) *can
 		if strings.Contains(part, "♦") {
 			subParts := strings.Split(part, "♦")
 			writeTextPart(rt, subParts[0], regFace, boldFace, italicFace)
-			rt.WriteFace(arrowFace, "♦")
+			rt.WriteFace(uniqueFace, "♦")
 			part = subParts[1]
 		}
 

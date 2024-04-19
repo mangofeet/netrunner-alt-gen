@@ -2,9 +2,7 @@ package netrunner
 
 import (
 	"fmt"
-	"image/color"
 	"log"
-	"math"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/nrdb-go"
@@ -22,12 +20,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	log.Printf("strokeWidth: %f", strokeWidth)
 
 	factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
-	factionColor := color.RGBA{
-		R: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.R)-48), 255))),
-		G: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.G)-48), 255))),
-		B: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.B)-48), 255))),
-		A: 0xff,
-	}
+	factionColor := art.Darken(factionBaseColor, 0.811)
 
 	ctx.Push()
 	ctx.SetFillColor(bgColor)
@@ -75,7 +68,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 
-	textBoxHeight := canvasHeight / 3
+	textBoxHeight := getTextBoxHeight(ctx)
 	textBoxLeft := canvasWidth / 8
 	textBoxRight := canvasWidth - (canvasWidth / 12)
 	textBoxArcRadius := (canvasHeight / 32)
@@ -98,21 +91,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.FillStroke()
 	ctx.Pop()
 
-	ctx.Push()
-	ctx.SetFillColor(factionColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
-
-	influenceHeight := textBoxHeight * 0.55
-	influenceWidth := canvasHeight / 48
-
-	influenceCost := 0
-	if card.Attributes.InfluenceCost != nil {
-		influenceCost = *card.Attributes.InfluenceCost
-	}
-	ctx.DrawPath(textBoxRight-(influenceWidth/2), 0, influence(influenceHeight, influenceWidth, influenceCost))
-
-	ctx.Pop()
+	drawInflence(ctx, card, textBoxRight, factionColor)
 
 	// type box
 	ctx.Push()

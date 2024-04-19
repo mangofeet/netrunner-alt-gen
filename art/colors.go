@@ -1,6 +1,35 @@
 package art
 
-import "image/color"
+import (
+	"image/color"
+	"math"
+)
+
+func Lighten(baseColor color.RGBA, factor float64) color.RGBA {
+	r, g, b, a := baseColor.R, baseColor.G, baseColor.B, baseColor.A
+
+	factorInt := 255 - int64(255.0*factor)
+
+	return color.RGBA{
+		R: uint8(math.Max(0, math.Min(float64(int64(r)+factorInt), 255))),
+		G: uint8(math.Max(0, math.Min(float64(int64(g)+factorInt), 255))),
+		B: uint8(math.Max(0, math.Min(float64(int64(b)+factorInt), 255))),
+		A: uint8(a),
+	}
+}
+
+func Darken(baseColor color.RGBA, factor float64) color.RGBA {
+	r, g, b, a := baseColor.R, baseColor.G, baseColor.B, baseColor.A
+
+	factorInt := 255 - int64(255.0*factor)
+
+	return color.RGBA{
+		R: uint8(math.Max(0, math.Min(float64(int64(r)-factorInt), 255))),
+		G: uint8(math.Max(0, math.Min(float64(int64(g)-factorInt), 255))),
+		B: uint8(math.Max(0, math.Min(float64(int64(b)-factorInt), 255))),
+		A: uint8(a),
+	}
+}
 
 func GetFactionBaseColor(factionID string) color.RGBA {
 
