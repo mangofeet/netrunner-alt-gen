@@ -70,8 +70,8 @@ func drawInflence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor c
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 
-	influenceHeight := getTextBoxHeight(ctx) * 0.55
-	influenceWidth := canvasHeight / 44
+	influenceHeight := getTextBoxHeight(ctx) * 0.6
+	influenceWidth := canvasHeight / 42
 
 	// center around the give point
 	boxX := x - (influenceWidth / 2)
@@ -91,18 +91,20 @@ func drawInflence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor c
 		ctx.Push()
 		ctx.SetStrokeWidth(strokeWidth * 0.75)
 		ctx.SetStrokeColor(textColor)
-
-		if i >= 5-float64(influenceCost) {
-			ctx.SetFill(textColor)
-		} else {
-			ctx.SetFill(transparent)
-		}
+		ctx.SetFill(transparent)
 
 		pip := canvas.Circle(pipR)
 		ctx.DrawPath(x, pipY, pip)
 
 		ctx.Pop()
 
+		if i >= 5-float64(influenceCost) {
+			ctx.Push()
+			ctx.SetFill(textColor)
+			pip := canvas.Circle(pipR * 0.5)
+			ctx.DrawPath(x, pipY, pip)
+			ctx.Pop()
+		}
 	}
 
 }
