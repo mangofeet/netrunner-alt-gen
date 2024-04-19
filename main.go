@@ -25,8 +25,15 @@ import (
 
 // based on NSG pdf sizes
 
-const canvasWidth = 3199.0
-const canvasHeight = 4432.0
+// const canvasWidth = 3199.0
+// const canvasHeight = 4432.0
+// const cardWidth = 2975.0
+// const cardHeight = 4156.0
+
+// based on MPC template
+
+const canvasWidth = 3264.0
+const canvasHeight = 4450.0
 const cardWidth = 2975.0
 const cardHeight = 4156.0
 
