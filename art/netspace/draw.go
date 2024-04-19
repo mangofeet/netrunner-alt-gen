@@ -28,7 +28,7 @@ func Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	numWalkers := int(math.Max(float64(numWalkersMin), float64(prng.Next(seed, int64(numWalkersMax)))))
 
 	startX := prng.Next(seed, int64(canvasWidth/2)) + int64(canvasWidth/4)
-	startY := prng.Next(seed, int64(canvasHeight/4)) + (int64(canvasHeight/8) * 5)
+	startY := prng.Next(seed, int64(canvasHeight/6)) + (int64(canvasHeight/8) * 5)
 
 	if card.Attributes.CardTypeID == "ice" {
 		startY = prng.Next(seed, int64(canvasHeight/4)) + (int64(canvasHeight / 6))
