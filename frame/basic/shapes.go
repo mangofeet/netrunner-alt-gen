@@ -175,7 +175,7 @@ func drawTextBox(ctx *canvas.Context, cornerSize float64, cornerType corner) (te
 
 	textBoxHeight := getTextBoxHeight(ctx)
 	textBoxLeft := canvasWidth / 8
-	textBoxRight := canvasWidth - (canvasWidth / 12)
+	textBoxRight := canvasWidth - (canvasWidth / 8)
 
 	textBoxArc2StartX := textBoxRight - cornerSize
 	textBoxArc2EndY := textBoxHeight - cornerSize
