@@ -13,7 +13,7 @@ import (
 )
 
 // number of walkers to draw
-const numWalkersMin = 1000
+const numWalkersMin = 3000
 const numWalkersMax = 10000
 
 // const numWalkersMin = 100
