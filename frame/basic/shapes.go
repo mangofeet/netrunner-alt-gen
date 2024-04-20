@@ -55,7 +55,7 @@ func drawCostCircle(ctx *canvas.Context, bgColor color.Color) {
 
 }
 
-func drawInflence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor color.RGBA) {
+func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor color.RGBA) {
 
 	if card.Attributes.InfluenceCost == nil {
 		return

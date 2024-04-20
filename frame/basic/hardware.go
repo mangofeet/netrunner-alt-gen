@@ -86,7 +86,7 @@ func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.FillStroke()
 	ctx.Pop()
 
-	drawInflence(ctx, card, textBoxRight, factionColor)
+	drawInfluence(ctx, card, textBoxRight, factionColor)
 
 	// type box
 	ctx.Push()
