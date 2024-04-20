@@ -143,14 +143,15 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 	canvasWidth, canvasHeight := ctx.Size()
 	strokeWidth := canvasHeight * 0.0023
 
-	cardTextPadding := canvasWidth * 0.02
-	cardTextX := box.left + cardTextPadding
-	cardTextY := box.height - cardTextPadding
+	cardTextPaddingLR := canvasWidth * 0.03
+	cardTextPaddingTB := canvasWidth * 0.02
+	cardTextX := box.left + cardTextPaddingLR
+	cardTextY := box.height - cardTextPaddingTB
 	typeTextX := cardTextX
-	typeTextY := typeBox.bottom + typeBox.height - cardTextPadding
-	cardTextBoxW := box.right - box.left - (cardTextPadding * 2.5)
+	typeTextY := typeBox.bottom + typeBox.height - cardTextPaddingTB
+	cardTextBoxW := box.right - box.left - (cardTextPaddingLR * 2.5)
 	cardTextBoxH := box.height
-	typeTextBoxW := typeBox.right - typeBox.left - (cardTextPadding * 2)
+	typeTextBoxW := typeBox.right - typeBox.left - (cardTextPaddingLR * 2)
 	typeTextBoxH := typeBox.height
 
 	var tText *canvas.Text
