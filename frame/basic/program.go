@@ -62,67 +62,9 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	drawCostCircle(ctx, transparent)
 
-	// bottom text box
-	ctx.Push()
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
+	boxText, boxType := drawTextBox(ctx, canvasHeight/48, cornerRounded)
 
-	textBoxHeight := getTextBoxHeight(ctx)
-	textBoxLeft := canvasWidth / 8
-	textBoxRight := canvasWidth - (canvasWidth / 12)
-	textBoxArcRadius := (canvasHeight / 32)
-	// textBoxArc1StartY := textBoxHeight - textBoxArcRadius
-	// textBoxArc1EndX := textBoxLeft + textBoxArcRadius
-
-	textBoxArc2StartX := textBoxRight - textBoxArcRadius
-	textBoxArc2EndY := textBoxHeight - textBoxArcRadius
-
-	ctx.MoveTo(textBoxLeft, 0)
-	// ctx.LineTo(textBoxLeft, textBoxArc1StartY)
-	// ctx.QuadTo(textBoxLeft, textBoxHeight, textBoxArc1EndX, textBoxHeight)
-	ctx.LineTo(textBoxLeft, textBoxHeight)
-
-	ctx.LineTo(textBoxArc2StartX, textBoxHeight)
-	ctx.QuadTo(textBoxRight, textBoxHeight, textBoxRight, textBoxArc2EndY)
-
-	ctx.LineTo(textBoxRight, 0)
-
-	ctx.FillStroke()
-	ctx.Pop()
-
-	drawInfluence(ctx, card, textBoxRight, factionColor)
-
-	// type box
-	ctx.Push()
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
-
-	typeBoxHeight := textBoxHeight * 0.17
-	typeBoxBottom := textBoxHeight + strokeWidth*0.5
-	typeBoxLeft := textBoxLeft
-	typeBoxRight := canvasWidth - (canvasWidth / 6)
-
-	typeBoxArcRadius := (canvasHeight / 32)
-	typeBoxArc1StartY := typeBoxBottom + typeBoxHeight - typeBoxArcRadius
-	typeBoxArc1EndX := typeBoxLeft + typeBoxArcRadius
-
-	typeBoxArc2StartX := typeBoxRight - typeBoxArcRadius
-	typeBoxArc2EndY := typeBoxBottom + typeBoxHeight - typeBoxArcRadius
-
-	ctx.MoveTo(typeBoxLeft, typeBoxBottom)
-	ctx.LineTo(typeBoxLeft, typeBoxArc1StartY)
-	ctx.QuadTo(typeBoxLeft, typeBoxHeight+typeBoxBottom, typeBoxArc1EndX, typeBoxHeight+typeBoxBottom)
-
-	ctx.LineTo(typeBoxArc2StartX, typeBoxHeight+typeBoxBottom)
-	ctx.QuadTo(typeBoxRight, typeBoxHeight+typeBoxBottom, typeBoxRight, typeBoxArc2EndY)
-
-	ctx.LineTo(typeBoxRight, typeBoxBottom)
-
-	ctx.FillStroke()
-
-	ctx.Pop()
+	drawInfluence(ctx, card, boxText.right, factionColor)
 
 	// program strength
 	ctx.Push()
@@ -222,16 +164,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		muBoxW, muBoxH,
 		canvas.Center, canvas.Center, 0, 0))
 
-	drawCardText(ctx, card, fontSizeCard, textBoxHeight*0.45, canvasWidth*0.06, textBoxDimensions{
-		left:   textBoxLeft,
-		right:  textBoxRight,
-		height: textBoxHeight,
-	}, textBoxDimensions{
-		left:   typeBoxLeft,
-		right:  typeBoxRight,
-		height: typeBoxHeight,
-		bottom: typeBoxBottom,
-	})
+	drawCardText(ctx, card, fontSizeCard, boxText.height*0.45, canvasWidth*0.06, boxText, boxType)
 
 	return nil
 }

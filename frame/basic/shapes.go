@@ -76,7 +76,7 @@ func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor 
 	// center around the give point
 	boxX := x - (influenceWidth / 2)
 
-	ctx.DrawPath(boxX, 0, influenceBox(influenceHeight, influenceWidth, influenceCost))
+	ctx.DrawPath(boxX, 0, influenceBox(influenceHeight, influenceWidth))
 
 	ctx.Pop()
 
@@ -120,7 +120,7 @@ func strength(canvasWidth, canvasHeight float64) *canvas.Path {
 	return path
 }
 
-func influenceBox(height, width float64, pips int) *canvas.Path {
+func influenceBox(height, width float64) *canvas.Path {
 
 	path := &canvas.Path{}
 
@@ -134,4 +134,110 @@ func influenceBox(height, width float64, pips int) *canvas.Path {
 	path.Close()
 
 	return path
+}
+
+type corner func(ctx *canvas.Context, cx, cy, x, y float64)
+
+var cornerRounded = corner(func(ctx *canvas.Context, cx, cy, x, y float64) {
+	ctx.QuadTo(cx, cy, x, y)
+})
+
+var cornerIn = corner(func(ctx *canvas.Context, cx, cy, x, y float64) {
+	var cxNew, cyNew float64
+
+	factor := 0.65
+
+	if x-cx > 0 {
+		cxNew = cx + (x-cx)*factor
+		cyNew = cy - (x-cx)*factor
+	} else {
+		cxNew = cx - (cy-y)*factor
+		cyNew = cy - (cy-y)*factor
+	}
+
+	ctx.QuadTo(cxNew, cyNew, x, y)
+})
+
+var cornerStraight = corner(func(ctx *canvas.Context, _, _, x, y float64) {
+	ctx.LineTo(x, y)
+})
+
+var cornerNone = corner(func(ctx *canvas.Context, cx, cy, x, y float64) {
+	ctx.LineTo(cx, cy)
+	ctx.LineTo(x, y)
+})
+
+func drawTextBox(ctx *canvas.Context, cornerSize float64, cornerType corner) (textBoxDimensions, textBoxDimensions) {
+
+	canvasWidth, _ := ctx.Size()
+
+	strokeWidth := getStrokeWidth(ctx)
+
+	textBoxHeight := getTextBoxHeight(ctx)
+	textBoxLeft := canvasWidth / 8
+	textBoxRight := canvasWidth - (canvasWidth / 12)
+
+	textBoxArc2StartX := textBoxRight - cornerSize
+	textBoxArc2EndY := textBoxHeight - cornerSize
+
+	// text box
+	ctx.Push()
+	ctx.SetFillColor(bgColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
+
+	ctx.MoveTo(textBoxLeft, 0)
+	ctx.LineTo(textBoxLeft, textBoxHeight)
+
+	ctx.LineTo(textBoxArc2StartX, textBoxHeight)
+
+	cornerType(ctx, textBoxRight, textBoxHeight, textBoxRight, textBoxArc2EndY)
+
+	ctx.LineTo(textBoxRight, 0)
+
+	ctx.FillStroke()
+	ctx.Pop()
+
+	// type box
+	ctx.Push()
+	ctx.SetFillColor(bgColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
+
+	typeBoxHeight := textBoxHeight * 0.17
+	typeBoxBottom := textBoxHeight + strokeWidth*0.5
+	typeBoxLeft := textBoxLeft
+	typeBoxRight := canvasWidth - (canvasWidth / 6)
+
+	typeBoxArcRadius := cornerSize
+	typeBoxArc1StartY := typeBoxBottom + typeBoxHeight - typeBoxArcRadius
+	typeBoxArc1EndX := typeBoxLeft + typeBoxArcRadius
+
+	typeBoxArc2StartX := typeBoxRight - typeBoxArcRadius
+	typeBoxArc2EndY := typeBoxBottom + typeBoxHeight - typeBoxArcRadius
+
+	ctx.MoveTo(typeBoxLeft, typeBoxBottom)
+	ctx.LineTo(typeBoxLeft, typeBoxArc1StartY)
+	cornerType(ctx, typeBoxLeft, typeBoxHeight+typeBoxBottom, typeBoxArc1EndX, typeBoxHeight+typeBoxBottom)
+
+	ctx.LineTo(typeBoxArc2StartX, typeBoxHeight+typeBoxBottom)
+	cornerType(ctx, typeBoxRight, typeBoxHeight+typeBoxBottom, typeBoxRight, typeBoxArc2EndY)
+
+	ctx.LineTo(typeBoxRight, typeBoxBottom)
+
+	ctx.FillStroke()
+
+	ctx.Pop()
+
+	return textBoxDimensions{
+			left:   textBoxLeft,
+			right:  textBoxRight,
+			height: textBoxHeight,
+		}, textBoxDimensions{
+			left:   typeBoxLeft,
+			right:  typeBoxRight,
+			height: typeBoxHeight,
+			bottom: typeBoxBottom,
+		}
+
 }

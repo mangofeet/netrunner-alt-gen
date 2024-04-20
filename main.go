@@ -52,6 +52,7 @@ func main() {
 	log.Printf("generating %s", cardName)
 
 	drawBleedLines := true
+	// drawBleedLines := false
 
 	if err := generateCard(cardName, drawBleedLines); err != nil {
 		log.Printf("error: %s", err)
