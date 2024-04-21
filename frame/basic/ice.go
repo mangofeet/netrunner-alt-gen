@@ -76,14 +76,15 @@ func (FrameIce) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetFillColor(bgColor)
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
-	typeBoxWidth := titleBoxHeight
+	typeBoxWidth := titleBoxHeight * 0.75
 	typeBoxTop := costIconY - (rezCostImage.Bounds().H * 1.1)
 	typeBoxLeft := costIconX + (rezCostImage.Bounds().W * 0.52) - (typeBoxWidth * 0.5)
 
-	typeBoxArc1StartY := typeBoxTop - titleBoxRadius
-	typeBoxArc1EndX := typeBoxLeft + titleBoxRadius
-	typeBoxArc2StartX := typeBoxLeft + typeBoxWidth - titleBoxRadius
-	typeBoxArc2EndY := typeBoxTop - titleBoxRadius
+	typeBoxRadius := titleBoxRadius * 0.75
+	typeBoxArc1StartY := typeBoxTop - typeBoxRadius
+	typeBoxArc1EndX := typeBoxLeft + typeBoxRadius
+	typeBoxArc2StartX := typeBoxLeft + typeBoxWidth - typeBoxRadius
+	typeBoxArc2EndY := typeBoxTop - typeBoxRadius
 
 	typePath := &canvas.Path{}
 	typePath.MoveTo(typeBoxLeft, 0)
@@ -188,7 +189,7 @@ func (FrameIce) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.Rotate(90)
 
 	typeText := getTypeText(card, fontSizeCard, typeBoxTop-typeBoxWidth*0.3, typeBoxWidth, canvas.Right)
-	ctx.DrawText(typeBoxLeft+typeBoxWidth*0.25, 0, typeText)
+	ctx.DrawText(typeBoxLeft+typeBoxWidth*0.16, 0, typeText)
 
 	ctx.Pop()
 
