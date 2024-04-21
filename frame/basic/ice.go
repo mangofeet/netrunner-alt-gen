@@ -154,7 +154,7 @@ func (FrameIce) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	// ctx.DrawText(titleTextX, titleTextY, canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
 
 	if card.Attributes.Cost != nil {
-		costTextX := costIconX * 1.05
+		costTextX := costIconX * 1.07
 		costTextY := costIconY - rezCostImage.Bounds().H*0.5
 		ctx.DrawText(costTextX, costTextY, canvas.NewTextBox(
 			getFont(fontSizeCost, canvas.FontBlack), fmt.Sprint(*card.Attributes.Cost),
