@@ -13,11 +13,11 @@ import (
 )
 
 // number of walkers to draw
-// const numWalkersMin = 3000
-// const numWalkersMax = 10000
+const numWalkersMin = 3000
+const numWalkersMax = 10000
 
-const numWalkersMin = 100
-const numWalkersMax = 100
+// const numWalkersMin = 100
+// const numWalkersMax = 100
 
 func Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
