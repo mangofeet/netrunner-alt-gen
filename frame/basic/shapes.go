@@ -112,8 +112,9 @@ func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor 
 func strength(canvasWidth, canvasHeight float64) *canvas.Path {
 	path := &canvas.Path{}
 
-	path.MoveTo(0, canvasHeight/8)
-	path.CubeTo(canvasWidth/6, canvasHeight/4, canvasWidth/4, canvasHeight/12, canvasWidth/8, 0)
+	path.MoveTo(0, canvasHeight*0.12)
+	// path.CubeTo(canvasWidth*0.166, canvasHeight*0.25, canvasWidth*0.25, canvasHeight*0.08333, canvasWidth*0.125, 0)
+	path.CubeTo(canvasWidth*0.166, canvasHeight*0.25, canvasWidth*0.35, canvasHeight*0.08, canvasWidth*0.17, 0)
 	path.LineTo(0, 0)
 	path.Close()
 

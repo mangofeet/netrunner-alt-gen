@@ -73,7 +73,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 
-	ctx.DrawPath(0, 0, strength(canvasWidth, canvasHeight))
+	ctx.DrawPath(canvasWidth*-0.06, 0, strength(canvasWidth, canvasHeight))
 
 	ctx.Pop()
 
