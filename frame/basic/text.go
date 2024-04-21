@@ -9,7 +9,7 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
-func getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64) *canvas.Text {
+func getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64, align canvas.TextAlign) *canvas.Text {
 
 	regFace := getFont(fontSize, canvas.FontRegular)
 	boldFace := getFont(fontSize, canvas.FontBold)
@@ -47,7 +47,7 @@ func getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64) *can
 
 	return rt.ToText(
 		cardTextBoxW, cardTextBoxH,
-		canvas.Left, canvas.Top,
+		align, canvas.Top,
 		0, 0)
 
 }
@@ -120,6 +120,10 @@ func getTypeName(typeID string) string {
 		return "Hardware"
 	case "event":
 		return "Event"
+	case "runner_identity", "corp_identity":
+		return "Identity"
+	case "ice":
+		return "Ice"
 	}
 
 	return typeID
@@ -136,45 +140,36 @@ func getTitleText(card *nrdb.Printing) string {
 
 type textBoxDimensions struct {
 	left, right, height, bottom, top float64
+	align                            canvas.TextAlign
 }
 
-func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCutoff, indent float64, box, typeBox textBoxDimensions) {
+func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCutoff, indent float64, box textBoxDimensions) {
 
-	canvasWidth, canvasHeight := ctx.Size()
-	strokeWidth := canvasHeight * 0.0023
-
-	cardTextPaddingLR := canvasWidth * 0.03
-	cardTextPaddingTB := canvasWidth * 0.02
-	cardTextX := box.left + cardTextPaddingLR
-	cardTextY := box.height - cardTextPaddingTB
-	typeTextX := cardTextX
-	typeTextY := typeBox.bottom + typeBox.height - cardTextPaddingTB
-	cardTextBoxW := box.right - box.left - (cardTextPaddingLR * 2.5)
-	cardTextBoxH := box.height
-	typeTextBoxW := typeBox.right - typeBox.left - (cardTextPaddingLR * 2)
-	typeTextBoxH := typeBox.height
-
-	var tText *canvas.Text
-
-	typeName := getTypeName(card.Attributes.CardTypeID)
-
-	if card.Attributes.DisplaySubtypes != nil {
-		tText = getCardText(fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSize, typeTextBoxW, typeTextBoxH)
-	} else {
-		tText = getCardText(fmt.Sprintf("<strong>%s</strong>", typeName), fontSize, typeTextBoxW, typeTextBoxH)
+	if box.align == 0 {
+		box.align = canvas.Left
 	}
 
-	ctx.DrawText(typeTextX, typeTextY, tText)
+	_, canvasHeight := ctx.Size()
+	strokeWidth := canvasHeight * 0.0023
 
-	cText := getCardText(card.Attributes.Text, fontSize, cardTextBoxW, cardTextBoxH)
+	paddingLR, paddingTB := getCardTextPadding(ctx)
+	x := box.left + paddingLR
+	y := box.height - paddingTB
+	if box.top != 0 {
+		y = box.top - paddingTB
+	}
+	w := box.right - box.left - (paddingLR * 2.5)
+	h := box.height
+
+	cText := getCardText(card.Attributes.Text, fontSize, w, h, box.align)
 
 	var leftoverText string
 
 	_, lastLineH := cText.Heights()
 
-	for lastLineH > cardTextBoxH*0.75 {
+	for lastLineH > h*0.75 {
 		fontSize -= strokeWidth
-		cText = getCardText(card.Attributes.Text, fontSize, cardTextBoxW, cardTextBoxH)
+		cText = getCardText(card.Attributes.Text, fontSize, w, h, box.align)
 		_, lastLineH = cText.Heights()
 	}
 
@@ -189,22 +184,64 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 		leftoverText = strings.Join(lines[len(lines)-i:], "\n")
 		newText := strings.Join(lines[:len(lines)-i], "\n")
 
-		cText = getCardText(newText, fontSize, cardTextBoxW, cardTextBoxH)
+		cText = getCardText(newText, fontSize, w, h, box.align)
 
 		_, lastLineH = cText.Heights()
 
 	}
 
-	ctx.DrawText(cardTextX, cardTextY, cText)
+	ctx.DrawText(x, y, cText)
 
 	if leftoverText != "" {
-		newCardTextX := cardTextX + indent
+		newCardTextX := x + indent
 		if !cText.Empty() {
-			cardTextY = cardTextY - (lastLineH + fontSize*0.4)
+			y = y - (lastLineH + fontSize*0.4)
 		}
 
-		cText := getCardText(leftoverText, fontSize, cardTextBoxW-(newCardTextX-cardTextX)-cardTextBoxW*0.03, cardTextBoxH)
-		ctx.DrawText(newCardTextX, cardTextY, cText)
+		cText := getCardText(leftoverText, fontSize, w-(newCardTextX-x)-w*0.03, h, box.align)
+		ctx.DrawText(newCardTextX, y, cText)
 	}
 
+}
+
+func getCardTextPadding(ctx *canvas.Context) (lr, tb float64) {
+	canvasWidth, _ := ctx.Size()
+
+	lr = canvasWidth * 0.03
+	tb = canvasWidth * 0.02
+
+	return lr, tb
+
+}
+
+func drawTypeText(ctx *canvas.Context, card *nrdb.Printing, fontSize float64, box textBoxDimensions) {
+
+	if box.align == 0 {
+		box.align = canvas.Left
+	}
+
+	paddingLR, PaddingTB := getCardTextPadding(ctx)
+
+	x := box.left + paddingLR
+	y := box.bottom + box.height - PaddingTB
+	w := box.right - box.left - (paddingLR * 2)
+	h := box.height
+
+	typeText := getTypeText(card, fontSize, w, h, box.align)
+
+	ctx.DrawText(x, y, typeText)
+
+}
+
+func getTypeText(card *nrdb.Printing, fontSize, w, h float64, align canvas.TextAlign) *canvas.Text {
+	var tText *canvas.Text
+	typeName := getTypeName(card.Attributes.CardTypeID)
+
+	if card.Attributes.DisplaySubtypes != nil {
+		tText = getCardText(fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSize, w, h, align)
+	} else {
+		tText = getCardText(fmt.Sprintf("<strong>%s</strong>", typeName), fontSize, w, h, align)
+	}
+
+	return tText
 }

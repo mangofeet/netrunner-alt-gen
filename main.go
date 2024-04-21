@@ -34,8 +34,10 @@ import (
 
 const canvasWidth = 3264.0
 const canvasHeight = 4450.0
-const cardWidth = 2975.0
-const cardHeight = 4156.0
+const cardWidth = 2976.0
+const cardHeight = 4152.0
+const safeWidth = 2736.0
+const safeHeight = 3924.0
 
 // real card MM, doesn't work currently, need higehr res for
 // generation
@@ -128,6 +130,8 @@ func generateCard(cardName string, drawBleedLines bool) error {
 		framer = basic.FrameHardware{}
 	case "event":
 		framer = basic.FrameEvent{}
+	case "ice":
+		framer = basic.FrameIce{}
 	}
 
 	if framer != nil {
@@ -140,20 +144,11 @@ func generateCard(cardName string, drawBleedLines bool) error {
 
 		marginX := (canvasWidth - cardWidth) / 2
 		marginY := (canvasHeight - cardHeight) / 2
+		safeMarginX := (canvasWidth - safeWidth) / 2
+		safeMarginY := (canvasHeight - safeHeight) / 2
 
-		dash := canvasHeight * 0.0021
-
-		ctx.Push()
-		ctx.SetStrokeColor(color.White)
-		ctx.SetStrokeWidth(dash / 2)
-		ctx.MoveTo(marginX, marginY)
-		ctx.LineTo(marginX, marginY+cardHeight)
-		ctx.LineTo(marginX+cardWidth, marginY+cardHeight)
-		ctx.LineTo(marginX+cardWidth, marginY)
-		ctx.Close()
-		ctx.SetDashes(0, dash, dash*2)
-		ctx.Stroke()
-		ctx.Pop()
+		drawMargin(ctx, marginX, marginY, cardWidth, cardHeight, color.White)
+		drawMargin(ctx, safeMarginX, safeMarginY, safeWidth, safeHeight, canvas.Red)
 
 	}
 
@@ -163,4 +158,23 @@ func generateCard(cardName string, drawBleedLines bool) error {
 	}
 
 	return nil
+}
+
+func drawMargin(ctx *canvas.Context, x, y, w, h float64, c color.Color) {
+	_, canvasHeight := ctx.Size()
+
+	dash := canvasHeight * 0.0021
+
+	ctx.Push()
+	ctx.SetStrokeColor(c)
+	ctx.SetStrokeWidth(dash / 2)
+	ctx.MoveTo(x, y)
+	ctx.LineTo(x, y+h)
+	ctx.LineTo(x+w, y+h)
+	ctx.LineTo(x+w, y)
+	ctx.Close()
+	ctx.SetDashes(0, dash, dash*2)
+	ctx.Stroke()
+	ctx.Pop()
+
 }

@@ -75,7 +75,7 @@ func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	}
 
 	titleTextY := titleBoxTop - titleBoxHeight*0.1
-	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitleText(card), fontSizeTitle, canvasWidth, titleBoxHeight))
+	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitleText(card), fontSizeTitle, canvasWidth, titleBoxHeight, canvas.Left))
 	// canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
 
 	if card.Attributes.Cost != nil {
@@ -87,7 +87,8 @@ func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			canvas.Center, canvas.Center, 0, 0))
 	}
 
-	drawCardText(ctx, card, fontSizeCard, canvasHeight, 0, boxText, boxType)
+	drawCardText(ctx, card, fontSizeCard, canvasHeight, 0, boxText)
+	drawTypeText(ctx, card, fontSizeCard, boxType)
 
 	return nil
 
