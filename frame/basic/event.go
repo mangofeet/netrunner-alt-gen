@@ -81,7 +81,7 @@ func (FrameEvent) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	titleTextX := costContainerStart + (costContainerR * 2) + (costContainerR / 3)
 	titleTextY := titleBoxTop - titleBoxHeight*0.1
-	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitleText(card), fontSizeTitle, titleBoxRight, titleBoxHeight, canvas.Left))
+	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitle(card), fontSizeTitle, titleBoxRight, titleBoxHeight, canvas.Left))
 	// ctx.DrawText(titleTextX, titleTextY, canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
 
 	if card.Attributes.Cost != nil {

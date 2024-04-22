@@ -9,6 +9,30 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
+func getTitle(card *nrdb.Printing) string {
+
+	if !card.Attributes.IsUnique {
+		return card.Attributes.Title
+	}
+
+	return fmt.Sprintf("♦ %s", card.Attributes.Title)
+}
+
+func getTitleText(ctx *canvas.Context, card *nrdb.Printing, fontSize, maxWidth, height float64) *canvas.Text {
+	title := getTitle(card)
+
+	text := getCardText(title, fontSize, maxWidth*2, height, canvas.Left)
+
+	strokeWidth := getStrokeWidth(ctx)
+
+	for text.Bounds().W > maxWidth {
+		fontSize -= strokeWidth
+		text = getCardText(title, fontSize, maxWidth*2, height, canvas.Left)
+	}
+
+	return text
+}
+
 func getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64, align canvas.TextAlign) *canvas.Text {
 
 	regFace := getFont(fontSize, canvas.FontRegular)
@@ -124,23 +148,19 @@ func getTypeName(typeID string) string {
 		return "Identity"
 	case "ice":
 		return "Ice"
+	case "asset":
+		return "Asset"
+	case "upgrade":
+		return "Upgrade"
 	}
 
 	return typeID
 }
 
-func getTitleText(card *nrdb.Printing) string {
-
-	if !card.Attributes.IsUnique {
-		return card.Attributes.Title
-	}
-
-	return fmt.Sprintf("♦ %s", card.Attributes.Title)
-}
-
 type textBoxDimensions struct {
-	left, right, height, bottom, top float64
-	align                            canvas.TextAlign
+	left, right, bottom, top float64
+	width, height            float64
+	align                    canvas.TextAlign
 }
 
 func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCutoff, indent float64, box textBoxDimensions) {
@@ -149,8 +169,7 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 		box.align = canvas.Left
 	}
 
-	_, canvasHeight := ctx.Size()
-	strokeWidth := canvasHeight * 0.0023
+	strokeWidth := getStrokeWidth(ctx)
 
 	paddingLR, paddingTB := getCardTextPadding(ctx)
 	x := box.left + paddingLR

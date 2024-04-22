@@ -1,7 +1,6 @@
 package basic
 
 import (
-	"fmt"
 	"image/color"
 	"log"
 	"math"
@@ -11,9 +10,9 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
-type FrameHardware struct{}
+type FrameAsset struct{}
 
-func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
+func (FrameAsset) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	canvasWidth, canvasHeight := ctx.Size()
 
@@ -34,58 +33,58 @@ func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 
-	costContainerR := getCostContainerRadius(ctx)
-	costContainerStart := getCostContainerStart(ctx)
-
 	titleBoxHeight := getTitleBoxHeight(ctx)
+	fontSizeCost := titleBoxHeight * 2.3
+	boxResIcon, err := drawRezCost(ctx, card, fontSizeCost)
+	if err != nil {
+		return err
+	}
 
 	titleBoxTop := getTitleBoxTop(ctx)
 	titleBoxBottom := titleBoxTop - titleBoxHeight
-	titleBoxLeftOut := costContainerStart + costContainerR*2.5
-	titleBoxLeftIn := titleBoxLeftOut + costContainerR*0.5
+	titleBoxLeftOut := boxResIcon.left + (boxResIcon.width * 1.2)
+	titleBoxLeftIn := titleBoxLeftOut + titleBoxHeight*0.8
 
 	titlePath := &canvas.Path{}
-	titlePath.MoveTo(titleBoxLeftIn, titleBoxTop)
+	titlePath.MoveTo(titleBoxLeftOut, titleBoxTop)
 	titlePath.LineTo(canvasWidth, titleBoxTop)
 	titlePath.LineTo(canvasWidth, titleBoxBottom)
 	titlePath.LineTo(titleBoxLeftIn, titleBoxBottom)
-	titlePath.LineTo(titleBoxLeftOut, titleBoxBottom+(titleBoxHeight*0.5))
 	titlePath.Close()
 
 	ctx.DrawPath(0, 0, titlePath)
 	ctx.Pop()
 
-	drawCostCircle(ctx, bgColor)
+	var boxText, boxType textBoxDimensions
+	if card.Attributes.TrashCost != nil {
+		boxText, boxType = drawTextBoxTrashable(ctx, canvasHeight/192, cornerRounded)
+	} else {
+		boxText, boxType = drawTextBox(ctx, canvasHeight/192, cornerRounded)
+	}
 
-	boxText, boxType := drawTextBox(ctx, canvasHeight/48, cornerStraight)
+	drawInfluence(ctx, card, boxText.left, factionColor)
 
-	drawInfluence(ctx, card, boxText.right, factionColor)
-
+	if _, err := drawTrashCost(ctx, card); err != nil {
+		return err
+	}
 	// render card text
 
 	// not sure how these sizes actually correlate to the weird
 	// pixel/mm setup I'm using, but these work
 	fontSizeTitle := titleBoxHeight * 2
-	fontSizeCost := titleBoxHeight * 3
 	fontSizeCard := titleBoxHeight * 1.2
 
-	titleTextX := titleBoxLeftIn + costContainerR*0.25
+	titleTextX := titleBoxLeftIn
 	if card.Attributes.IsUnique { // unique diamon fits better in the angled end here
-		titleTextX = titleBoxLeftIn - costContainerR*0.25
+		titleTextX = titleBoxLeftIn - titleBoxHeight*0.2
 	}
 
-	titleTextY := titleBoxTop - titleBoxHeight*0.1
-	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitle(card), fontSizeTitle, canvasWidth, titleBoxHeight, canvas.Left))
+	titleTextMaxWidth := (canvasWidth * 0.9) - titleBoxLeftIn
+
+	titleText := getTitleText(ctx, card, fontSizeTitle, titleTextMaxWidth, titleBoxHeight)
+	titleTextY := (titleBoxTop - (titleBoxHeight-titleText.Bounds().H)*0.5)
+	ctx.DrawText(titleTextX, titleTextY, titleText)
 	// canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
-
-	if card.Attributes.Cost != nil {
-		costTextX := costContainerStart
-		costTextY := titleBoxBottom + titleBoxHeight/2
-		ctx.DrawText(costTextX, costTextY, canvas.NewTextBox(
-			getFont(fontSizeCost, canvas.FontBlack), fmt.Sprint(*card.Attributes.Cost),
-			costContainerR*2, 0,
-			canvas.Center, canvas.Center, 0, 0))
-	}
 
 	drawCardText(ctx, card, fontSizeCard, canvasHeight, 0, boxText)
 	drawTypeText(ctx, card, fontSizeCard, boxType)

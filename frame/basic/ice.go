@@ -19,25 +19,6 @@ func (FrameIce) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
 	factionColor := art.Darken(factionBaseColor, 0.811)
 
-	// res cost icon
-	rezCostImage, err := loadGameAsset("REZ_COST")
-	if err != nil {
-		return err
-	}
-	rezCostImage = rezCostImage.Transform(canvas.Identity.ReflectY()).Scale(0.1, 0.1)
-
-	ctx.Push()
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth * 0.3)
-
-	costIconX := canvasWidth * 0.066
-	costIconY := canvasHeight - costIconX
-
-	ctx.DrawPath(costIconX, costIconY, rezCostImage)
-
-	ctx.Pop()
-
 	// title box
 
 	ctx.Push()
@@ -46,10 +27,15 @@ func (FrameIce) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetStrokeWidth(strokeWidth)
 
 	titleBoxHeight := getTitleBoxHeight(ctx)
+	fontSizeCost := titleBoxHeight * 2.3
+	boxResIcon, err := drawRezCost(ctx, card, fontSizeCost)
+	if err != nil {
+		return err
+	}
 
 	titleBoxTop := getTitleBoxTop(ctx)
 	titleBoxBottom := titleBoxTop - titleBoxHeight
-	titleBoxLeft := costIconX + (rezCostImage.Bounds().W * 1.1)
+	titleBoxLeft := boxResIcon.left + (boxResIcon.width)
 	// titleBoxLeft := costIconX
 	titleBoxRadius := (canvasHeight / 48)
 	titleBoxArc1StartY := titleBoxTop - titleBoxRadius
@@ -77,8 +63,8 @@ func (FrameIce) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 	typeBoxWidth := titleBoxHeight * 0.75
-	typeBoxTop := costIconY - (rezCostImage.Bounds().H * 1.1)
-	typeBoxLeft := costIconX + (rezCostImage.Bounds().W * 0.52) - (typeBoxWidth * 0.5)
+	typeBoxTop := boxResIcon.top - (boxResIcon.height * 1.1)
+	typeBoxLeft := boxResIcon.left + (boxResIcon.width * 0.52) - (typeBoxWidth * 0.5)
 
 	typeBoxRadius := titleBoxRadius * 0.75
 	typeBoxArc1StartY := typeBoxTop - typeBoxRadius
@@ -144,23 +130,13 @@ func (FrameIce) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	drawInfluence(ctx, card, influenceX, factionColor)
 
 	fontSizeTitle := titleBoxHeight * 2
-	fontSizeCost := titleBoxHeight * 2.3
 	fontSizeStr := titleBoxHeight * 4
 	fontSizeCard := titleBoxHeight * 1.2
 
 	titleTextX := titleBoxLeft + titleBoxHeight*0.3
 	titleTextY := titleBoxTop - titleBoxHeight*0.1
-	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitleText(card), fontSizeTitle, canvasWidth-titleBoxLeft, titleBoxHeight, canvas.Left))
+	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitle(card), fontSizeTitle, canvasWidth-titleBoxLeft, titleBoxHeight, canvas.Left))
 	// ctx.DrawText(titleTextX, titleTextY, canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
-
-	if card.Attributes.Cost != nil {
-		costTextX := costIconX * 1.03
-		costTextY := costIconY - rezCostImage.Bounds().H*0.5
-		ctx.DrawText(costTextX, costTextY, canvas.NewTextBox(
-			getFont(fontSizeCost, canvas.FontBlack), fmt.Sprint(*card.Attributes.Cost),
-			rezCostImage.Bounds().W, 0,
-			canvas.Center, canvas.Center, 0, 0))
-	}
 
 	strengthText := "-"
 	if card.Attributes.Strength != nil {

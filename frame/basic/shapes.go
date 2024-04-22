@@ -1,6 +1,7 @@
 package basic
 
 import (
+	"fmt"
 	"image/color"
 
 	"github.com/mangofeet/nrdb-go"
@@ -54,6 +55,102 @@ func drawCostCircle(ctx *canvas.Context, bgColor color.Color) {
 
 	ctx.Pop()
 
+}
+
+func drawRezCost(ctx *canvas.Context, card *nrdb.Printing, fontSize float64) (*textBoxDimensions, error) {
+	canvasWidth, canvasHeight := ctx.Size()
+
+	strokeWidth := getStrokeWidth(ctx)
+
+	// res cost icon
+	rezCostImage, err := loadGameAsset("REZ_COST")
+	if err != nil {
+		return nil, err
+	}
+	rezCostImage = rezCostImage.Transform(canvas.Identity.ReflectY()).Scale(0.1, 0.1)
+
+	ctx.Push()
+	ctx.SetFillColor(bgColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth * 0.5)
+
+	costIconX := canvasWidth * 0.066
+	costIconY := canvasHeight - costIconX
+
+	ctx.DrawPath(costIconX, costIconY, rezCostImage)
+
+	ctx.Pop()
+
+	if card.Attributes.Cost != nil {
+		costTextX := costIconX * 1.03
+		costTextY := costIconY - rezCostImage.Bounds().H*0.5
+		ctx.DrawText(costTextX, costTextY, canvas.NewTextBox(
+			getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.Cost),
+			rezCostImage.Bounds().W, 0,
+			canvas.Center, canvas.Center, 0, 0))
+	}
+
+	return &textBoxDimensions{
+		top:    costIconY,
+		left:   costIconX,
+		width:  rezCostImage.Bounds().W,
+		height: rezCostImage.Bounds().H,
+	}, nil
+}
+
+func drawTrashCost(ctx *canvas.Context, card *nrdb.Printing) (*textBoxDimensions, error) {
+	canvasWidth, canvasHeight := ctx.Size()
+
+	strokeWidth := getStrokeWidth(ctx)
+
+	trashScale := 0.006
+
+	// res cost icon
+	image, err := loadGameAsset("TRASH_COST")
+	if err != nil {
+		return nil, err
+	}
+	image = image.Transform(canvas.Identity.ReflectY()).Scale(trashScale, trashScale)
+
+	image2, err := loadGameAsset("TRASH_COST_2")
+	if err != nil {
+		return nil, err
+	}
+	image2 = image2.Transform(canvas.Identity.ReflectY()).Scale(trashScale, trashScale)
+
+	fontSize := image2.Bounds().H * 2
+	iconX := canvasWidth * 0.8
+	iconY := canvasHeight * 0.16
+
+	ctx.Push()
+	ctx.SetStrokeColor(textColor)
+	ctx.DrawPath(iconX, iconY, image)
+	ctx.Pop()
+
+	ctx.Push()
+	ctx.SetFillColor(bgColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
+
+	ctx.DrawPath(iconX, iconY, image2)
+
+	ctx.Pop()
+
+	if card.Attributes.TrashCost != nil {
+		textX := iconX + image2.Bounds().W*0.75
+		textY := iconY - image2.Bounds().H*1.2
+		ctx.DrawText(textX, textY, canvas.NewTextBox(
+			getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.TrashCost),
+			image.Bounds().W, 0,
+			canvas.Center, canvas.Center, 0, 0))
+	}
+
+	return &textBoxDimensions{
+		top:    iconY,
+		left:   iconX,
+		width:  image.Bounds().W,
+		height: image.Bounds().H,
+	}, nil
 }
 
 func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor color.RGBA) {
@@ -170,14 +267,26 @@ var cornerNone = corner(func(ctx *canvas.Context, cx, cy, x, y float64) {
 })
 
 func drawTextBox(ctx *canvas.Context, cornerSize float64, cornerType corner) (textBoxDimensions, textBoxDimensions) {
-
 	canvasWidth, _ := ctx.Size()
+	textBoxLeft := canvasWidth / 8
+	textBoxRight := canvasWidth - (canvasWidth / 8)
+
+	return drawTextBoxToSize(ctx, textBoxLeft, textBoxRight, cornerSize, cornerType)
+}
+
+func drawTextBoxTrashable(ctx *canvas.Context, cornerSize float64, cornerType corner) (textBoxDimensions, textBoxDimensions) {
+	canvasWidth, _ := ctx.Size()
+	textBoxLeft := canvasWidth / 8
+	textBoxRight := canvasWidth - (canvasWidth / 6)
+
+	return drawTextBoxToSize(ctx, textBoxLeft, textBoxRight, cornerSize, cornerType)
+}
+
+func drawTextBoxToSize(ctx *canvas.Context, textBoxLeft, textBoxRight, cornerSize float64, cornerType corner) (textBoxDimensions, textBoxDimensions) {
 
 	strokeWidth := getStrokeWidth(ctx)
 
 	textBoxHeight := getTextBoxHeight(ctx)
-	textBoxLeft := canvasWidth / 8
-	textBoxRight := canvasWidth - (canvasWidth / 8)
 
 	textBoxArc2StartX := textBoxRight - cornerSize
 	textBoxArc2EndY := textBoxHeight - cornerSize
@@ -209,7 +318,7 @@ func drawTextBox(ctx *canvas.Context, cornerSize float64, cornerType corner) (te
 	typeBoxHeight := textBoxHeight * 0.17
 	typeBoxBottom := textBoxHeight + strokeWidth*0.5
 	typeBoxLeft := textBoxLeft
-	typeBoxRight := canvasWidth - (canvasWidth / 6)
+	typeBoxRight := textBoxRight * 0.9
 
 	typeBoxArcRadius := cornerSize
 	typeBoxArc1StartY := typeBoxBottom + typeBoxHeight - typeBoxArcRadius
