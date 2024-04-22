@@ -24,14 +24,14 @@ func (FrameIce) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	if err != nil {
 		return err
 	}
-	rezCostImage = rezCostImage.Transform(canvas.Identity.ReflectY()).Scale(0.13, 0.13)
+	rezCostImage = rezCostImage.Transform(canvas.Identity.ReflectY()).Scale(0.1, 0.1)
 
 	ctx.Push()
 	ctx.SetFillColor(bgColor)
 	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth * 0.5)
+	ctx.SetStrokeWidth(strokeWidth * 0.3)
 
-	costIconX := canvasWidth * 0.04
+	costIconX := canvasWidth * 0.066
 	costIconY := canvasHeight - costIconX
 
 	ctx.DrawPath(costIconX, costIconY, rezCostImage)
@@ -49,8 +49,8 @@ func (FrameIce) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	titleBoxTop := getTitleBoxTop(ctx)
 	titleBoxBottom := titleBoxTop - titleBoxHeight
-	// titleBoxRight := canvasWidth - (canvasWidth / 16)
 	titleBoxLeft := costIconX + (rezCostImage.Bounds().W * 1.1)
+	// titleBoxLeft := costIconX
 	titleBoxRadius := (canvasHeight / 48)
 	titleBoxArc1StartY := titleBoxTop - titleBoxRadius
 	titleBoxArc1EndX := titleBoxLeft + titleBoxRadius
@@ -108,7 +108,7 @@ func (FrameIce) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	textBoxBottom := canvasHeight * 0.5
 	textBoxTop := titleBoxBottom - titleBoxHeight*0.5
-	textBoxLeft := typeBoxLeft + typeBoxWidth + titleBoxHeight*0.5
+	textBoxLeft := typeBoxLeft + typeBoxWidth + ((titleBoxHeight - typeBoxWidth) / 2) + titleBoxHeight*0.5
 
 	textBoxArc1StartY := textBoxTop - titleBoxRadius
 	textBoxArc1EndX := textBoxLeft + titleBoxRadius
@@ -144,7 +144,7 @@ func (FrameIce) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	drawInfluence(ctx, card, influenceX, factionColor)
 
 	fontSizeTitle := titleBoxHeight * 2
-	fontSizeCost := titleBoxHeight * 3
+	fontSizeCost := titleBoxHeight * 2.3
 	fontSizeStr := titleBoxHeight * 4
 	fontSizeCard := titleBoxHeight * 1.2
 
@@ -154,7 +154,7 @@ func (FrameIce) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	// ctx.DrawText(titleTextX, titleTextY, canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
 
 	if card.Attributes.Cost != nil {
-		costTextX := costIconX * 1.07
+		costTextX := costIconX * 1.03
 		costTextY := costIconY - rezCostImage.Bounds().H*0.5
 		ctx.DrawText(costTextX, costTextY, canvas.NewTextBox(
 			getFont(fontSizeCost, canvas.FontBlack), fmt.Sprint(*card.Attributes.Cost),
