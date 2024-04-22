@@ -98,47 +98,42 @@ func drawRezCost(ctx *canvas.Context, card *nrdb.Printing, fontSize float64) (*t
 	}, nil
 }
 
+func loadTrashCostPath() *canvas.Path {
+
+	trashScale := 0.005
+	paths := make([]*canvas.Path, 5)
+	for i := range 5 {
+		path := mustLoadGameAsset(fmt.Sprintf("TRASH_COST_%d", i))
+		path = path.Transform(canvas.Identity.ReflectY()).Scale(trashScale, trashScale)
+		paths[i] = path
+	}
+
+	return paths[0].Join(paths[1]).Join(paths[2]).Join(paths[3]).Join(paths[4])
+
+}
+
 func drawTrashCost(ctx *canvas.Context, card *nrdb.Printing) (*textBoxDimensions, error) {
 	canvasWidth, canvasHeight := ctx.Size()
 
 	strokeWidth := getStrokeWidth(ctx)
 
-	trashScale := 0.006
-
 	// res cost icon
-	image, err := loadGameAsset("TRASH_COST")
-	if err != nil {
-		return nil, err
-	}
-	image = image.Transform(canvas.Identity.ReflectY()).Scale(trashScale, trashScale)
+	image := loadTrashCostPath()
 
-	image2, err := loadGameAsset("TRASH_COST_2")
-	if err != nil {
-		return nil, err
-	}
-	image2 = image2.Transform(canvas.Identity.ReflectY()).Scale(trashScale, trashScale)
-
-	fontSize := image2.Bounds().H * 2
-	iconX := canvasWidth * 0.8
-	iconY := canvasHeight * 0.16
+	fontSize := image.Bounds().H * 2
+	iconX := canvasWidth * 0.815
+	iconY := canvasHeight * 0.145
 
 	ctx.Push()
+	ctx.SetFill(bgColor)
 	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
 	ctx.DrawPath(iconX, iconY, image)
 	ctx.Pop()
 
-	ctx.Push()
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
-
-	ctx.DrawPath(iconX, iconY, image2)
-
-	ctx.Pop()
-
 	if card.Attributes.TrashCost != nil {
-		textX := iconX + image2.Bounds().W*0.75
-		textY := iconY - image2.Bounds().H*1.2
+		textX := iconX + image.Bounds().W*0.45
+		textY := iconY - image.Bounds().H
 		ctx.DrawText(textX, textY, canvas.NewTextBox(
 			getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.TrashCost),
 			image.Bounds().W, 0,
