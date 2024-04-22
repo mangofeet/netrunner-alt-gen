@@ -328,7 +328,7 @@ func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor 
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 
-	influenceHeight := getTextBoxHeight(ctx) * 0.65
+	influenceHeight := getTextBoxHeight(ctx) * 0.75
 	influenceWidth := canvasHeight / 42
 
 	// center around the give point
@@ -342,9 +342,10 @@ func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor 
 
 	pipR := curveRadius * 0.6
 
+	var pipY float64
 	for i := 0.0; i < 5; i += 1 {
 
-		pipY := influenceHeight - (pipR * ((i + 1) * 4)) + (pipR / 2)
+		pipY = influenceHeight - (pipR * ((i + 1) * 4)) + (pipR / 2)
 
 		ctx.Push()
 		ctx.SetStrokeWidth(strokeWidth * 0.75)
@@ -365,6 +366,36 @@ func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor 
 		}
 	}
 
+	var factionImage *canvas.Canvas
+
+	switch card.Attributes.FactionID {
+	case "anarch":
+		factionImage = mustLoadFactionSVG("ANARCH")
+	case "shaper":
+		factionImage = mustLoadFactionSVG("SHAPER")
+	case "criminal":
+		factionImage = mustLoadFactionSVG("CRIMINAL")
+	case "haas_bioroid":
+		factionImage = mustLoadFactionSVG("HB")
+	case "nbn":
+		factionImage = mustLoadFactionSVG("NBN")
+	case "jinteki":
+		factionImage = mustLoadFactionSVG("JINTEKI")
+	case "weyland_consortium":
+		factionImage = mustLoadFactionSVG("WEYLAND")
+	}
+
+	// neutral faction
+	if factionImage == nil {
+		return
+	}
+
+	factionScaleFactor := 0.2
+	factionX := x - factionImage.W*0.5*factionScaleFactor
+	factionY := pipY - pipR*2 - factionImage.H*factionScaleFactor
+
+	factionImage.Transform(canvas.Identity.Translate(factionX, factionY).Scale(factionScaleFactor, factionScaleFactor))
+	factionImage.RenderTo(ctx)
 }
 
 func strength(canvasWidth, canvasHeight float64) *canvas.Path {
@@ -384,11 +415,17 @@ func influenceBox(height, width float64) *canvas.Path {
 	path := &canvas.Path{}
 
 	curveRadius := width / 2
+	bubbleStart := height * 0.2
+	bubbleRadius := width * 1.2
 	curveStart := height - curveRadius
 
 	path.MoveTo(0, 0)
+	path.LineTo(0, bubbleStart)
+	path.QuadTo(-1*bubbleRadius, bubbleStart+bubbleRadius, 0, bubbleStart+bubbleRadius*2)
 	path.LineTo(0, curveStart)
 	path.CubeTo(0, height, width, height, width, curveStart)
+	path.LineTo(width, bubbleStart+bubbleRadius*2)
+	path.QuadTo(width+bubbleRadius, bubbleStart+bubbleRadius, width, bubbleStart)
 	path.LineTo(width, 0)
 	path.Close()
 
