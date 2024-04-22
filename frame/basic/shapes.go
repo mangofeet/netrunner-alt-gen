@@ -113,6 +113,11 @@ func loadTrashCostPath() *canvas.Path {
 }
 
 func drawTrashCost(ctx *canvas.Context, card *nrdb.Printing) (*textBoxDimensions, error) {
+
+	if card.Attributes.TrashCost == nil {
+		return nil, nil
+	}
+
 	canvasWidth, canvasHeight := ctx.Size()
 
 	strokeWidth := getStrokeWidth(ctx)
