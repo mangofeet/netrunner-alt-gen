@@ -98,6 +98,55 @@ func drawRezCost(ctx *canvas.Context, card *nrdb.Printing, fontSize float64) (*t
 	}, nil
 }
 
+func drawAgendaPoints(ctx *canvas.Context, card *nrdb.Printing, fontSize float64) (*textBoxDimensions, error) {
+	canvasWidth, _ := ctx.Size()
+
+	strokeWidth := getStrokeWidth(ctx)
+
+	// res cost icon
+	icon, err := loadGameAsset("AGENDA")
+	if err != nil {
+		return nil, err
+	}
+	icon = icon.Transform(canvas.Identity.ReflectY()).Scale(0.07, 0.07)
+
+	iconX := canvasWidth * 0.085
+	iconY := getTextBoxHeight(ctx) + icon.Bounds().H*1.8
+
+	ctx.Push()
+	ctx.SetFillColor(bgColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth * 0.5)
+	circle := canvas.Circle(icon.Bounds().H * 0.6)
+	ctx.DrawPath(iconX+icon.Bounds().W*0.53, iconY-icon.Bounds().H*0.46, circle)
+	ctx.Pop()
+
+	ctx.Push()
+	ctx.SetFillColor(transparent)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth * 0.5)
+
+	ctx.DrawPath(iconX, iconY, icon)
+
+	ctx.Pop()
+
+	if card.Attributes.AgendaPoints != nil {
+		textX := iconX * 1.03
+		textY := iconY - icon.Bounds().H*0.4
+		ctx.DrawText(textX, textY, canvas.NewTextBox(
+			getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.AgendaPoints),
+			icon.Bounds().W, 0,
+			canvas.Center, canvas.Center, 0, 0))
+	}
+
+	return &textBoxDimensions{
+		top:    iconY,
+		left:   iconX,
+		width:  icon.Bounds().W,
+		height: icon.Bounds().H,
+	}, nil
+}
+
 func loadTrashCostPath() *canvas.Path {
 
 	trashScale := 0.005
