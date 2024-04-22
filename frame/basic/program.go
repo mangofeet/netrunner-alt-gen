@@ -73,7 +73,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 
-	ctx.DrawPath(canvasWidth*-0.06, 0, strength(canvasWidth, canvasHeight))
+	ctx.DrawPath(canvasWidth*-0.04, 0, strength(canvasWidth, canvasHeight))
 
 	ctx.Pop()
 
@@ -145,7 +145,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		strengthText = fmt.Sprint(*card.Attributes.Strength)
 	}
 
-	strTextX := 0.0
+	strTextX := canvasWidth * 0.01
 	strTextY := canvasHeight / 10
 	ctx.DrawText(strTextX, strTextY, canvas.NewTextBox(
 		getFont(fontSizeStr, canvas.FontBlack), strengthText,
