@@ -152,6 +152,8 @@ func getTypeName(typeID string) string {
 		return "Asset"
 	case "upgrade":
 		return "Upgrade"
+	case "operation":
+		return "Operation"
 	}
 
 	return typeID
