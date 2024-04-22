@@ -124,6 +124,7 @@ func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
 	text = replaceSymbol(rt, "[click]", "CLICK", text, face, 0.0002, 1)
 	text = replaceSymbol(rt, "[subroutine]", "SUBROUTINE", text, face, 0.0002, 1)
 	text = replaceSymbol(rt, "[trash]", "TRASH_ABILITY", text, face, 0.0002, 1)
+	text = replaceSymbol(rt, "[interrupt]", "INTERRUPT", text, face, 0.0002, 1)
 
 	if replacementCheck.MatchString(text) {
 		writeChunk(rt, text, face)
