@@ -9,7 +9,8 @@ import (
 
 func getStrokeWidth(ctx *canvas.Context) float64 {
 	_, canvasHeight := ctx.Size()
-	return canvasHeight * 0.0023
+	// return canvasHeight * 0.0023
+	return canvasHeight * 0.0016
 }
 
 func getTitleBoxHeight(ctx *canvas.Context) float64 {
