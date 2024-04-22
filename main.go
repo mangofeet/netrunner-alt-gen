@@ -5,6 +5,7 @@ import (
 	"image/color"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -161,11 +162,33 @@ func generateCard(cardName string, drawBleedLines bool) error {
 	}
 
 	// if err := renderers.Write("out.png", cnv, canvas.DPI(1200)); err != nil {
-	if err := renderers.Write("out.png", cnv, canvas.DPMM(1)); err != nil {
+	// if err := renderers.Write("out.png", cnv, canvas.DPMM(1)); err != nil {
+	if err := renderers.Write(fmt.Sprintf("output/%s.png", getFileName(printing)), cnv, canvas.DPMM(1)); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+var fileNameRegexp = regexp.MustCompile(`[^A-Za-z0-9]`)
+
+func getFileName(card *nrdb.Printing) string {
+
+	pos := fmt.Sprint(card.Attributes.PositionInSet)
+
+	if card.Attributes.PositionInSet < 10 {
+		pos = fmt.Sprintf("00%d", card.Attributes.PositionInSet)
+	} else if card.Attributes.PositionInSet < 100 {
+		pos = fmt.Sprintf("0%d", card.Attributes.PositionInSet)
+	}
+
+	title := fileNameRegexp.ReplaceAllString(card.Attributes.StrippedTitle, "-")
+	title = strings.ToLower(title)
+
+	set := fileNameRegexp.ReplaceAllString(card.Attributes.CardSetID, "-")
+
+	return fmt.Sprintf("%s-%s-%s", set, pos, title)
+
 }
 
 func drawMargin(ctx *canvas.Context, x, y, w, h float64, c color.Color) {
