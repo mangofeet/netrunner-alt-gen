@@ -112,6 +112,12 @@ func drawAgendaPoints(ctx *canvas.Context, card *nrdb.Printing, fontSize float64
 
 	iconX := canvasWidth * 0.085
 	iconY := getTextBoxHeight(ctx) + icon.Bounds().H*1.8
+	iconColor := color.RGBA{
+		R: textColor.R,
+		G: textColor.G,
+		B: textColor.B,
+		A: 0x44,
+	}
 
 	ctx.Push()
 	ctx.SetFillColor(bgColor)
@@ -122,12 +128,8 @@ func drawAgendaPoints(ctx *canvas.Context, card *nrdb.Printing, fontSize float64
 	ctx.Pop()
 
 	ctx.Push()
-	ctx.SetFillColor(transparent)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth * 0.5)
-
+	ctx.SetFillColor(iconColor)
 	ctx.DrawPath(iconX, iconY, icon)
-
 	ctx.Pop()
 
 	if card.Attributes.AgendaPoints != nil {
