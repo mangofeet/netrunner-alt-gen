@@ -163,7 +163,7 @@ func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor 
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 
-	influenceHeight := getTextBoxHeight(ctx) * 0.6
+	influenceHeight := getTextBoxHeight(ctx) * 0.65
 	influenceWidth := canvasHeight / 42
 
 	// center around the give point
