@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image/color"
 
+	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
 )
@@ -291,8 +292,8 @@ func drawLink(ctx *canvas.Context, card *nrdb.Printing) {
 	ctx.Push()
 	ctx.SetFillColor(textColor)
 
-	iconX := boxX + (icon.Bounds().W * 2.2)
-	iconY := boxY - (icon.Bounds().H * 0.8)
+	iconX := boxX + (icon.Bounds().W * 2.5)
+	iconY := boxY + (icon.Bounds().H * 1.1)
 
 	ctx.DrawPath(iconX, iconY, icon)
 
@@ -303,9 +304,9 @@ func drawLink(ctx *canvas.Context, card *nrdb.Printing) {
 		text = fmt.Sprint(*card.Attributes.BaseLink)
 	}
 
-	textX := boxX - boxW*0.08
-	textY := boxY
-	fontSize := getTitleBoxHeight(ctx) * 1.2
+	textX := boxX + boxW*0.0
+	textY := boxY + boxW*0.2
+	fontSize := getTitleBoxHeight(ctx) * 2
 	ctx.DrawText(textX, textY, canvas.NewTextBox(
 		getFont(fontSize, canvas.FontBlack), text,
 		boxW, boxH,
@@ -510,4 +511,74 @@ func drawTextBoxToSize(ctx *canvas.Context, textBoxLeft, textBoxRight, cornerSiz
 			bottom: typeBoxBottom,
 		}
 
+}
+
+func drawRunnerLimits(ctx *canvas.Context, card *nrdb.Printing, box textBoxDimensions) {
+
+	canvasWidth, _ := ctx.Size()
+
+	factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
+	factionColor := art.Darken(factionBaseColor, 0.811)
+	influenceColor := color.RGBA{
+		R: 0x3f,
+		G: 0x3f,
+		B: 0x3f,
+		A: 0xff,
+	}
+	strokeWidth := getStrokeWidth(ctx)
+
+	width := canvasWidth * 0.1
+	height := canvasWidth * 0.08
+	deckBoxLeft := box.left - width*0.5
+	influenceBoxLeft := box.right - width*0.5
+	bottom := box.height * 0.18
+	top := bottom + height
+	corner := width * 0.25
+
+	ctx.Push()
+	ctx.SetFillColor(factionColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
+
+	ctx.MoveTo(deckBoxLeft, bottom)
+	ctx.LineTo(deckBoxLeft, top-corner)
+	ctx.LineTo(deckBoxLeft+corner, top)
+	ctx.LineTo(deckBoxLeft+width, top)
+	ctx.LineTo(deckBoxLeft+width, bottom+corner)
+	ctx.LineTo(deckBoxLeft+width-corner, bottom)
+	ctx.Close()
+
+	ctx.FillStroke()
+	ctx.Pop()
+
+	ctx.Push()
+	ctx.SetFillColor(influenceColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
+
+	ctx.MoveTo(influenceBoxLeft, bottom+corner)
+	ctx.LineTo(influenceBoxLeft, top)
+	ctx.LineTo(influenceBoxLeft+width-corner, top)
+	ctx.LineTo(influenceBoxLeft+width, top-corner)
+	ctx.LineTo(influenceBoxLeft+width, bottom)
+	ctx.LineTo(influenceBoxLeft+corner, bottom)
+	ctx.Close()
+
+	ctx.FillStroke()
+	ctx.Pop()
+
+	textDeckX := deckBoxLeft
+	textDeckY := top
+	fontSize := height * 2
+	ctx.DrawText(textDeckX, textDeckY, canvas.NewTextBox(
+		getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.MinimumDeckSize),
+		width, height,
+		canvas.Center, canvas.Center, 0, 0))
+
+	textInfluenceX := influenceBoxLeft
+	textInfluenceY := top
+	ctx.DrawText(textInfluenceX, textInfluenceY, canvas.NewTextBox(
+		getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.InfluenceLimit),
+		width, height,
+		canvas.Center, canvas.Center, 0, 0))
 }
