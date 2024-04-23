@@ -567,9 +567,11 @@ func drawRunnerLimits(ctx *canvas.Context, card *nrdb.Printing, box textBoxDimen
 	ctx.FillStroke()
 	ctx.Pop()
 
+	// text
+	fontSize := height * 2
+
 	textDeckX := deckBoxLeft
 	textDeckY := top
-	fontSize := height * 2
 	ctx.DrawText(textDeckX, textDeckY, canvas.NewTextBox(
 		getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.MinimumDeckSize),
 		width, height,
@@ -580,5 +582,56 @@ func drawRunnerLimits(ctx *canvas.Context, card *nrdb.Printing, box textBoxDimen
 	ctx.DrawText(textInfluenceX, textInfluenceY, canvas.NewTextBox(
 		getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.InfluenceLimit),
 		width, height,
+		canvas.Center, canvas.Center, 0, 0))
+}
+
+func drawCorpLimits(ctx *canvas.Context, card *nrdb.Printing, box textBoxDimensions) {
+
+	canvasWidth, _ := ctx.Size()
+
+	factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
+	factionColor := art.Darken(factionBaseColor, 0.811)
+	influenceColor := color.RGBA{
+		R: 0x3f,
+		G: 0x3f,
+		B: 0x3f,
+		A: 0xff,
+	}
+	strokeWidth := getStrokeWidth(ctx)
+
+	radius := canvasWidth * 0.04
+	y := box.height
+	deckX := box.left - radius*0.5
+	influenceX := box.right + radius*0.5
+
+	ctx.Push()
+	ctx.SetFillColor(factionColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
+	ctx.DrawPath(deckX, y, canvas.Circle(radius))
+	ctx.Pop()
+
+	ctx.Push()
+	ctx.SetFillColor(influenceColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
+	ctx.DrawPath(influenceX, y, canvas.Circle(radius))
+	ctx.Pop()
+
+	// text
+	fontSize := radius * 4
+
+	textDeckX := deckX - radius
+	textDeckY := y + radius
+	ctx.DrawText(textDeckX, textDeckY, canvas.NewTextBox(
+		getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.MinimumDeckSize),
+		radius*2, radius*2,
+		canvas.Center, canvas.Center, 0, 0))
+
+	textInfluenceX := influenceX - radius
+	textInfluenceY := y + radius
+	ctx.DrawText(textInfluenceX, textInfluenceY, canvas.NewTextBox(
+		getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.InfluenceLimit),
+		radius*2, radius*2,
 		canvas.Center, canvas.Center, 0, 0))
 }
