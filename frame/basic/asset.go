@@ -81,7 +81,7 @@ func (FrameAsset) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	titleTextMaxWidth := (canvasWidth * 0.9) - titleBoxLeftIn
 
-	titleText := getTitleText(ctx, card, fontSizeTitle, titleTextMaxWidth, titleBoxHeight)
+	titleText := getTitleText(ctx, card, fontSizeTitle, titleTextMaxWidth, titleBoxHeight, canvas.Left)
 	titleTextY := (titleBoxTop - (titleBoxHeight-titleText.Bounds().H)*0.5)
 	ctx.DrawText(titleTextX, titleTextY, titleText)
 	// canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))

@@ -80,9 +80,12 @@ func (FrameAgenda) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	drawAgendaPoints(ctx, card, fontSizeCost)
 
-	titleTextX := 0.0
-	titleTextY := titleBoxTop - titleBoxHeight*0.1
-	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitle(card), fontSizeTitle, titleBoxRight-(costContainerR*0.5), titleBoxHeight, canvas.Right))
+	titleTextMaxWidth := titleBoxRight * 0.8
+	titleTextX := titleBoxRight - titleTextMaxWidth - titleBoxHeight*0.5
+	titleText := getTitleText(ctx, card, fontSizeTitle, titleTextMaxWidth, titleBoxHeight, canvas.Right)
+	titleTextY := (titleBoxTop - (titleBoxHeight-titleText.Bounds().H)*0.5)
+
+	ctx.DrawText(titleTextX, titleTextY, titleText)
 
 	if card.Attributes.AdvancementRequirement != nil {
 		costTextX := costContainerStart

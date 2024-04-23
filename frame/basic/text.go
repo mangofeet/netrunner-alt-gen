@@ -31,17 +31,20 @@ func getSubtitle(card *nrdb.Printing) string {
 	return strings.Join(strings.Split(card.Attributes.Title, ":")[1:], ":")
 }
 
-func getTitleText(ctx *canvas.Context, card *nrdb.Printing, fontSize, maxWidth, height float64) *canvas.Text {
+func getTitleText(ctx *canvas.Context, card *nrdb.Printing, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
 	title := getTitle(card)
 
-	text := getCardText(title, fontSize, maxWidth*2, height, canvas.Left)
+	text := getCardText(title, fontSize, maxWidth*2, height, align)
 
 	strokeWidth := getStrokeWidth(ctx)
 
 	for text.Bounds().W > maxWidth {
 		fontSize -= strokeWidth
-		text = getCardText(title, fontSize, maxWidth*2, height, canvas.Left)
+		text = getCardText(title, fontSize, maxWidth*2, height, align)
 	}
+
+	// get it a final time to get the width correct
+	text = getCardText(title, fontSize, maxWidth, height, align)
 
 	return text
 }
