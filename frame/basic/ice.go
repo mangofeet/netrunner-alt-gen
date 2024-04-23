@@ -37,7 +37,7 @@ func (FrameIce) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	titleBoxBottom := titleBoxTop - titleBoxHeight
 	titleBoxLeft := boxResIcon.left + (boxResIcon.width * 1.1)
 	// titleBoxLeft := costIconX
-	titleBoxRadius := (canvasHeight / 48)
+	titleBoxRadius := (canvasHeight / 192)
 	titleBoxArc1StartY := titleBoxTop - titleBoxRadius
 	titleBoxArc1EndX := titleBoxLeft + titleBoxRadius
 	titleBoxArc2StartX := titleBoxLeft + titleBoxRadius
