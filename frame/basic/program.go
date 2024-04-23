@@ -2,7 +2,6 @@ package basic
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/nrdb-go"
@@ -16,8 +15,6 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	canvasWidth, canvasHeight := ctx.Size()
 
 	strokeWidth := getStrokeWidth(ctx)
-
-	log.Printf("strokeWidth: %f", strokeWidth)
 
 	factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
 	factionColor := art.Darken(factionBaseColor, 0.811)

@@ -52,10 +52,8 @@ func main() {
 
 	cardName := strings.Join(os.Args[1:], " ")
 
-	log.Printf("generating %s", cardName)
-
-	drawBleedLines := true
-	// drawBleedLines := false
+	// drawBleedLines := true
+	drawBleedLines := false
 
 	if err := generateCard(cardName, drawBleedLines); err != nil {
 		log.Printf("error: %s", err)
@@ -87,7 +85,7 @@ func getCardData(cardName string) (*nrdb.Printing, error) {
 
 	if len(cards) != 1 {
 		for _, card := range cards {
-			log.Printf("%s - %s", card.Title(), card.LatestPrintingID())
+			log.Printf("%s - %s", card.StrippedTitle(), card.LatestPrintingID())
 		}
 		return nil, fmt.Errorf("mulitple results")
 	}
@@ -99,6 +97,8 @@ func getCardData(cardName string) (*nrdb.Printing, error) {
 		return nil, fmt.Errorf("getting latest printing data: %w", err)
 	}
 
+	log.Printf("generating %s", printing.Attributes.StrippedTitle)
+
 	return printing, nil
 
 }
@@ -109,8 +109,6 @@ func generateCard(cardName string, drawBleedLines bool) error {
 	if err != nil {
 		return err
 	}
-
-	log.Printf("%s - %s", printing.Attributes.Title, printing.Attributes.Text)
 
 	cnv := canvas.New(canvasWidth, canvasHeight)
 
@@ -168,9 +166,13 @@ func generateCard(cardName string, drawBleedLines bool) error {
 	if err := os.MkdirAll("output", os.ModePerm); err != nil {
 		return err
 	}
-	if err := renderers.Write(fmt.Sprintf("output/%s.png", getFileName(printing)), cnv, canvas.DPMM(1)); err != nil {
+
+	filename := fmt.Sprintf("output/%s.png", getFileName(printing))
+	log.Printf("rendering output to %s", filename)
+	if err := renderers.Write(filename, cnv, canvas.DPMM(1)); err != nil {
 		return err
 	}
+	log.Println("done")
 
 	return nil
 }

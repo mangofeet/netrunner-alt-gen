@@ -1,8 +1,6 @@
 package basic
 
 import (
-	"log"
-
 	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
 )
@@ -14,8 +12,6 @@ func (FrameRunnerID) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	canvasWidth, canvasHeight := ctx.Size()
 
 	strokeWidth := getStrokeWidth(ctx)
-
-	log.Printf("strokeWidth: %f", strokeWidth)
 
 	titleBoxHeight := getTitleBoxHeight(ctx)
 

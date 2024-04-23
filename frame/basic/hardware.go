@@ -3,7 +3,6 @@ package basic
 import (
 	"fmt"
 	"image/color"
-	"log"
 	"math"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
@@ -18,8 +17,6 @@ func (FrameHardware) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	canvasWidth, canvasHeight := ctx.Size()
 
 	strokeWidth := getStrokeWidth(ctx)
-
-	log.Printf("strokeWidth: %f", strokeWidth)
 
 	factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
 	factionColor := color.RGBA{

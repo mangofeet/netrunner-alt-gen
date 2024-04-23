@@ -114,8 +114,8 @@ func Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			wlk.Move()
 			wlk.Draw(ctx)
 		}
-		log.Printf("finished %s", wlk)
 	}
+	log.Printf("finished %d walkers", len(walkers))
 
 	return nil
 }
