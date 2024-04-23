@@ -70,7 +70,7 @@ func (FrameRunnerID) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	boxText, boxType := drawTextBox(ctx, canvasHeight/48, cornerRounded)
 
-	drawMU(ctx, card)
+	drawMU(ctx, card, false)
 	drawLink(ctx, card)
 
 	// render card text

@@ -204,7 +204,7 @@ func drawTrashCost(ctx *canvas.Context, card *nrdb.Printing) (*textBoxDimensions
 	}, nil
 }
 
-func drawMU(ctx *canvas.Context, card *nrdb.Printing) {
+func drawMU(ctx *canvas.Context, card *nrdb.Printing, drawBox bool) {
 	canvasWidth, _ := ctx.Size()
 
 	strokeWidth := getStrokeWidth(ctx)
@@ -216,28 +216,27 @@ func drawMU(ctx *canvas.Context, card *nrdb.Printing) {
 	}
 	muImage = muImage.Transform(canvas.Identity.ReflectY()).Scale(0.05, 0.05)
 
-	ctx.Push()
-
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
-
-	muBoxX := canvasWidth * 0.1
+	muBoxX := canvasWidth * 0.0853
 	muBoxY := (getTitleBoxTop(ctx) - getTitleBoxHeight(ctx)) - (muImage.Bounds().H * 0.8)
 	muBoxW := muImage.Bounds().W + muImage.Bounds().W*0.35
 	muBoxH := muImage.Bounds().H + muImage.Bounds().H*0.45
 
-	boxPath := &canvas.Path{}
+	if drawBox {
+		ctx.Push()
+		ctx.SetFillColor(bgColor)
+		ctx.SetStrokeColor(textColor)
+		ctx.SetStrokeWidth(strokeWidth)
 
-	boxPath.MoveTo(0, 0)
-	boxPath.LineTo(muBoxW, 0)
-	boxPath.LineTo(muBoxW, -1*muBoxH)
-	boxPath.LineTo(0, -1*muBoxH)
-	boxPath.Close()
+		boxPath := &canvas.Path{}
+		boxPath.MoveTo(0, 0)
+		boxPath.LineTo(muBoxW, 0)
+		boxPath.LineTo(muBoxW, -1*muBoxH)
+		boxPath.LineTo(0, -1*muBoxH)
+		boxPath.Close()
+		ctx.DrawPath(muBoxX, muBoxY, boxPath)
 
-	ctx.DrawPath(muBoxX, muBoxY, boxPath)
-
-	ctx.Pop()
+		ctx.Pop()
+	}
 
 	ctx.Push()
 	ctx.SetFillColor(textColor)
@@ -277,8 +276,6 @@ func drawMU(ctx *canvas.Context, card *nrdb.Printing) {
 func drawLink(ctx *canvas.Context, card *nrdb.Printing) {
 	canvasWidth, _ := ctx.Size()
 
-	strokeWidth := getStrokeWidth(ctx)
-
 	// link icon
 	icon, err := loadGameAsset("LINK")
 	if err != nil {
@@ -286,28 +283,10 @@ func drawLink(ctx *canvas.Context, card *nrdb.Printing) {
 	}
 	icon = icon.Transform(canvas.Identity.ReflectY()).Scale(0.015, 0.015)
 
-	ctx.Push()
-
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
-
 	boxX := canvasWidth * 0.1
 	boxY := getTitleBoxTop(ctx) - getTitleBoxHeight(ctx)*0.6
 	boxW := icon.Bounds().W + icon.Bounds().W*2.7
 	boxH := icon.Bounds().H + icon.Bounds().H*1.8
-
-	boxPath := &canvas.Path{}
-
-	boxPath.MoveTo(0, 0)
-	boxPath.LineTo(boxW, 0)
-	boxPath.LineTo(boxW, -1*boxH)
-	boxPath.LineTo(0, -1*boxH)
-	boxPath.Close()
-
-	ctx.DrawPath(boxX, boxY, boxPath)
-
-	ctx.Pop()
 
 	ctx.Push()
 	ctx.SetFillColor(textColor)

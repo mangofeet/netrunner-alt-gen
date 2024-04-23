@@ -77,7 +77,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	ctx.Pop()
 
-	drawMU(ctx, card)
+	drawMU(ctx, card, true)
 	// render card text
 
 	// not sure how these sizes actually correlate to the weird
