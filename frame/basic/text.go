@@ -134,7 +134,7 @@ func replaceSymbol(rt *canvas.RichText, symbol, svgName, text string, face *canv
 
 func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
 
-	text = replaceSymbol(rt, "[mu]", "Mu", text, face, 0.0002, 0.8)
+	text = replaceSymbol(rt, "[mu]", "MU", text, face, 0.0002, 0.8)
 	text = replaceSymbol(rt, "[credit]", "CREDIT", text, face, 0.000025, 0.8)
 	text = replaceSymbol(rt, "[recurring-credit]", "RECURRING_CREDIT", text, face, 0.00014, 0.8)
 	text = replaceSymbol(rt, "[click]", "CLICK", text, face, 0.0002, 1)

@@ -211,7 +211,7 @@ func drawMU(ctx *canvas.Context, card *nrdb.Printing, drawBox bool) {
 	strokeWidth := getStrokeWidth(ctx)
 
 	// mu icon
-	muImage, err := loadGameAsset("Mu")
+	muImage, err := loadGameAsset("MU")
 	if err != nil {
 		panic(err)
 	}
