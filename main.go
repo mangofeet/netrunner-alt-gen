@@ -165,8 +165,9 @@ func generateCard(cardName string, drawBleedLines bool) error {
 
 	}
 
-	// if err := renderers.Write("out.png", cnv, canvas.DPI(1200)); err != nil {
-	// if err := renderers.Write("out.png", cnv, canvas.DPMM(1)); err != nil {
+	if err := os.MkdirAll("output", os.ModePerm); err != nil {
+		return err
+	}
 	if err := renderers.Write(fmt.Sprintf("output/%s.png", getFileName(printing)), cnv, canvas.DPMM(1)); err != nil {
 		return err
 	}
