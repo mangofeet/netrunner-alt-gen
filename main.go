@@ -141,6 +141,8 @@ func generateCard(cardName string, drawBleedLines bool) error {
 		framer = basic.FrameOperation{}
 	case "agenda":
 		framer = basic.FrameAgenda{}
+	case "runner_identity":
+		framer = basic.FrameRunnerID{}
 	}
 
 	if framer != nil {

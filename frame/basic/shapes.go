@@ -204,6 +204,135 @@ func drawTrashCost(ctx *canvas.Context, card *nrdb.Printing) (*textBoxDimensions
 	}, nil
 }
 
+func drawMU(ctx *canvas.Context, card *nrdb.Printing) {
+	canvasWidth, _ := ctx.Size()
+
+	strokeWidth := getStrokeWidth(ctx)
+
+	// mu icon
+	muImage, err := loadGameAsset("Mu")
+	if err != nil {
+		panic(err)
+	}
+	muImage = muImage.Transform(canvas.Identity.ReflectY()).Scale(0.05, 0.05)
+
+	ctx.Push()
+
+	ctx.SetFillColor(bgColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
+
+	muBoxX := canvasWidth * 0.1
+	muBoxY := (getTitleBoxTop(ctx) - getTitleBoxHeight(ctx)) - (muImage.Bounds().H * 0.8)
+	muBoxW := muImage.Bounds().W + muImage.Bounds().W*0.35
+	muBoxH := muImage.Bounds().H + muImage.Bounds().H*0.45
+
+	boxPath := &canvas.Path{}
+
+	boxPath.MoveTo(0, 0)
+	boxPath.LineTo(muBoxW, 0)
+	boxPath.LineTo(muBoxW, -1*muBoxH)
+	boxPath.LineTo(0, -1*muBoxH)
+	boxPath.Close()
+
+	ctx.DrawPath(muBoxX, muBoxY, boxPath)
+
+	ctx.Pop()
+
+	ctx.Push()
+	ctx.SetFillColor(textColor)
+
+	muIconX := muBoxX
+	muIconY := muBoxY + (muImage.Bounds().H * 0.2)
+
+	ctx.DrawPath(muIconX, muIconY, muImage)
+
+	ctx.Pop()
+
+	var muText string
+	switch card.Attributes.CardTypeID {
+	case "program":
+		if card.Attributes.MemoryCost != nil {
+			muText = fmt.Sprint(*card.Attributes.MemoryCost)
+		}
+	case "runner_identity":
+		// TODO: see if this is actually coming back yet from the preview API
+		muText = "4"
+		if card.Attributes.CardAbilities.MUProvided != nil {
+			muText = fmt.Sprint(*card.Attributes.CardAbilities.MUProvided)
+		}
+
+	}
+
+	muTextX := muBoxX - muBoxW*0.08
+	muTextY := muBoxY
+	fontSize := getTitleBoxHeight(ctx) * 1.2
+	ctx.DrawText(muTextX, muTextY, canvas.NewTextBox(
+		getFont(fontSize, canvas.FontBlack), muText,
+		muBoxW, muBoxH,
+		canvas.Center, canvas.Center, 0, 0))
+
+}
+
+func drawLink(ctx *canvas.Context, card *nrdb.Printing) {
+	canvasWidth, _ := ctx.Size()
+
+	strokeWidth := getStrokeWidth(ctx)
+
+	// link icon
+	icon, err := loadGameAsset("LINK")
+	if err != nil {
+		panic(err)
+	}
+	icon = icon.Transform(canvas.Identity.ReflectY()).Scale(0.015, 0.015)
+
+	ctx.Push()
+
+	ctx.SetFillColor(bgColor)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
+
+	boxX := canvasWidth * 0.1
+	boxY := getTitleBoxTop(ctx) - getTitleBoxHeight(ctx)*0.6
+	boxW := icon.Bounds().W + icon.Bounds().W*2.7
+	boxH := icon.Bounds().H + icon.Bounds().H*1.8
+
+	boxPath := &canvas.Path{}
+
+	boxPath.MoveTo(0, 0)
+	boxPath.LineTo(boxW, 0)
+	boxPath.LineTo(boxW, -1*boxH)
+	boxPath.LineTo(0, -1*boxH)
+	boxPath.Close()
+
+	ctx.DrawPath(boxX, boxY, boxPath)
+
+	ctx.Pop()
+
+	ctx.Push()
+	ctx.SetFillColor(textColor)
+
+	iconX := boxX + (icon.Bounds().W * 2.2)
+	iconY := boxY - (icon.Bounds().H * 0.8)
+
+	ctx.DrawPath(iconX, iconY, icon)
+
+	ctx.Pop()
+
+	text := "0"
+	if card.Attributes.BaseLink != nil {
+		text = fmt.Sprint(*card.Attributes.BaseLink)
+	}
+
+	textX := boxX - boxW*0.08
+	textY := boxY
+	fontSize := getTitleBoxHeight(ctx) * 1.2
+	ctx.DrawText(textX, textY, canvas.NewTextBox(
+		getFont(fontSize, canvas.FontBlack), text,
+		boxW, boxH,
+		canvas.Center, canvas.Center, 0, 0))
+}
+
 func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor color.RGBA) {
 
 	if card.Attributes.InfluenceCost == nil {

@@ -11,11 +11,24 @@ import (
 
 func getTitle(card *nrdb.Printing) string {
 
+	if card.Attributes.CardTypeID == "runner_identity" || card.Attributes.CardTypeID == "corp_identity" {
+		return strings.Split(card.Attributes.Title, ":")[0]
+	}
+
 	if !card.Attributes.IsUnique {
 		return card.Attributes.Title
 	}
 
 	return fmt.Sprintf("♦ %s", card.Attributes.Title)
+}
+
+func getSubtitle(card *nrdb.Printing) string {
+
+	if card.Attributes.CardTypeID != "runner_identity" && card.Attributes.CardTypeID != "corp_identity" {
+		return ""
+	}
+
+	return strings.Join(strings.Split(card.Attributes.Title, ":")[1:], ":")
 }
 
 func getTitleText(ctx *canvas.Context, card *nrdb.Printing, fontSize, maxWidth, height float64) *canvas.Text {

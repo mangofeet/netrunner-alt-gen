@@ -77,46 +77,7 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	ctx.Pop()
 
-	// mu icon
-	muImage, err := loadGameAsset("Mu")
-	if err != nil {
-		return err
-	}
-	muImage = muImage.Transform(canvas.Identity.ReflectY()).Scale(0.05, 0.05)
-
-	ctx.Push()
-
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
-
-	muBoxX := costContainerStart + costContainerR*0.25
-	muBoxY := titleBoxBottom - (muImage.Bounds().H * 0.8)
-	muBoxW := muImage.Bounds().W + muImage.Bounds().W*0.35
-	muBoxH := muImage.Bounds().H + muImage.Bounds().H*0.45
-
-	boxPath := &canvas.Path{}
-
-	boxPath.MoveTo(0, 0)
-	boxPath.LineTo(muBoxW, 0)
-	boxPath.LineTo(muBoxW, -1*muBoxH)
-	boxPath.LineTo(0, -1*muBoxH)
-	boxPath.Close()
-
-	ctx.DrawPath(muBoxX, muBoxY, boxPath)
-
-	ctx.Pop()
-
-	ctx.Push()
-	ctx.SetFillColor(textColor)
-
-	muIconX := muBoxX
-	muIconY := muBoxY + (muImage.Bounds().H * 0.2)
-
-	ctx.DrawPath(muIconX, muIconY, muImage)
-
-	ctx.Pop()
-
+	drawMU(ctx, card)
 	// render card text
 
 	// not sure how these sizes actually correlate to the weird
@@ -150,18 +111,6 @@ func (FrameProgram) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.DrawText(strTextX, strTextY, canvas.NewTextBox(
 		getFont(fontSizeStr, canvas.FontBlack), strengthText,
 		canvasWidth/5, 0,
-		canvas.Center, canvas.Center, 0, 0))
-
-	muText := ""
-	if card.Attributes.MemoryCost != nil {
-		muText = fmt.Sprint(*card.Attributes.MemoryCost)
-	}
-
-	muTextX := muBoxX - muBoxW*0.08
-	muTextY := muBoxY
-	ctx.DrawText(muTextX, muTextY, canvas.NewTextBox(
-		getFont(fontSizeCard, canvas.FontBlack), muText,
-		muBoxW, muBoxH,
 		canvas.Center, canvas.Center, 0, 0))
 
 	drawCardText(ctx, card, fontSizeCard, boxText.height*0.45, canvasWidth*0.06, boxText)
