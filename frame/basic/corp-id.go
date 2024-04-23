@@ -50,12 +50,7 @@ func (FrameCorpID) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.DrawPath(0, 0, subtitlePath)
 	ctx.Pop()
 
-	var boxText, boxType textBoxDimensions
-	if card.Attributes.TrashCost != nil {
-		boxText, boxType = drawTextBoxTrashable(ctx, canvasHeight/192, cornerRounded)
-	} else {
-		boxText, boxType = drawTextBox(ctx, canvasHeight/192, cornerRounded)
-	}
+	boxText, boxType := drawTextBox(ctx, canvasHeight/192, cornerRounded)
 
 	drawCorpLimits(ctx, card, boxText)
 
