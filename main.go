@@ -97,8 +97,6 @@ func getCardData(cardName string) (*nrdb.Printing, error) {
 		return nil, fmt.Errorf("getting latest printing data: %w", err)
 	}
 
-	log.Printf("generating %s", printing.Attributes.StrippedTitle)
-
 	return printing, nil
 
 }
@@ -109,6 +107,7 @@ func generateCard(cardName string, drawBleedLines bool) error {
 	if err != nil {
 		return err
 	}
+	log.Printf("generating %s", printing.Attributes.StrippedTitle)
 
 	cnv := canvas.New(canvasWidth, canvasHeight)
 
@@ -189,12 +188,24 @@ func getFileName(card *nrdb.Printing) string {
 		pos = fmt.Sprintf("0%d", card.Attributes.PositionInSet)
 	}
 
+	cardIDInt, err := strconv.Atoi(card.ID)
+	if err != nil {
+		panic(err)
+	}
+	cardID := fmt.Sprint(card.ID)
+
+	if cardIDInt < 10 {
+		cardID = fmt.Sprintf("00%s", card.ID)
+	} else if cardIDInt < 100 {
+		cardID = fmt.Sprintf("0%s", card.ID)
+	}
+
 	title := fileNameRegexp.ReplaceAllString(card.Attributes.StrippedTitle, "-")
 	title = strings.ToLower(title)
 
 	set := fileNameRegexp.ReplaceAllString(card.Attributes.CardSetID, "-")
 
-	return fmt.Sprintf("%s-%s-%s", set, pos, title)
+	return fmt.Sprintf("%s-%s-%s-%s", cardID, set, pos, title)
 
 }
 
