@@ -176,7 +176,7 @@ func generateCard(cardName string, drawBleedLines bool) error {
 	return nil
 }
 
-var fileNameRegexp = regexp.MustCompile(`[^A-Za-z0-9]`)
+var fileNameRegexp = regexp.MustCompile(`[^A-Za-z0-9]+`)
 
 func getFileName(card *nrdb.Printing) string {
 
