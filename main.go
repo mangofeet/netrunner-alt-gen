@@ -200,7 +200,7 @@ func getFileName(card *nrdb.Printing) string {
 		cardID = fmt.Sprintf("0%s", card.ID)
 	}
 
-	title := fileNameRegexp.ReplaceAllString(card.Attributes.StrippedTitle, "-")
+	title := fileNameRegexp.ReplaceAllString(strings.ReplaceAll(card.Attributes.StrippedTitle, ":", ""), "-")
 	title = strings.ToLower(title)
 
 	set := fileNameRegexp.ReplaceAllString(card.Attributes.CardSetID, "-")
