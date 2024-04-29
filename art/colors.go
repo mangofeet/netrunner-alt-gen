@@ -76,11 +76,18 @@ func GetFactionBaseColor(factionID string) color.RGBA {
 
 	case "haas_bioroid":
 		return color.RGBA{
-			R: 0xc0,
-			G: 0xbe,
-			B: 0xd1,
+			R: 0x5a,
+			G: 0x32,
+			B: 0x6d,
 			A: 0xff,
 		}
+
+		// return color.RGBA{
+		// 	R: 0xc0,
+		// 	G: 0xbe,
+		// 	B: 0xd1,
+		// 	A: 0xff,
+		// }
 
 	}
 
