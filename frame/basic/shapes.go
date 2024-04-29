@@ -3,6 +3,8 @@ package basic
 import (
 	"fmt"
 	"image/color"
+	"image/png"
+	"os"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/nrdb-go"
@@ -328,7 +330,7 @@ func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor 
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 
-	influenceHeight := getTextBoxHeight(ctx) * 0.75
+	influenceHeight := getTextBoxHeight(ctx) * 0.8
 	influenceWidth := canvasHeight / 42
 
 	// center around the give point
@@ -366,36 +368,31 @@ func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor 
 		}
 	}
 
-	var factionImage *canvas.Canvas
-
-	switch card.Attributes.FactionID {
-	case "anarch":
-		factionImage = mustLoadFactionSVG("ANARCH")
-	case "shaper":
-		factionImage = mustLoadFactionSVG("SHAPER")
-	case "criminal":
-		factionImage = mustLoadFactionSVG("CRIMINAL")
-	case "haas_bioroid":
-		factionImage = mustLoadFactionSVG("HB")
-	case "nbn":
-		factionImage = mustLoadFactionSVG("NBN")
-	case "jinteki":
-		factionImage = mustLoadFactionSVG("JINTEKI")
-	case "weyland_consortium":
-		factionImage = mustLoadFactionSVG("WEYLAND")
+	factionImageFile, err := os.Open(fmt.Sprintf("assets/%s.png", card.Attributes.FactionID))
+	if err != nil {
+		panic(err)
+	}
+	factionImage, err := png.Decode(factionImageFile)
+	if err != nil {
+		panic(err)
 	}
 
-	// neutral faction
-	if factionImage == nil {
-		return
-	}
+	factionImageWidth := float64(factionImage.Bounds().Max.X)
+	factionImageHeight := float64(factionImage.Bounds().Max.Y)
+	factionScaleFactor := (influenceWidth * 1.7) / factionImageWidth
+	bubbleStart := influenceHeight * 0.2
+	bubbleRadius := influenceWidth * 1.2
 
-	factionScaleFactor := 0.2
-	factionX := x - factionImage.W*0.5*factionScaleFactor
-	factionY := pipY - pipR*2 - factionImage.H*factionScaleFactor
+	factionImageX := x - factionImageWidth*0.5*factionScaleFactor
+	factionImageY := bubbleStart + bubbleRadius - factionImageHeight*factionScaleFactor*0.5
 
-	factionImage.Transform(canvas.Identity.Translate(factionX, factionY).Scale(factionScaleFactor, factionScaleFactor))
-	factionImage.RenderTo(ctx)
+	ctx.RenderImage(
+		factionImage,
+		canvas.Identity.
+			Translate(factionImageX, factionImageY).
+			Scale(factionScaleFactor, factionScaleFactor),
+	)
+
 }
 
 func strength(canvasWidth, canvasHeight float64) *canvas.Path {

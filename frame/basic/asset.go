@@ -83,7 +83,7 @@ func (FrameAsset) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.DrawText(titleTextX, titleTextY, titleText)
 	// canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
 
-	drawCardText(ctx, card, fontSizeCard, canvasHeight, 0, boxText)
+	drawCardText(ctx, card, fontSizeCard, boxText.height*0.6, canvasWidth*0.02, boxText)
 	drawTypeText(ctx, card, fontSizeCard, boxType)
 
 	return nil
