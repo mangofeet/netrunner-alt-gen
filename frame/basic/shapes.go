@@ -5,6 +5,7 @@ import (
 	"image/color"
 	"image/png"
 	"os"
+	"strings"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/nrdb-go"
@@ -379,9 +380,20 @@ func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor 
 
 	factionImageWidth := float64(factionImage.Bounds().Max.X)
 	factionImageHeight := float64(factionImage.Bounds().Max.Y)
-	factionScaleFactor := (influenceWidth * 1.7) / factionImageWidth
+	factionScaleFactor := (influenceWidth * 2) / factionImageWidth
+	if strings.Contains(card.Attributes.FactionID, "neutral") {
+		factionScaleFactor = (influenceWidth * 1.7) / factionImageWidth
+	}
 	bubbleStart := influenceHeight * 0.2
 	bubbleRadius := influenceWidth * 1.2
+
+	circle := canvas.Circle(bubbleRadius)
+	ctx.Push()
+	ctx.SetFill(bgColorOpaque)
+	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeWidth(strokeWidth)
+	ctx.DrawPath(x, bubbleStart+bubbleRadius, circle)
+	ctx.Pop()
 
 	factionImageX := x - factionImageWidth*0.5*factionScaleFactor
 	factionImageY := bubbleStart + bubbleRadius - factionImageHeight*factionScaleFactor*0.5
@@ -412,17 +424,11 @@ func influenceBox(height, width float64) *canvas.Path {
 	path := &canvas.Path{}
 
 	curveRadius := width / 2
-	bubbleStart := height * 0.2
-	bubbleRadius := width * 1.2
 	curveStart := height - curveRadius
 
 	path.MoveTo(0, 0)
-	path.LineTo(0, bubbleStart)
-	path.QuadTo(-1*bubbleRadius, bubbleStart+bubbleRadius, 0, bubbleStart+bubbleRadius*2)
 	path.LineTo(0, curveStart)
 	path.CubeTo(0, height, width, height, width, curveStart)
-	path.LineTo(width, bubbleStart+bubbleRadius*2)
-	path.QuadTo(width+bubbleRadius, bubbleStart+bubbleRadius, width, bubbleStart)
 	path.LineTo(width, 0)
 	path.Close()
 
