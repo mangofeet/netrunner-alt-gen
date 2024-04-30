@@ -16,7 +16,7 @@ func (FrameCorpID) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	titleBoxHeight := getTitleBoxHeight(ctx)
 	titleBoxTop := getTitleBoxTop(ctx)
 	titleBoxBottom := titleBoxTop - titleBoxHeight
-	titleBoxRightOut := canvasWidth * 0.8
+	titleBoxRightOut := canvasWidth * 0.9
 	titleBoxRightIn := titleBoxRightOut - titleBoxHeight
 	titlePath := &canvas.Path{}
 	titlePath.MoveTo(0, titleBoxTop)
@@ -29,7 +29,7 @@ func (FrameCorpID) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	subtitleBoxHeight := titleBoxHeight * subtitleFactor
 	subtitleBoxTop := titleBoxBottom
 	subtitleBoxBottom := subtitleBoxTop - subtitleBoxHeight
-	subtitleBoxRightOut := canvasWidth * 0.6
+	subtitleBoxRightOut := canvasWidth * 0.7
 	subtitleBoxRightIn := subtitleBoxRightOut - subtitleBoxHeight
 	subtitlePath := &canvas.Path{}
 	subtitlePath.MoveTo(0, subtitleBoxTop)
@@ -58,7 +58,7 @@ func (FrameCorpID) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	fontSizeSubtitle := fontSizeTitle * subtitleFactor
 	fontSizeCard := titleBoxHeight * 1.2
 
-	titleTextX := canvasWidth * 0.085
+	titleTextX := canvasWidth * 0.25
 	titleTextMaxWidth := titleBoxRightIn - titleTextX
 
 	titleText := getTitleText(ctx, card, fontSizeTitle, titleTextMaxWidth, titleBoxHeight, canvas.Left)
@@ -72,6 +72,8 @@ func (FrameCorpID) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	drawCardText(ctx, card, fontSizeCard, canvasHeight, 0, boxText)
 	drawTypeText(ctx, card, fontSizeCard, boxType)
+
+	drawFactionSybmol(ctx, card, canvasWidth*0.15, subtitleBoxBottom+(titleBoxHeight+subtitleBoxHeight)*0.5, (titleBoxHeight + subtitleBoxHeight))
 
 	return nil
 

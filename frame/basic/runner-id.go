@@ -98,6 +98,7 @@ func (FrameRunnerID) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	drawCardText(ctx, card, fontSizeCard, boxText.height*0.75, canvasWidth*0.06, boxText)
 	drawTypeText(ctx, card, fontSizeCard, boxType)
+	drawFactionSybmol(ctx, card, canvasWidth*0.85, subtitleBoxBottom+(titleBoxHeight+subtitleBoxHeight)*0.5, (titleBoxHeight + subtitleBoxHeight))
 
 	return nil
 }
