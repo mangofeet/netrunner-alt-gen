@@ -12,20 +12,17 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
-// number of walkers to draw
-const numWalkersMin = 3000
-const numWalkersMax = 10000
+type Netspace struct {
+	MinWalkers, MaxWalkers int
+}
 
-// const numWalkersMin = 100
-// const numWalkersMax = 100
-
-func Draw(ctx *canvas.Context, card *nrdb.Printing) error {
+func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	seed := card.Attributes.Title + card.Attributes.Text + card.Attributes.CardTypeID + card.Attributes.FactionID
 
 	canvasWidth, canvasHeight := ctx.Size()
 
-	numWalkers := int(math.Max(float64(numWalkersMin), float64(prng.Next(seed, int64(numWalkersMax)))))
+	numWalkers := int(math.Max(float64(drawer.MinWalkers), float64(prng.Next(seed, int64(drawer.MaxWalkers)))))
 
 	startX := prng.Next(seed, int64(canvasWidth/2)) + int64(canvasWidth/4)
 	startY := prng.Next(seed, int64(canvasHeight/6)) + (int64(canvasHeight/8) * 5)
@@ -53,7 +50,10 @@ func Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	var walkers []*art.Walker
 
-	nGrid := math.Max(float64(numWalkers)*0.01, float64(prng.Next(seed, int64(float64(numWalkers)*0.02))))
+	nGrid := 0.0
+	if float64(numWalkers)*0.01 >= 1 {
+		nGrid = math.Max(float64(numWalkers)*0.01, float64(prng.Next(seed, int64(float64(numWalkers)*0.02))))
+	}
 
 	dirChangeStep := 30.0
 
