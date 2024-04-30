@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"image/color"
 	"image/png"
-	"os"
 	"strings"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
+	"github.com/mangofeet/netrunner-alt-gen/assets"
 	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
 )
@@ -390,7 +390,7 @@ func drawFactionSybmol(ctx *canvas.Context, card *nrdb.Printing, x, y, width flo
 	ctx.DrawPath(x, y, circle)
 	ctx.Pop()
 
-	factionImageFile, err := os.Open(fmt.Sprintf("assets/%s.png", card.Attributes.FactionID))
+	factionImageFile, err := assets.FS.Open(fmt.Sprintf("%s.png", card.Attributes.FactionID))
 	if err != nil {
 		return err
 	}
