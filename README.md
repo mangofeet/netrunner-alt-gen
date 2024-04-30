@@ -1,5 +1,7 @@
 # Netrunner Alt Art Generator
 
-Work in progress nothing works yet.
+## Netspace
 
-Intended to be a tool to use generative art algorithms to create alt art for Netrunner using data from netrunnerdb.com.
+Generate a card by running `netrunner-alt-gen netspace [card name or printing ID] [flags]`
+
+Run `netrunner-alt-gen --help` to see all options
