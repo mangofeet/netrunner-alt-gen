@@ -126,7 +126,7 @@ func drawAgendaPoints(ctx *canvas.Context, card *nrdb.Printing, fontSize float64
 	ctx.Push()
 	ctx.SetFillColor(bgColor)
 	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth * 0.5)
+	ctx.SetStrokeWidth(strokeWidth)
 	circle := canvas.Circle(icon.Bounds().H * 0.6)
 	ctx.DrawPath(iconX+icon.Bounds().W*0.53, iconY-icon.Bounds().H*0.46, circle)
 	ctx.Pop()
@@ -369,34 +369,45 @@ func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor 
 		}
 	}
 
-	factionImageFile, err := os.Open(fmt.Sprintf("assets/%s.png", card.Attributes.FactionID))
-	if err != nil {
-		panic(err)
-	}
-	factionImage, err := png.Decode(factionImageFile)
-	if err != nil {
+	factionY := influenceHeight*0.2 + influenceWidth*1.2
+
+	if err := drawFactionSybmol(ctx, card, x, factionY, influenceWidth*2); err != nil {
 		panic(err)
 	}
 
-	factionImageWidth := float64(factionImage.Bounds().Max.X)
-	factionImageHeight := float64(factionImage.Bounds().Max.Y)
-	factionScaleFactor := (influenceWidth * 2) / factionImageWidth
-	if strings.Contains(card.Attributes.FactionID, "neutral") {
-		factionScaleFactor = (influenceWidth * 1.7) / factionImageWidth
-	}
-	bubbleStart := influenceHeight * 0.2
-	bubbleRadius := influenceWidth * 1.2
+}
+
+func drawFactionSybmol(ctx *canvas.Context, card *nrdb.Printing, x, y, width float64) error {
+	strokeWidth := getStrokeWidth(ctx)
+
+	bubbleRadius := width * 0.6
 
 	circle := canvas.Circle(bubbleRadius)
 	ctx.Push()
 	ctx.SetFill(bgColorOpaque)
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
-	ctx.DrawPath(x, bubbleStart+bubbleRadius, circle)
+	ctx.DrawPath(x, y, circle)
 	ctx.Pop()
 
+	factionImageFile, err := os.Open(fmt.Sprintf("assets/%s.png", card.Attributes.FactionID))
+	if err != nil {
+		return err
+	}
+	factionImage, err := png.Decode(factionImageFile)
+	if err != nil {
+		return err
+	}
+
+	factionImageWidth := float64(factionImage.Bounds().Max.X)
+	factionImageHeight := float64(factionImage.Bounds().Max.Y)
+	factionScaleFactor := width / factionImageWidth
+	if strings.Contains(card.Attributes.FactionID, "neutral") {
+		factionScaleFactor = (width * 0.85) / factionImageWidth
+	}
+
 	factionImageX := x - factionImageWidth*0.5*factionScaleFactor
-	factionImageY := bubbleStart + bubbleRadius - factionImageHeight*factionScaleFactor*0.5
+	factionImageY := y - factionImageHeight*factionScaleFactor*0.5
 
 	ctx.RenderImage(
 		factionImage,
@@ -404,6 +415,8 @@ func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor 
 			Translate(factionImageX, factionImageY).
 			Scale(factionScaleFactor, factionScaleFactor),
 	)
+
+	return nil
 
 }
 
