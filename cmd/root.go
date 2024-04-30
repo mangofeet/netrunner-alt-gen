@@ -39,8 +39,8 @@ const safeHeight = 3924.0
 // const cardHeight = 88.0
 
 var (
-	drawMarginLines bool
-	frame           string
+	drawMarginLines  bool
+	frame, outputDir string
 
 	netspaceWalkersMin, netspaceWalkersMax int
 )
@@ -48,6 +48,7 @@ var (
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&drawMarginLines, "draw-margin-lines", "", false, `Draw bleed and "safe area" lines`)
 	rootCmd.PersistentFlags().StringVarP(&frame, "frame", "f", "basic", `Frame to draw, use "none" to skip drawing a frame`)
+	rootCmd.PersistentFlags().StringVarP(&outputDir, "output", "o", "output", `Output directory name`)
 
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMin, "min-walkers", "m", 3000, `Minimum amount of walkers`)
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMax, "max-walkers", "M", 10000, `Maximum amount of walkers`)

@@ -43,11 +43,11 @@ func generateCard(drawer art.Drawer, card *nrdb.Printing) error {
 
 	}
 
-	if err := os.MkdirAll("output", os.ModePerm); err != nil {
+	if err := os.MkdirAll(outputDir, os.ModePerm); err != nil {
 		return err
 	}
 
-	filename := fmt.Sprintf("output/%s.png", getFileName(card))
+	filename := fmt.Sprintf("%s/%s.png", outputDir, getFileName(card))
 	log.Printf("rendering output to %s", filename)
 	if err := renderers.Write(filename, cnv, canvas.DPMM(1)); err != nil {
 		return err
