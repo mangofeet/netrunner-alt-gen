@@ -8,9 +8,52 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mangofeet/netrunner-alt-gen/art"
+	"github.com/mangofeet/netrunner-alt-gen/frame/basic"
 	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
 )
+
+func getFramer(card *nrdb.Printing) (art.Drawer, error) {
+
+	switch frame {
+	case "basic":
+		var framer art.Drawer
+		log.Println("card type:", card.Attributes.CardTypeID)
+		switch card.Attributes.CardTypeID {
+		case "program":
+			framer = basic.FrameProgram{}
+		case "resource":
+			framer = basic.FrameResource{}
+		case "hardware":
+			framer = basic.FrameHardware{}
+		case "event":
+			framer = basic.FrameEvent{}
+		case "ice":
+			framer = basic.FrameIce{}
+		case "asset":
+			framer = basic.FrameAsset{}
+		case "upgrade":
+			framer = basic.FrameUpgrade{}
+		case "operation":
+			framer = basic.FrameOperation{}
+		case "agenda":
+			framer = basic.FrameAgenda{}
+		case "runner_identity":
+			framer = basic.FrameRunnerID{}
+		case "corp_identity":
+			framer = basic.FrameCorpID{}
+		default:
+			return nil, fmt.Errorf(`unknown card type "%s"`, card.Attributes.CardTypeID)
+		}
+
+		return framer, nil
+	case "none":
+		return art.NoopDrawer{}, nil
+	}
+
+	return nil, fmt.Errorf(`unknown frame type "%s"`, frame)
+}
 
 func getCardData(cardName string) (*nrdb.Printing, error) {
 	nrClient := nrdb.NewClient()
