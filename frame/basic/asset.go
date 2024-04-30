@@ -59,7 +59,7 @@ func (FrameAsset) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		boxText, boxType = drawTextBox(ctx, canvasHeight/192, cornerRounded)
 	}
 
-	drawInfluence(ctx, card, boxText.left, factionColor)
+	drawInfluenceAndOrFactionSymbol(ctx, card, boxText.left, factionColor)
 
 	if _, err := drawTrashCost(ctx, card); err != nil {
 		return err

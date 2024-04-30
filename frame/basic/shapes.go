@@ -316,60 +316,60 @@ func drawLink(ctx *canvas.Context, card *nrdb.Printing) {
 		canvas.Center, canvas.Center, 0, 0))
 }
 
-func drawInfluence(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor color.RGBA) {
+func drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor color.RGBA) {
 
-	if card.Attributes.InfluenceCost == nil {
-		return
-	}
-	influenceCost := *card.Attributes.InfluenceCost
 	strokeWidth := getStrokeWidth(ctx)
 
 	_, canvasHeight := ctx.Size()
 
-	ctx.Push()
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
-
 	influenceHeight := getTextBoxHeight(ctx) * 0.8
 	influenceWidth := canvasHeight / 42
+	factionY := influenceHeight*0.2 + influenceWidth*1.2
 
-	// center around the give point
-	boxX := x - (influenceWidth / 2)
+	if card.Attributes.InfluenceCost != nil {
 
-	ctx.DrawPath(boxX, 0, influenceBox(influenceHeight, influenceWidth))
-
-	ctx.Pop()
-
-	curveRadius := influenceWidth / 2
-
-	pipR := curveRadius * 0.6
-
-	var pipY float64
-	for i := 0.0; i < 5; i += 1 {
-
-		pipY = influenceHeight - (pipR * ((i + 1) * 4)) + (pipR / 2)
+		influenceCost := *card.Attributes.InfluenceCost
 
 		ctx.Push()
-		ctx.SetStrokeWidth(strokeWidth * 0.75)
+		ctx.SetFillColor(bgColor)
 		ctx.SetStrokeColor(textColor)
-		ctx.SetFill(transparent)
+		ctx.SetStrokeWidth(strokeWidth)
 
-		pip := canvas.Circle(pipR)
-		ctx.DrawPath(x, pipY, pip)
+		// center around the give point
+		boxX := x - (influenceWidth / 2)
+
+		ctx.DrawPath(boxX, 0, influenceBox(influenceHeight, influenceWidth))
 
 		ctx.Pop()
 
-		if i >= 5-float64(influenceCost) {
+		curveRadius := influenceWidth / 2
+
+		pipR := curveRadius * 0.6
+
+		var pipY float64
+		for i := 0.0; i < 5; i += 1 {
+
+			pipY = influenceHeight - (pipR * ((i + 1) * 4)) + (pipR / 2)
+
 			ctx.Push()
-			ctx.SetFill(textColor)
-			pip := canvas.Circle(pipR * 0.5)
+			ctx.SetStrokeWidth(strokeWidth * 0.75)
+			ctx.SetStrokeColor(textColor)
+			ctx.SetFill(transparent)
+
+			pip := canvas.Circle(pipR)
 			ctx.DrawPath(x, pipY, pip)
+
 			ctx.Pop()
+
+			if i >= 5-float64(influenceCost) {
+				ctx.Push()
+				ctx.SetFill(textColor)
+				pip := canvas.Circle(pipR * 0.5)
+				ctx.DrawPath(x, pipY, pip)
+				ctx.Pop()
+			}
 		}
 	}
-
-	factionY := influenceHeight*0.2 + influenceWidth*1.2
 
 	if err := drawFactionSybmol(ctx, card, x, factionY, influenceWidth*2); err != nil {
 		panic(err)

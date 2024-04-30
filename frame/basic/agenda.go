@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image/color"
 	"math"
-	"strings"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/nrdb-go"
@@ -98,11 +97,7 @@ func (FrameAgenda) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	drawCardText(ctx, card, fontSizeCard, boxText.height*0.6, canvasWidth*0.02, boxText)
 	drawTypeText(ctx, card, fontSizeCard, boxType)
 
-	if strings.Contains(card.Attributes.FactionID, "neutral") {
-		drawInfluence(ctx, card, boxText.left, factionColor)
-	} else {
-		drawFactionSybmol(ctx, card, boxText.left, canvasHeight*0.082, canvasHeight/21)
-	}
+	drawInfluenceAndOrFactionSymbol(ctx, card, boxText.left, factionColor)
 
 	return nil
 }

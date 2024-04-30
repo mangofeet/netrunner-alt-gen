@@ -127,7 +127,7 @@ func (FrameIce) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.Pop()
 
 	influenceX := canvasWidth - (canvasWidth / 8)
-	drawInfluence(ctx, card, influenceX, factionColor)
+	drawInfluenceAndOrFactionSymbol(ctx, card, influenceX, factionColor)
 
 	fontSizeTitle := titleBoxHeight * 2
 	fontSizeStr := titleBoxHeight * 4

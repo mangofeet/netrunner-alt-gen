@@ -55,7 +55,7 @@ func (FrameResource) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	boxText, boxType := drawTextBox(ctx, canvasHeight/48, cornerIn)
 
-	drawInfluence(ctx, card, boxText.right, factionColor)
+	drawInfluenceAndOrFactionSymbol(ctx, card, boxText.right, factionColor)
 
 	// render card text
 
