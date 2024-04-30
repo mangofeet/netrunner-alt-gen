@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image/color"
 	"math"
+	"strings"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/nrdb-go"
@@ -68,8 +69,6 @@ func (FrameAgenda) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		boxText, boxType = drawTextBox(ctx, canvasHeight/192, cornerRounded)
 	}
 
-	drawInfluence(ctx, card, boxText.left, factionColor)
-
 	// render card text
 
 	// not sure how these sizes actually correlate to the weird
@@ -96,8 +95,14 @@ func (FrameAgenda) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			canvas.Center, canvas.Center, 0, 0))
 	}
 
-	drawCardText(ctx, card, fontSizeCard, canvasHeight, 0, boxText)
+	drawCardText(ctx, card, fontSizeCard, boxText.height*0.6, canvasWidth*0.02, boxText)
 	drawTypeText(ctx, card, fontSizeCard, boxType)
+
+	if strings.Contains(card.Attributes.FactionID, "neutral") {
+		drawInfluence(ctx, card, boxText.left, factionColor)
+	} else {
+		drawFactionSybmol(ctx, card, boxText.left, canvasHeight*0.082, canvasHeight/21)
+	}
 
 	return nil
 }
