@@ -53,6 +53,7 @@ func init() {
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMax, "max-walkers", "M", 10000, `Maximum amount of walkers`)
 
 	rootCmd.AddCommand(netspaceCmd)
+	rootCmd.AddCommand(emptyCmd)
 }
 
 var rootCmd = &cobra.Command{
