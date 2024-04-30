@@ -28,11 +28,24 @@ func getSubtitle(card *nrdb.Printing) string {
 		return ""
 	}
 
-	return strings.Join(strings.Split(card.Attributes.Title, ":")[1:], ":")
+	subtitle := strings.Join(strings.Split(card.Attributes.Title, ":")[1:], ":")
+
+	if card.Attributes.CardTypeID == "runner_identity" && card.Attributes.Pronouns != nil {
+		subtitle += fmt.Sprintf(" (%s)", *card.Attributes.Pronouns)
+	}
+
+	return subtitle
 }
 
 func getTitleText(ctx *canvas.Context, card *nrdb.Printing, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
-	title := getTitle(card)
+	return getFittedText(ctx, getTitle(card), fontSize, maxWidth, height, align)
+}
+
+func getSubtitleText(ctx *canvas.Context, card *nrdb.Printing, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
+	return getFittedText(ctx, getSubtitle(card), fontSize, maxWidth, height, align)
+}
+
+func getFittedText(ctx *canvas.Context, title string, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
 
 	text := getCardText(title, fontSize, maxWidth*2, height, align)
 

@@ -67,8 +67,11 @@ func (FrameCorpID) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	// canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
 
 	subtitleTextX := titleTextX
-	subtitleTextY := subtitleBoxTop - subtitleBoxHeight*0.1
-	ctx.DrawText(subtitleTextX, subtitleTextY, getCardText(getSubtitle(card), fontSizeSubtitle, subtitleBoxRightIn, subtitleBoxHeight, canvas.Left))
+	subtitleTextMaxWidth := subtitleBoxRightIn - subtitleTextX
+	subtitleText := getSubtitleText(ctx, card, fontSizeSubtitle, subtitleTextMaxWidth, subtitleBoxHeight, canvas.Left)
+
+	subtitleTextY := (subtitleBoxTop - (subtitleBoxHeight-subtitleText.Bounds().H)*0.5)
+	ctx.DrawText(subtitleTextX, subtitleTextY, subtitleText)
 
 	drawCardText(ctx, card, fontSizeCard, canvasHeight, 0, boxText)
 	drawTypeText(ctx, card, fontSizeCard, boxType)

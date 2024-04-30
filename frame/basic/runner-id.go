@@ -88,17 +88,27 @@ func (FrameRunnerID) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	fontSizeSubtitle := fontSizeTitle * subtitleFactor
 	fontSizeCard := titleBoxHeight * 1.2
 
+	factionBubbleWidth := (titleBoxHeight + subtitleBoxHeight)
+	factionBubbleX := canvasWidth * 0.85
+	factionBubbleY := subtitleBoxBottom + (titleBoxHeight+subtitleBoxHeight)*0.5
+
 	titleTextX := titleBoxLeftBottom + titleBoxHeight*0.3
+	titleTextMaxWidth := factionBubbleX - titleTextX - factionBubbleWidth*0.7
+
+	titleText := getTitleText(ctx, card, fontSizeTitle, titleTextMaxWidth, titleBoxHeight, canvas.Left)
 	titleTextY := titleBoxTop - titleBoxHeight*0.1
-	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitle(card), fontSizeTitle, canvasWidth-titleBoxLeftBottom, titleBoxHeight, canvas.Left))
+	ctx.DrawText(titleTextX, titleTextY, titleText)
 
 	subtitleTextX := subtitleBoxLeft + subtitleBoxHeight*0.6
-	subtitleTextY := subtitleBoxTop - subtitleBoxHeight*0.1
-	ctx.DrawText(subtitleTextX, subtitleTextY, getCardText(getSubtitle(card), fontSizeSubtitle, canvasWidth-subtitleBoxLeft, subtitleBoxHeight, canvas.Left))
+	subtitleTextMaxWidth := factionBubbleX - subtitleTextX - factionBubbleWidth*0.7
+
+	subtitleText := getSubtitleText(ctx, card, fontSizeSubtitle, subtitleTextMaxWidth, subtitleBoxHeight, canvas.Left)
+	subtitleTextY := (subtitleBoxTop - (subtitleBoxHeight-subtitleText.Bounds().H)*0.5)
+	ctx.DrawText(subtitleTextX, subtitleTextY, subtitleText)
 
 	drawCardText(ctx, card, fontSizeCard, boxText.height*0.75, canvasWidth*0.06, boxText)
 	drawTypeText(ctx, card, fontSizeCard, boxType)
-	drawFactionSybmol(ctx, card, canvasWidth*0.85, subtitleBoxBottom+(titleBoxHeight+subtitleBoxHeight)*0.5, (titleBoxHeight + subtitleBoxHeight))
+	drawFactionSybmol(ctx, card, factionBubbleX, factionBubbleY, factionBubbleWidth)
 
 	return nil
 }
