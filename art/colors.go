@@ -34,43 +34,43 @@ func Darken(baseColor color.RGBA, factor float64) color.RGBA {
 func GetFactionBaseColor(factionID string) color.RGBA {
 
 	switch factionID {
-	case "shaper", "weyland_consortium":
+	case "shaper":
 		return color.RGBA{
-			R: 0x7f,
-			G: 0x9f,
-			B: 0x7f,
+			R: 0x4c,
+			G: 0xb1,
+			B: 0x48,
 			A: 0xff,
 		}
 
 	case "anarch":
 		return color.RGBA{
-			R: 0xdf,
-			G: 0xaf,
-			B: 0x8f,
+			R: 0xe2,
+			G: 0x6b,
+			B: 0x35,
 			A: 0xff,
 		}
 
 	case "criminal":
 		return color.RGBA{
-			R: 0x8c,
-			G: 0xd0,
-			B: 0xd3,
+			R: 0x19,
+			G: 0x4c,
+			B: 0x9b,
 			A: 0xff,
 		}
 
 	case "nbn":
 		return color.RGBA{
-			R: 0xf0,
-			G: 0xdf,
-			B: 0xaf,
+			R: 0xff,
+			G: 0xde,
+			B: 0x00,
 			A: 0xff,
 		}
 
 	case "jinteki":
 		return color.RGBA{
-			R: 0xcc,
-			G: 0x93,
-			B: 0x96,
+			R: 0x94,
+			G: 0x2c,
+			B: 0x4c,
 			A: 0xff,
 		}
 
@@ -82,12 +82,14 @@ func GetFactionBaseColor(factionID string) color.RGBA {
 			A: 0xff,
 		}
 
-		// return color.RGBA{
-		// 	R: 0xc0,
-		// 	G: 0xbe,
-		// 	B: 0xd1,
-		// 	A: 0xff,
-		// }
+	case "weyland_consortium":
+
+		return color.RGBA{
+			R: 0x3f,
+			G: 0x4f,
+			B: 0x3f,
+			A: 0xff,
+		}
 
 	}
 
