@@ -10,88 +10,88 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
-type FrameOperation struct{}
+func (fb FrameBasic) Operation() art.Drawer {
+	return art.DrawerFunc(func(ctx *canvas.Context, card *nrdb.Printing) error {
 
-func (FrameOperation) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
+		canvasWidth, canvasHeight := ctx.Size()
 
-	canvasWidth, canvasHeight := ctx.Size()
+		strokeWidth := getStrokeWidth(ctx)
 
-	strokeWidth := getStrokeWidth(ctx)
+		factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
+		factionColor := color.RGBA{
+			R: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.R)-48), 255))),
+			G: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.G)-48), 255))),
+			B: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.B)-48), 255))),
+			A: 0xff,
+		}
 
-	factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
-	factionColor := color.RGBA{
-		R: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.R)-48), 255))),
-		G: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.G)-48), 255))),
-		B: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.B)-48), 255))),
-		A: 0xff,
-	}
+		ctx.Push()
+		ctx.SetFillColor(bgColor)
+		ctx.SetStrokeColor(textColor)
+		ctx.SetStrokeWidth(strokeWidth)
 
-	ctx.Push()
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
-	ctx.SetStrokeWidth(strokeWidth)
+		costContainerR := getCostContainerRadius(ctx)
+		costContainerStart := getCostContainerStart(ctx)
 
-	costContainerR := getCostContainerRadius(ctx)
-	costContainerStart := getCostContainerStart(ctx)
+		titleBoxHeight := getTitleBoxHeight(ctx)
 
-	titleBoxHeight := getTitleBoxHeight(ctx)
+		titleBoxTop := getTitleBoxTop(ctx)
+		titleBoxBottom := titleBoxTop - titleBoxHeight
+		titleBoxLeft := costContainerR * 3.25
 
-	titleBoxTop := getTitleBoxTop(ctx)
-	titleBoxBottom := titleBoxTop - titleBoxHeight
-	titleBoxLeft := costContainerR * 3.25
+		titlePath := &canvas.Path{}
+		titlePath.MoveTo(titleBoxLeft, titleBoxTop)
+		titlePath.QuadTo(titleBoxLeft+(costContainerR*0.5), titleBoxBottom+(titleBoxHeight*0.5), titleBoxLeft, titleBoxBottom)
+		titlePath.LineTo(canvasWidth, titleBoxBottom)
+		titlePath.LineTo(canvasWidth, titleBoxTop)
+		titlePath.Close()
 
-	titlePath := &canvas.Path{}
-	titlePath.MoveTo(titleBoxLeft, titleBoxTop)
-	titlePath.QuadTo(titleBoxLeft+(costContainerR*0.5), titleBoxBottom+(titleBoxHeight*0.5), titleBoxLeft, titleBoxBottom)
-	titlePath.LineTo(canvasWidth, titleBoxBottom)
-	titlePath.LineTo(canvasWidth, titleBoxTop)
-	titlePath.Close()
+		ctx.DrawPath(0, 0, titlePath)
+		ctx.Pop()
 
-	ctx.DrawPath(0, 0, titlePath)
-	ctx.Pop()
+		// outline for cost circle
+		drawCostCircle(ctx, bgColor)
 
-	// outline for cost circle
-	drawCostCircle(ctx, bgColor)
+		var boxText, boxType textBoxDimensions
+		if card.Attributes.TrashCost != nil {
+			boxText, boxType = drawTextBoxTrashable(ctx, canvasHeight/192, cornerRounded)
+		} else {
+			boxText, boxType = drawTextBox(ctx, canvasHeight/192, cornerRounded)
+		}
 
-	var boxText, boxType textBoxDimensions
-	if card.Attributes.TrashCost != nil {
-		boxText, boxType = drawTextBoxTrashable(ctx, canvasHeight/192, cornerRounded)
-	} else {
-		boxText, boxType = drawTextBox(ctx, canvasHeight/192, cornerRounded)
-	}
+		drawInfluenceAndOrFactionSymbol(ctx, card, boxText.left, factionColor)
 
-	drawInfluenceAndOrFactionSymbol(ctx, card, boxText.left, factionColor)
+		if _, err := drawTrashCost(ctx, card); err != nil {
+			return err
+		}
+		// render card text
 
-	if _, err := drawTrashCost(ctx, card); err != nil {
-		return err
-	}
-	// render card text
+		// not sure how these sizes actually correlate to the weird
+		// pixel/mm setup I'm using, but these work
+		fontSizeTitle := titleBoxHeight * 2
+		fontSizeCost := titleBoxHeight * 3
+		fontSizeCard := titleBoxHeight * 1.2
 
-	// not sure how these sizes actually correlate to the weird
-	// pixel/mm setup I'm using, but these work
-	fontSizeTitle := titleBoxHeight * 2
-	fontSizeCost := titleBoxHeight * 3
-	fontSizeCard := titleBoxHeight * 1.2
+		titleTextX := titleBoxLeft + costContainerR*0.5
+		if card.Attributes.IsUnique {
+			titleTextX = titleBoxLeft + (costContainerR * 0.4)
+		}
+		titleTextY := titleBoxTop - titleBoxHeight*0.1
+		ctx.DrawText(titleTextX, titleTextY, getCardText(getTitle(card), fontSizeTitle, canvasWidth, titleBoxHeight, canvas.Left))
+		// ctx.DrawText(titleTextX, titleTextY, canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
 
-	titleTextX := titleBoxLeft + costContainerR*0.5
-	if card.Attributes.IsUnique {
-		titleTextX = titleBoxLeft + (costContainerR * 0.4)
-	}
-	titleTextY := titleBoxTop - titleBoxHeight*0.1
-	ctx.DrawText(titleTextX, titleTextY, getCardText(getTitle(card), fontSizeTitle, canvasWidth, titleBoxHeight, canvas.Left))
-	// ctx.DrawText(titleTextX, titleTextY, canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
+		if card.Attributes.Cost != nil {
+			costTextX := costContainerStart
+			costTextY := titleBoxBottom + titleBoxHeight/2
+			ctx.DrawText(costTextX, costTextY, canvas.NewTextBox(
+				getFont(fontSizeCost, canvas.FontBlack), fmt.Sprint(*card.Attributes.Cost),
+				costContainerR*2, 0,
+				canvas.Center, canvas.Center, 0, 0))
+		}
 
-	if card.Attributes.Cost != nil {
-		costTextX := costContainerStart
-		costTextY := titleBoxBottom + titleBoxHeight/2
-		ctx.DrawText(costTextX, costTextY, canvas.NewTextBox(
-			getFont(fontSizeCost, canvas.FontBlack), fmt.Sprint(*card.Attributes.Cost),
-			costContainerR*2, 0,
-			canvas.Center, canvas.Center, 0, 0))
-	}
+		drawCardText(ctx, card, fontSizeCard, boxText.height*0.6, canvasWidth*0.02, boxText, fb.getAdditionalText()...)
+		drawTypeText(ctx, card, fontSizeCard, boxType)
 
-	drawCardText(ctx, card, fontSizeCard, boxText.height*0.6, canvasWidth*0.02, boxText)
-	drawTypeText(ctx, card, fontSizeCard, boxType)
-
-	return nil
+		return nil
+	})
 }

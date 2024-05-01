@@ -197,7 +197,12 @@ type textBoxDimensions struct {
 	align                    canvas.TextAlign
 }
 
-func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCutoff, indent float64, box textBoxDimensions) {
+type additionalText struct {
+	content string
+	align   canvas.TextAlign
+}
+
+func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCutoff, indent float64, box textBoxDimensions, extra ...additionalText) {
 
 	if box.align == 0 {
 		box.align = canvas.Left
@@ -215,15 +220,32 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 	h := box.height
 
 	cText := getCardText(card.Attributes.Text, fontSize, w, h, box.align)
+	var fTexts []*canvas.Text
+	for _, txt := range extra {
+		fTexts = append(fTexts, getCardText(txt.content, fontSize, w*0.85, h, txt.align))
+	}
 
 	var leftoverText string
 
 	_, lastLineH := cText.Heights()
 
+	for _, txt := range fTexts {
+		_, extraH := txt.Heights()
+		lastLineH += extraH
+	}
+
 	for lastLineH > h*0.75 {
 		fontSize -= strokeWidth
 		cText = getCardText(card.Attributes.Text, fontSize, w, h, box.align)
+		fTexts = []*canvas.Text{}
+		for _, txt := range extra {
+			fTexts = append(fTexts, getCardText(txt.content, fontSize, w, h, txt.align))
+		}
 		_, lastLineH = cText.Heights()
+		for _, txt := range fTexts {
+			_, extraH := txt.Heights()
+			lastLineH += extraH
+		}
 	}
 
 	i := 0
@@ -245,14 +267,25 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 
 	ctx.DrawText(x, y, cText)
 
+	newCardTextX := x
+
 	if leftoverText != "" {
-		newCardTextX := x + indent
+		newCardTextX = x + indent
 		if !cText.Empty() {
 			y = y - (lastLineH + fontSize*0.4)
 		}
 
 		cText := getCardText(leftoverText, fontSize, w-(newCardTextX-x)-w*0.03, h, box.align)
 		ctx.DrawText(newCardTextX, y, cText)
+		_, lastLineH = cText.Heights()
+	}
+
+	newCardTextX += w * 0.08
+	y = y - (lastLineH + fontSize*0.4)
+	for _, txt := range fTexts {
+		ctx.DrawText(newCardTextX, y, txt)
+		_, lastLineH = txt.Heights()
+		y = y - (lastLineH)
 	}
 
 }

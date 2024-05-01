@@ -20,29 +20,39 @@ func getFramer(card *nrdb.Printing) (art.Drawer, error) {
 	case "basic":
 		var framer art.Drawer
 		log.Println("card type:", card.Attributes.CardTypeID)
+
+		frm := basic.FrameBasic{}
+
+		if flavorText != "" {
+			frm.Flavor = "<em>" + flavorText + "</em>"
+		}
+		if flavorAttribution != "" {
+			frm.FlavorAttribution = "<em>- " + flavorAttribution + "</em>"
+		}
+
 		switch card.Attributes.CardTypeID {
 		case "program":
-			framer = basic.FrameProgram{}
+			framer = frm.Program()
 		case "resource":
-			framer = basic.FrameResource{}
+			framer = frm.Resource()
 		case "hardware":
-			framer = basic.FrameHardware{}
+			framer = frm.Hardware()
 		case "event":
-			framer = basic.FrameEvent{}
+			framer = frm.Event()
 		case "ice":
-			framer = basic.FrameIce{}
+			framer = frm.Ice()
 		case "asset":
-			framer = basic.FrameAsset{}
+			framer = frm.Asset()
 		case "upgrade":
-			framer = basic.FrameUpgrade{}
+			framer = frm.Upgrade()
 		case "operation":
-			framer = basic.FrameOperation{}
+			framer = frm.Operation()
 		case "agenda":
-			framer = basic.FrameAgenda{}
+			framer = frm.Agenda()
 		case "runner_identity":
-			framer = basic.FrameRunnerID{}
+			framer = frm.RunnerID()
 		case "corp_identity":
-			framer = basic.FrameCorpID{}
+			framer = frm.CorpID()
 		default:
 			return nil, fmt.Errorf(`unknown card type "%s"`, card.Attributes.CardTypeID)
 		}
@@ -74,7 +84,7 @@ func getCardData(cardName string) (*nrdb.Printing, error) {
 	}
 
 	if len(cards) == 0 {
-		return nil, fmt.Errorf("no results")
+		return nil, fmt.Errorf("no results for %s", cardName)
 	}
 
 	if len(cards) != 1 {

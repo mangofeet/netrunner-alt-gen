@@ -14,7 +14,7 @@ var netspaceCmd = &cobra.Command{
 	Short: `Generate a card using the "netspace" algorithm`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		cardName := strings.Join(args, "")
+		cardName := strings.Join(args, " ")
 
 		if err := generateCardNetspace(cardName); err != nil {
 			log.Println("error:", err)

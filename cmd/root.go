@@ -42,6 +42,8 @@ var (
 	drawMarginLines  bool
 	frame, outputDir string
 
+	flavorText, flavorAttribution string
+
 	netspaceWalkersMin, netspaceWalkersMax int
 )
 
@@ -49,6 +51,9 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&drawMarginLines, "draw-margin-lines", "", false, `Draw bleed and "safe area" lines`)
 	rootCmd.PersistentFlags().StringVarP(&frame, "frame", "f", "basic", `Frame to draw, use "none" to skip drawing a frame`)
 	rootCmd.PersistentFlags().StringVarP(&outputDir, "output", "o", "output", `Output directory name`)
+
+	rootCmd.PersistentFlags().StringVarP(&flavorText, "flavor", "", "", `Flavor text to add to the generated card`)
+	rootCmd.PersistentFlags().StringVarP(&flavorAttribution, "flavor-attribution", "", "", `Flavor text attribution to add to the generated card, for "quotes"`)
 
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMin, "min-walkers", "m", 3000, `Minimum amount of walkers`)
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMax, "max-walkers", "M", 10000, `Maximum amount of walkers`)
