@@ -26,6 +26,8 @@ func init() {
 		panic(err)
 	}
 
+	// the "extra bold" in the font family is used for unicode
+	// symbols, this font seems to be the best at rendering them
 	if err := loadFont("DejaVu Sans", "monospace", canvas.FontExtraBold); err != nil {
 		panic(err)
 	}
