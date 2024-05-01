@@ -69,6 +69,7 @@ func init() {
 
 	rootCmd.AddCommand(netspaceCmd)
 	rootCmd.AddCommand(emptyCmd)
+	rootCmd.AddCommand(imageCmd)
 }
 
 var rootCmd = &cobra.Command{
