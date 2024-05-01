@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -47,6 +48,9 @@ var (
 	textBoxFactor                 float64
 
 	netspaceWalkersMin, netspaceWalkersMax int
+
+	// set by ldflags
+	version string = "local"
 )
 
 func init() {
@@ -73,6 +77,7 @@ var rootCmd = &cobra.Command{
 	Long: `A generative art tool to create alternate art cards with tournament legal frames for Netrunner.
   Complete documentation is available at https://github.com/mangofeet/netrunner-alt-gen`,
 	Run: func(cmd *cobra.Command, args []string) {
+		log.Println("Version:", version)
 		cmd.Usage()
 	},
 }
