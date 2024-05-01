@@ -90,8 +90,9 @@ func (fb FrameBasic) Ice() art.Drawer {
 		ctx.SetStrokeColor(textColor)
 		ctx.SetStrokeWidth(strokeWidth)
 
-		textBoxBottom := canvasHeight * 0.5
+		textBoxHeight := fb.getTextBoxHeight(ctx)
 		textBoxTop := titleBoxBottom - titleBoxHeight*0.5
+		textBoxBottom := textBoxTop - textBoxHeight
 		textBoxLeft := typeBoxLeft + typeBoxWidth + ((titleBoxHeight - typeBoxWidth) / 2) + titleBoxHeight*0.5
 
 		textBoxArc1StartY := textBoxTop - titleBoxRadius
