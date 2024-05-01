@@ -306,14 +306,16 @@ func drawTypeText(ctx *canvas.Context, card *nrdb.Printing, fontSize float64, bo
 		box.align = canvas.Left
 	}
 
-	paddingLR, PaddingTB := getCardTextPadding(ctx)
+	paddingLR, _ := getCardTextPadding(ctx)
 
-	x := box.left + paddingLR
-	y := box.bottom + box.height - PaddingTB
 	w := box.right - box.left - (paddingLR * 2)
 	h := box.height
+	box.top = box.bottom + box.height
 
 	typeText := getTypeText(card, fontSize, w, h, box.align)
+
+	x := box.left + paddingLR
+	y := box.top - (box.height-(typeText.Bounds().H))*0.5
 
 	ctx.DrawText(x, y, typeText)
 

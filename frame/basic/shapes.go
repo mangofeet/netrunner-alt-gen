@@ -325,7 +325,8 @@ func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *
 
 	_, canvasHeight := ctx.Size()
 
-	influenceHeight := fb.getTextBoxHeight(ctx) * 0.8
+	// influenceHeight := math.Max(fb.getTextBoxHeight(ctx)*0.8, canvasHeight*0.26664)
+	influenceHeight := canvasHeight * 0.28
 	influenceWidth := canvasHeight / 42
 	factionY := influenceHeight*0.2 + influenceWidth*1.2
 
@@ -500,6 +501,8 @@ func (fb FrameBasic) drawTextBoxTrashable(ctx *canvas.Context, cornerSize float6
 
 func (fb FrameBasic) drawTextBoxToSize(ctx *canvas.Context, textBoxLeft, textBoxRight, cornerSize float64, cornerType corner) (textBoxDimensions, textBoxDimensions) {
 
+	_, canvasHeight := ctx.Size()
+
 	strokeWidth := getStrokeWidth(ctx)
 
 	textBoxHeight := fb.getTextBoxHeight(ctx)
@@ -531,7 +534,8 @@ func (fb FrameBasic) drawTextBoxToSize(ctx *canvas.Context, textBoxLeft, textBox
 	ctx.SetStrokeColor(textColor)
 	ctx.SetStrokeWidth(strokeWidth)
 
-	typeBoxHeight := textBoxHeight * 0.17
+	// typeBoxHeight := math.Max(textBoxHeight*0.17, canvasHeight*0.056661)
+	typeBoxHeight := canvasHeight * 0.056661
 	typeBoxBottom := textBoxHeight + strokeWidth*0.5
 	typeBoxLeft := textBoxLeft
 	typeBoxRight := textBoxRight * 0.9
