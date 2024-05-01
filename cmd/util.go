@@ -44,10 +44,24 @@ func getFramer(card *nrdb.Printing) (art.Drawer, error) {
 			flavor = strings.ReplaceAll(flavor, "</strong>", "")
 
 			parts := strings.Split(flavor, "\n")
-			frm.Flavor = "<em>" + parts[0] + "</em>"
+
+			finalFlavor := parts[0]
 			if len(parts) > 1 {
-				frm.FlavorAttribution = "<em>" + parts[1] + "</em>"
+				for _, part := range parts[1:] {
+					if len(part) == 0 {
+						continue
+					}
+					part = strings.Replace(part, "—", "- ", 1)
+					if part[0] == '-' {
+						frm.FlavorAttribution = "<em>" + part + "</em>"
+					} else {
+						finalFlavor += "<BR>" + part
+					}
+
+				}
+
 			}
+			frm.Flavor = "<em>" + finalFlavor + "</em>"
 		}
 
 		switch card.Attributes.CardTypeID {

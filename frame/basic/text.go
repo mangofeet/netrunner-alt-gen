@@ -108,6 +108,7 @@ func getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64, alig
 func writeTextPart(rt *canvas.RichText, text string, regFace, boldFace, italicFace *canvas.FontFace) {
 
 	text = strings.ReplaceAll(text, "\n", "\n\n")
+	text = strings.ReplaceAll(text, "<BR>", "\n")
 
 	if strings.Contains(text, "</strong>") {
 		subParts := strings.Split(text, "</strong>")
