@@ -44,6 +44,11 @@ func (fb FrameBasic) getTextBoxHeight(ctx *canvas.Context) float64 {
 	return (canvasHeight * factor)
 }
 
+func getInfluenceHeight(ctx *canvas.Context) float64 {
+	_, canvasHeight := ctx.Size()
+	return canvasHeight * 0.28
+}
+
 func drawCostCircle(ctx *canvas.Context, bgColor color.Color) {
 
 	strokeWidth := getStrokeWidth(ctx)
@@ -326,7 +331,7 @@ func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *
 	_, canvasHeight := ctx.Size()
 
 	// influenceHeight := math.Max(fb.getTextBoxHeight(ctx)*0.8, canvasHeight*0.26664)
-	influenceHeight := canvasHeight * 0.28
+	influenceHeight := getInfluenceHeight(ctx)
 	influenceWidth := canvasHeight / 42
 	factionY := influenceHeight*0.2 + influenceWidth*1.2
 
