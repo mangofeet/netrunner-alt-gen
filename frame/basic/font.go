@@ -22,7 +22,7 @@ func init() {
 		panic(err)
 	}
 
-	if err := loadFont("UbuntuMono Nerd Font", "monospace", canvas.FontBlack); err != nil {
+	if err := loadFont("Ubuntu Mono", "monospace", canvas.FontBlack); err != nil {
 		panic(err)
 	}
 
