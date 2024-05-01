@@ -37,6 +37,19 @@ func getFramer(card *nrdb.Printing) (art.Drawer, error) {
 			frm.FlavorAttribution = "<em>- " + flavorAttribution + "</em>"
 		}
 
+		if !skipFlavor && frm.Flavor == "" && card.Attributes.Flavor != "" {
+
+			// replace extra formatting tags for now...
+			flavor := strings.ReplaceAll(card.Attributes.Flavor, "<strong>", "")
+			flavor = strings.ReplaceAll(flavor, "</strong>", "")
+
+			parts := strings.Split(flavor, "\n")
+			frm.Flavor = "<em>" + parts[0] + "</em>"
+			if len(parts) > 1 {
+				frm.FlavorAttribution = "<em>" + parts[1] + "</em>"
+			}
+		}
+
 		switch card.Attributes.CardTypeID {
 		case "program":
 			framer = frm.Program()
