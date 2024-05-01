@@ -239,7 +239,7 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 		cText = getCardText(card.Attributes.Text, fontSize, w, h, box.align)
 		fTexts = []*canvas.Text{}
 		for _, txt := range extra {
-			fTexts = append(fTexts, getCardText(txt.content, fontSize, w, h, txt.align))
+			fTexts = append(fTexts, getCardText(txt.content, fontSize, w*0.85, h, txt.align))
 		}
 		_, lastLineH = cText.Heights()
 		for _, txt := range fTexts {
