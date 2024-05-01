@@ -32,6 +32,7 @@ func generateCardNetspace(cardName string) error {
 	ns := netspace.Netspace{
 		MinWalkers: netspaceWalkersMin,
 		MaxWalkers: netspaceWalkersMax,
+		Color:      parseColor(baseColor),
 	}
 
 	return generateCard(ns, printing)

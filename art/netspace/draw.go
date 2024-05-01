@@ -14,6 +14,7 @@ import (
 
 type Netspace struct {
 	MinWalkers, MaxWalkers int
+	Color                  *color.RGBA
 }
 
 func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
@@ -32,6 +33,9 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	}
 
 	baseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
+	if drawer.Color != nil {
+		baseColor = *drawer.Color
+	}
 
 	cardBGColor := art.Darken(baseColor, 0.623)
 

@@ -39,9 +39,9 @@ const safeHeight = 3924.0
 // const cardHeight = 88.0
 
 var (
-	drawMarginLines  bool
-	frame, outputDir string
-
+	drawMarginLines               bool
+	frame, outputDir              string
+	baseColor                     string
 	flavorText, flavorAttribution string
 
 	netspaceWalkersMin, netspaceWalkersMax int
@@ -54,6 +54,7 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVarP(&flavorText, "flavor", "", "", `Flavor text to add to the generated card`)
 	rootCmd.PersistentFlags().StringVarP(&flavorAttribution, "flavor-attribution", "", "", `Flavor text attribution to add to the generated card, for "quotes"`)
+	rootCmd.PersistentFlags().StringVarP(&baseColor, "base-color", "c", "", `Alternate base color for the card, defaults to pre-defined faction colors`)
 
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMin, "min-walkers", "m", 3000, `Minimum amount of walkers`)
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMax, "max-walkers", "M", 10000, `Maximum amount of walkers`)

@@ -21,7 +21,9 @@ func getFramer(card *nrdb.Printing) (art.Drawer, error) {
 		var framer art.Drawer
 		log.Println("card type:", card.Attributes.CardTypeID)
 
-		frm := basic.FrameBasic{}
+		frm := basic.FrameBasic{
+			Color: parseColor(baseColor),
+		}
 
 		if flavorText != "" {
 			frm.Flavor = "<em>" + flavorText + "</em>"
@@ -154,5 +156,61 @@ func drawMargin(ctx *canvas.Context, x, y, w, h float64, c color.Color) {
 	ctx.SetDashes(0, dash, dash*2)
 	ctx.Stroke()
 	ctx.Pop()
+
+}
+
+func parseColor(colorStr string) *color.RGBA {
+
+	if colorStr == "" {
+		return nil
+	}
+
+	if colorStr[0] == '#' {
+		colorStr = colorStr[1:]
+	}
+
+	if len(colorStr) != 6 && len(colorStr) != 8 {
+		log.Printf(`!! Could not parse color string "#%s", using defaults`, colorStr)
+		return nil
+	}
+
+	rStr := colorStr[0:2]
+	gStr := colorStr[2:4]
+	bStr := colorStr[4:6]
+	aStr := "ff"
+	if len(colorStr) == 8 {
+		aStr = colorStr[6:8]
+	}
+
+	r, err := strconv.ParseInt(rStr, 16, 16)
+	if err != nil {
+		log.Printf(`!! Could not parse color string "#%s", using defaults`, colorStr)
+		return nil
+	}
+
+	g, err := strconv.ParseInt(gStr, 16, 16)
+	if err != nil {
+		log.Printf(`!! Could not parse color string "#%s", using defaults`, colorStr)
+		return nil
+	}
+
+	b, err := strconv.ParseInt(bStr, 16, 16)
+	if err != nil {
+		log.Printf(`!! Could not parse color string "#%s", using defaults`, colorStr)
+		return nil
+	}
+
+	a, err := strconv.ParseInt(aStr, 16, 16)
+	if err != nil {
+		log.Printf(`!! Could not parse color string "#%s", using defaults`, colorStr)
+		return nil
+	}
+
+	return &color.RGBA{
+		R: uint8(r),
+		G: uint8(g),
+		B: uint8(b),
+		A: uint8(a),
+	}
 
 }

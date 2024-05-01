@@ -6,7 +6,6 @@ import (
 	"image/png"
 	"strings"
 
-	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/netrunner-alt-gen/assets"
 	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
@@ -566,12 +565,11 @@ func drawTextBoxToSize(ctx *canvas.Context, textBoxLeft, textBoxRight, cornerSiz
 
 }
 
-func drawRunnerLimits(ctx *canvas.Context, card *nrdb.Printing, box textBoxDimensions) {
+func (fb FrameBasic) drawRunnerLimits(ctx *canvas.Context, card *nrdb.Printing, box textBoxDimensions) {
 
 	canvasWidth, _ := ctx.Size()
 
-	factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
-	factionColor := art.Darken(factionBaseColor, 0.811)
+	factionColor := fb.getColor(card)
 	influenceColor := color.RGBA{
 		R: 0x3f,
 		G: 0x3f,
@@ -638,12 +636,11 @@ func drawRunnerLimits(ctx *canvas.Context, card *nrdb.Printing, box textBoxDimen
 		canvas.Center, canvas.Center, 0, 0))
 }
 
-func drawCorpLimits(ctx *canvas.Context, card *nrdb.Printing, box textBoxDimensions) {
+func (fb FrameBasic) drawCorpLimits(ctx *canvas.Context, card *nrdb.Printing, box textBoxDimensions) {
 
 	canvasWidth, _ := ctx.Size()
 
-	factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
-	factionColor := art.Darken(factionBaseColor, 0.811)
+	factionColor := fb.getColor(card)
 	influenceColor := color.RGBA{
 		R: 0x3f,
 		G: 0x3f,

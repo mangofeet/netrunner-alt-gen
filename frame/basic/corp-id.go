@@ -48,7 +48,7 @@ func (fb FrameBasic) CorpID() art.Drawer {
 
 		boxText, boxType := drawTextBox(ctx, canvasHeight/192, cornerRounded)
 
-		drawCorpLimits(ctx, card, boxText)
+		fb.drawCorpLimits(ctx, card, boxText)
 
 		// render card text
 

@@ -1,9 +1,6 @@
 package basic
 
 import (
-	"image/color"
-	"math"
-
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
@@ -16,13 +13,7 @@ func (fb FrameBasic) Asset() art.Drawer {
 
 		strokeWidth := getStrokeWidth(ctx)
 
-		factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
-		factionColor := color.RGBA{
-			R: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.R)-48), 255))),
-			G: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.G)-48), 255))),
-			B: uint8(math.Max(0, math.Min(float64(int64(factionBaseColor.B)-48), 255))),
-			A: 0xff,
-		}
+		factionColor := fb.getColor(card)
 
 		ctx.Push()
 		ctx.SetFillColor(bgColor)

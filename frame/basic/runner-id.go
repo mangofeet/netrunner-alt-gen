@@ -76,7 +76,7 @@ func (fb FrameBasic) RunnerID() art.Drawer {
 
 		boxText, boxType := drawTextBox(ctx, canvasHeight/96, cornerStraight)
 
-		drawRunnerLimits(ctx, card, boxText)
+		fb.drawRunnerLimits(ctx, card, boxText)
 		drawMU(ctx, card, false)
 		drawLink(ctx, card)
 

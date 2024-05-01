@@ -15,8 +15,7 @@ func (fb FrameBasic) Ice() art.Drawer {
 
 		strokeWidth := getStrokeWidth(ctx)
 
-		factionBaseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
-		factionColor := art.Darken(factionBaseColor, 0.811)
+		factionColor := fb.getColor(card)
 
 		// title box
 
