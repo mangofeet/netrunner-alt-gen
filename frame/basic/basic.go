@@ -11,6 +11,7 @@ import (
 type FrameBasic struct {
 	Flavor, FlavorAttribution string
 	Color                     *color.RGBA
+	TextBoxHeightFactor       *float64
 }
 
 func (fb FrameBasic) getAdditionalText() []additionalText {

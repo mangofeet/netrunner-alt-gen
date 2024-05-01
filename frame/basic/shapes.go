@@ -35,9 +35,13 @@ func getCostContainerStart(ctx *canvas.Context) float64 {
 	return getCostContainerRadius(ctx) * 1.3
 }
 
-func getTextBoxHeight(ctx *canvas.Context) float64 {
+func (fb FrameBasic) getTextBoxHeight(ctx *canvas.Context) float64 {
 	_, canvasHeight := ctx.Size()
-	return (canvasHeight / 3)
+	factor := 0.3333
+	if fb.TextBoxHeightFactor != nil {
+		factor = *fb.TextBoxHeightFactor
+	}
+	return (canvasHeight * factor)
 }
 
 func drawCostCircle(ctx *canvas.Context, bgColor color.Color) {
@@ -101,7 +105,7 @@ func drawRezCost(ctx *canvas.Context, card *nrdb.Printing, fontSize float64) (*t
 	}, nil
 }
 
-func drawAgendaPoints(ctx *canvas.Context, card *nrdb.Printing, fontSize float64) (*textBoxDimensions, error) {
+func (fb FrameBasic) drawAgendaPoints(ctx *canvas.Context, card *nrdb.Printing, fontSize float64) (*textBoxDimensions, error) {
 	canvasWidth, _ := ctx.Size()
 
 	strokeWidth := getStrokeWidth(ctx)
@@ -114,7 +118,7 @@ func drawAgendaPoints(ctx *canvas.Context, card *nrdb.Printing, fontSize float64
 	icon = icon.Transform(canvas.Identity.ReflectY()).Scale(0.07, 0.07)
 
 	iconX := canvasWidth * 0.085
-	iconY := getTextBoxHeight(ctx) + icon.Bounds().H*1.8
+	iconY := fb.getTextBoxHeight(ctx) + icon.Bounds().H*1.8
 	iconColor := color.RGBA{
 		R: textColor.R,
 		G: textColor.G,
@@ -315,13 +319,13 @@ func drawLink(ctx *canvas.Context, card *nrdb.Printing) {
 		canvas.Center, canvas.Center, 0, 0))
 }
 
-func drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor color.RGBA) {
+func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor color.RGBA) {
 
 	strokeWidth := getStrokeWidth(ctx)
 
 	_, canvasHeight := ctx.Size()
 
-	influenceHeight := getTextBoxHeight(ctx) * 0.8
+	influenceHeight := fb.getTextBoxHeight(ctx) * 0.8
 	influenceWidth := canvasHeight / 42
 	factionY := influenceHeight*0.2 + influenceWidth*1.2
 
@@ -478,27 +482,27 @@ var cornerNone = corner(func(ctx *canvas.Context, cx, cy, x, y float64) {
 	ctx.LineTo(x, y)
 })
 
-func drawTextBox(ctx *canvas.Context, cornerSize float64, cornerType corner) (textBoxDimensions, textBoxDimensions) {
+func (fb FrameBasic) drawTextBox(ctx *canvas.Context, cornerSize float64, cornerType corner) (textBoxDimensions, textBoxDimensions) {
 	canvasWidth, _ := ctx.Size()
 	textBoxLeft := canvasWidth / 8
 	textBoxRight := canvasWidth - (canvasWidth / 8)
 
-	return drawTextBoxToSize(ctx, textBoxLeft, textBoxRight, cornerSize, cornerType)
+	return fb.drawTextBoxToSize(ctx, textBoxLeft, textBoxRight, cornerSize, cornerType)
 }
 
-func drawTextBoxTrashable(ctx *canvas.Context, cornerSize float64, cornerType corner) (textBoxDimensions, textBoxDimensions) {
+func (fb FrameBasic) drawTextBoxTrashable(ctx *canvas.Context, cornerSize float64, cornerType corner) (textBoxDimensions, textBoxDimensions) {
 	canvasWidth, _ := ctx.Size()
 	textBoxLeft := canvasWidth / 8
 	textBoxRight := canvasWidth - (canvasWidth / 6)
 
-	return drawTextBoxToSize(ctx, textBoxLeft, textBoxRight, cornerSize, cornerType)
+	return fb.drawTextBoxToSize(ctx, textBoxLeft, textBoxRight, cornerSize, cornerType)
 }
 
-func drawTextBoxToSize(ctx *canvas.Context, textBoxLeft, textBoxRight, cornerSize float64, cornerType corner) (textBoxDimensions, textBoxDimensions) {
+func (fb FrameBasic) drawTextBoxToSize(ctx *canvas.Context, textBoxLeft, textBoxRight, cornerSize float64, cornerType corner) (textBoxDimensions, textBoxDimensions) {
 
 	strokeWidth := getStrokeWidth(ctx)
 
-	textBoxHeight := getTextBoxHeight(ctx)
+	textBoxHeight := fb.getTextBoxHeight(ctx)
 
 	textBoxArc2StartX := textBoxRight - cornerSize
 	textBoxArc2EndY := textBoxHeight - cornerSize

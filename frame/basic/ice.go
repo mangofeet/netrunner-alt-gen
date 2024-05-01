@@ -125,7 +125,7 @@ func (fb FrameBasic) Ice() art.Drawer {
 		ctx.Pop()
 
 		influenceX := canvasWidth - (canvasWidth / 8)
-		drawInfluenceAndOrFactionSymbol(ctx, card, influenceX, factionColor)
+		fb.drawInfluenceAndOrFactionSymbol(ctx, card, influenceX, factionColor)
 
 		fontSizeTitle := titleBoxHeight * 2
 		fontSizeStr := titleBoxHeight * 4

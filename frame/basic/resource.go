@@ -44,9 +44,9 @@ func (fb FrameBasic) Resource() art.Drawer {
 		// outline for cost circle
 		drawCostCircle(ctx, bgColor)
 
-		boxText, boxType := drawTextBox(ctx, canvasHeight/48, cornerIn)
+		boxText, boxType := fb.drawTextBox(ctx, canvasHeight/48, cornerIn)
 
-		drawInfluenceAndOrFactionSymbol(ctx, card, boxText.right, factionColor)
+		fb.drawInfluenceAndOrFactionSymbol(ctx, card, boxText.right, factionColor)
 
 		// render card text
 

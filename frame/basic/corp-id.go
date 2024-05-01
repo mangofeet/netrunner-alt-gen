@@ -46,7 +46,7 @@ func (fb FrameBasic) CorpID() art.Drawer {
 		ctx.DrawPath(0, 0, subtitlePath)
 		ctx.Pop()
 
-		boxText, boxType := drawTextBox(ctx, canvasHeight/192, cornerRounded)
+		boxText, boxType := fb.drawTextBox(ctx, canvasHeight/192, cornerRounded)
 
 		fb.drawCorpLimits(ctx, card, boxText)
 

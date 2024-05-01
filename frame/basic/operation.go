@@ -46,12 +46,12 @@ func (fb FrameBasic) Operation() art.Drawer {
 
 		var boxText, boxType textBoxDimensions
 		if card.Attributes.TrashCost != nil {
-			boxText, boxType = drawTextBoxTrashable(ctx, canvasHeight/192, cornerRounded)
+			boxText, boxType = fb.drawTextBoxTrashable(ctx, canvasHeight/192, cornerRounded)
 		} else {
-			boxText, boxType = drawTextBox(ctx, canvasHeight/192, cornerRounded)
+			boxText, boxType = fb.drawTextBox(ctx, canvasHeight/192, cornerRounded)
 		}
 
-		drawInfluenceAndOrFactionSymbol(ctx, card, boxText.left, factionColor)
+		fb.drawInfluenceAndOrFactionSymbol(ctx, card, boxText.left, factionColor)
 
 		if _, err := drawTrashCost(ctx, card); err != nil {
 			return err

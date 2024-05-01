@@ -74,7 +74,7 @@ func (fb FrameBasic) RunnerID() art.Drawer {
 		ctx.DrawPath(0, 0, subtitlePath)
 		ctx.Pop()
 
-		boxText, boxType := drawTextBox(ctx, canvasHeight/96, cornerStraight)
+		boxText, boxType := fb.drawTextBox(ctx, canvasHeight/96, cornerStraight)
 
 		fb.drawRunnerLimits(ctx, card, boxText)
 		drawMU(ctx, card, false)

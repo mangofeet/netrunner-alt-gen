@@ -55,9 +55,9 @@ func (fb FrameBasic) Agenda() art.Drawer {
 
 		var boxText, boxType textBoxDimensions
 		if card.Attributes.TrashCost != nil {
-			boxText, boxType = drawTextBoxTrashable(ctx, canvasHeight/192, cornerRounded)
+			boxText, boxType = fb.drawTextBoxTrashable(ctx, canvasHeight/192, cornerRounded)
 		} else {
-			boxText, boxType = drawTextBox(ctx, canvasHeight/192, cornerRounded)
+			boxText, boxType = fb.drawTextBox(ctx, canvasHeight/192, cornerRounded)
 		}
 
 		// render card text
@@ -68,7 +68,7 @@ func (fb FrameBasic) Agenda() art.Drawer {
 		fontSizeCost := titleBoxHeight * 3
 		fontSizeCard := titleBoxHeight * 1.2
 
-		drawAgendaPoints(ctx, card, fontSizeCost)
+		fb.drawAgendaPoints(ctx, card, fontSizeCost)
 
 		titleTextMaxWidth := titleBoxRight * 0.8
 		titleTextX := titleBoxRight - titleTextMaxWidth - titleBoxHeight*0.5
@@ -89,7 +89,7 @@ func (fb FrameBasic) Agenda() art.Drawer {
 		drawCardText(ctx, card, fontSizeCard, boxText.height*0.6, canvasWidth*0.02, boxText, fb.getAdditionalText()...)
 		drawTypeText(ctx, card, fontSizeCard, boxType)
 
-		drawInfluenceAndOrFactionSymbol(ctx, card, boxText.left, factionColor)
+		fb.drawInfluenceAndOrFactionSymbol(ctx, card, boxText.left, factionColor)
 
 		return nil
 	})

@@ -21,8 +21,13 @@ func getFramer(card *nrdb.Printing) (art.Drawer, error) {
 		var framer art.Drawer
 		log.Println("card type:", card.Attributes.CardTypeID)
 
+		if textBoxFactor > 1 {
+			textBoxFactor /= 100.0
+		}
+
 		frm := basic.FrameBasic{
-			Color: parseColor(baseColor),
+			Color:               parseColor(baseColor),
+			TextBoxHeightFactor: &textBoxFactor,
 		}
 
 		if flavorText != "" {
