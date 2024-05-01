@@ -25,3 +25,7 @@ Generate a card by running `netrunner-alt-gen netspace [card name or printing ID
 ### `empty`
 
 Generate a card frame by running `netrunner-alt-gen empty [card name or printing ID]`
+
+### `empty`
+
+Generate a card frame on top of a specified image by running `netrunner-alt-gen image [path to image] [card name or printing ID]`
