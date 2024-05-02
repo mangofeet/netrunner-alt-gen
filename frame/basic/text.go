@@ -235,7 +235,7 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 		lastLineH += extraH
 	}
 
-	for lastLineH > h*0.5 {
+	for lastLineH > h*0.75 {
 		fontSize -= strokeWidth
 		cText = getCardText(card.Attributes.Text, fontSize, w, h, box.align)
 		fTexts = []*canvas.Text{}
