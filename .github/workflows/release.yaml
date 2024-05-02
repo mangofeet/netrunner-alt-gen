@@ -1,0 +1,77 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build Linux
+        run: |
+          CGO_ENABLED=0 GOOS=linux go build -trimpath -v \
+          -ldflags "-X github.com/mangofeet/netrunner-alt-gen/cmd.version=$(git describe --tags)" \
+          -o netrunner-alt-gen
+          
+      - name: Build MacOX
+        run: |
+          CGO_ENABLED=0 GOOS=darwin go build -trimpath -v \
+          -ldflags "-X github.com/mangofeet/netrunner-alt-gen/cmd.version=$(git describe --tags)" \
+          -o netrunner-alt-gen-darwin
+          
+      - name: Build Windows
+        run: |
+          CGO_ENABLED=0 GOOS=windows go build -trimpath -v \
+          -ldflags "-X github.com/mangofeet/netrunner-alt-gen/cmd.version=$(git describe --tags)" \
+          -o netrunner-alt-gen-windows
+          
+      - name: Upload Linux
+        uses: actions/upload-release-asset@v1        
+        env:          
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
+        with:          
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ./netrunner-alt-gen          
+          asset_name: netrunner-alt-gen-${{ github.ref }}-linux
+          asset_content_type: application/x-executable
+          
+      - name: Upload MacOS        
+        uses: actions/upload-release-asset@v1        
+        env:          
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
+        with:          
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ./netrunner-alt-gen-darwin
+          asset_name: netrunner-alt-gen-${{ github.ref }}-darwin
+          asset_content_type: application/x-mach-binary
+          
+      - name: Upload Windows
+        uses: actions/upload-release-asset@v1        
+        env:          
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
+        with:          
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ./netrunner-alt-gen-windows
+          asset_name: netrunner-alt-gen-${{ github.ref }}-windows.exe
+          asset_content_type: application/vnd.microsoft.portable-executable
