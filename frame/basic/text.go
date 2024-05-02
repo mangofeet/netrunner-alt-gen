@@ -199,9 +199,17 @@ type textBoxDimensions struct {
 	align                    canvas.TextAlign
 }
 
+type additionalTextType string
+
+const (
+	additionalTextTypeFlavor      additionalTextType = "flavor"
+	additionalTextTypeAttribution additionalTextType = "attribution"
+)
+
 type additionalText struct {
-	content string
-	align   canvas.TextAlign
+	content  string
+	textType additionalTextType
+	align    canvas.TextAlign
 }
 
 func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCutoff, indent float64, box textBoxDimensions, extra ...additionalText) {
@@ -309,7 +317,7 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 	for _, ln := range extra {
 
 		textWidth := w - (newCardTextX - x) - w*0.03
-		if ln.align == canvas.Right {
+		if ln.textType == additionalTextTypeAttribution {
 			textWidth = math.Min(widestLine*1.2, textWidth)
 		}
 

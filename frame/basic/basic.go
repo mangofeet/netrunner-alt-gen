@@ -20,14 +20,16 @@ func (fb FrameBasic) getAdditionalText() []additionalText {
 	var extra []additionalText
 	if fb.Flavor != "" {
 		extra = append(extra, additionalText{
-			content: fb.Flavor,
-			align:   canvas.Left,
+			content:  fb.Flavor,
+			textType: additionalTextTypeFlavor,
+			align:    canvas.Left,
 		})
 	}
 	if fb.FlavorAttribution != "" {
 		extra = append(extra, additionalText{
-			content: fb.FlavorAttribution,
-			align:   canvas.Right,
+			content:  fb.FlavorAttribution,
+			textType: additionalTextTypeAttribution,
+			align:    canvas.Right,
 		})
 	}
 
