@@ -106,7 +106,7 @@ func (fb FrameBasic) RunnerID() art.Drawer {
 		subtitleTextY := (subtitleBoxTop - (subtitleBoxHeight-subtitleText.Bounds().H)*0.5)
 		ctx.DrawText(subtitleTextX, subtitleTextY, subtitleText)
 
-		drawCardText(ctx, card, fontSizeCard, boxText.height*0.75, canvasWidth*0.06, boxText, fb.getAdditionalText()...)
+		drawCardText(ctx, card, fontSizeCard, getRunnerLimitsBottom(ctx)+getRunnerLimitsHeight(ctx), canvasWidth*0.06, boxText, fb.getAdditionalText()...)
 		drawTypeText(ctx, card, fontSizeCard, boxType)
 		drawFactionSybmol(ctx, card, factionBubbleX, factionBubbleY, factionBubbleWidth)
 

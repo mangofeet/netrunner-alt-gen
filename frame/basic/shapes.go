@@ -49,6 +49,16 @@ func getInfluenceHeight(ctx *canvas.Context) float64 {
 	return canvasHeight * 0.28
 }
 
+func getRunnerLimitsBottom(ctx *canvas.Context) float64 {
+	_, canvasHeight := ctx.Size()
+	return canvasHeight * 0.059994
+}
+
+func getRunnerLimitsHeight(ctx *canvas.Context) float64 {
+	canvasWidth, _ := ctx.Size()
+	return canvasWidth * 0.08
+}
+
 func drawCostCircle(ctx *canvas.Context, bgColor color.Color) {
 
 	strokeWidth := getStrokeWidth(ctx)
@@ -592,10 +602,10 @@ func (fb FrameBasic) drawRunnerLimits(ctx *canvas.Context, card *nrdb.Printing, 
 	strokeWidth := getStrokeWidth(ctx)
 
 	width := canvasWidth * 0.1
-	height := canvasWidth * 0.08
+	height := getRunnerLimitsHeight(ctx)
 	deckBoxLeft := box.left - width*0.5
 	influenceBoxLeft := box.right - width*0.5
-	bottom := box.height * 0.18
+	bottom := getRunnerLimitsBottom(ctx)
 	top := bottom + height
 	corner := width * 0.25
 
