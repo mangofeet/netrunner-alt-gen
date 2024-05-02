@@ -72,11 +72,11 @@ func init() {
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMin, "min-walkers", "m", 3000, `Minimum amount of walkers`)
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMax, "max-walkers", "M", 10000, `Maximum amount of walkers`)
 	netspaceCmd.Flags().StringVarP(&gridColor1, "grid-color-1", "", "",
-		`Alternate grid color for the grid pattern on the card, defaults to pre-defined faction color analogue +30, will be randomly desaturated by algorithm`)
+		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-1, will be randomly desaturated by algorithm`)
 	netspaceCmd.Flags().StringVarP(&gridColor2, "grid-color-2", "", "",
-		`Alternate grid color for the grid pattern on the card, defaults to pre-defined faction color analogue -30, will be randomly desaturated by algorithm`)
+		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-2, will be randomly desaturated by algorithm`)
 	netspaceCmd.Flags().StringVarP(&gridColor3, "grid-color-3", "", "",
-		`Alternate grid color for the grid pattern on the card, defaults to pre-defined faction color compliment, will be randomly desaturated by algorithm`)
+		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-3, will be randomly desaturated by algorithm`)
 
 	rootCmd.AddCommand(netspaceCmd)
 	rootCmd.AddCommand(emptyCmd)
