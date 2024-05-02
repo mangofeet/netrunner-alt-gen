@@ -33,6 +33,12 @@ func generateCardNetspace(cardName string) error {
 		MinWalkers: netspaceWalkersMin,
 		MaxWalkers: netspaceWalkersMax,
 		Color:      parseColor(baseColor),
+		AltColor1:  parseColor(altColor1),
+		AltColor2:  parseColor(altColor2),
+		AltColor3:  parseColor(altColor3),
+		GridColor1: parseColor(gridColor1),
+		GridColor2: parseColor(gridColor2),
+		GridColor3: parseColor(gridColor3),
 	}
 
 	return generateCard(ns, printing)

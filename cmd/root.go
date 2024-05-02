@@ -40,14 +40,16 @@ const safeHeight = 3924.0
 // const cardHeight = 88.0
 
 var (
-	drawMarginLines               bool
-	frame, outputDir              string
-	baseColor                     string
-	skipFlavor                    bool
-	flavorText, flavorAttribution string
-	textBoxFactor                 float64
+	drawMarginLines                            bool
+	frame, outputDir                           string
+	baseColor, altColor1, altColor2, altColor3 string
+	skipFlavor                                 bool
+	flavorText, flavorAttribution              string
+	textBoxFactor                              float64
 
+	// netspace
 	netspaceWalkersMin, netspaceWalkersMax int
+	gridColor1, gridColor2, gridColor3     string
 
 	// set by ldflags
 	version string = "local"
@@ -62,10 +64,19 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&flavorAttribution, "flavor-attribution", "", "", `Flavor text attribution to add to the generated card, for "quotes"`)
 	rootCmd.PersistentFlags().BoolVarP(&skipFlavor, "skip-flavor", "", false, `Don't render default flavor text`)
 	rootCmd.PersistentFlags().StringVarP(&baseColor, "base-color", "c", "", `Alternate base color for the card, defaults to pre-defined faction colors`)
+	rootCmd.PersistentFlags().StringVarP(&altColor1, "alt-color-1", "", "", `Alternate alt color for the card, defaults to pre-defined faction color analogue +30`)
+	rootCmd.PersistentFlags().StringVarP(&altColor2, "alt-color-2", "", "", `Alternate alt color for the card, defaults to pre-defined faction color analogue -30`)
+	rootCmd.PersistentFlags().StringVarP(&altColor3, "alt-color-3", "", "", `Alternate alt color for the card, defaults to pre-defined faction color compliment`)
 	rootCmd.PersistentFlags().Float64VarP(&textBoxFactor, "text-box-height", "", 33.3, `Percentage of total card height taken up by the main text box`)
 
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMin, "min-walkers", "m", 3000, `Minimum amount of walkers`)
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMax, "max-walkers", "M", 10000, `Maximum amount of walkers`)
+	netspaceCmd.Flags().StringVarP(&gridColor1, "grid-color-1", "", "",
+		`Alternate grid color for the grid pattern on the card, defaults to pre-defined faction color analogue +30, will be randomly desaturated by algorithm`)
+	netspaceCmd.Flags().StringVarP(&gridColor2, "grid-color-2", "", "",
+		`Alternate grid color for the grid pattern on the card, defaults to pre-defined faction color analogue -30, will be randomly desaturated by algorithm`)
+	netspaceCmd.Flags().StringVarP(&gridColor3, "grid-color-3", "", "",
+		`Alternate grid color for the grid pattern on the card, defaults to pre-defined faction color compliment, will be randomly desaturated by algorithm`)
 
 	rootCmd.AddCommand(netspaceCmd)
 	rootCmd.AddCommand(emptyCmd)

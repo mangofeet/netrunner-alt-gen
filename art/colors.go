@@ -3,6 +3,8 @@ package art
 import (
 	"image/color"
 	"math"
+
+	"github.com/crazy3lf/colorconv"
 )
 
 func Lighten(baseColor color.RGBA, factor float64) color.RGBA {
@@ -29,6 +31,59 @@ func Darken(baseColor color.RGBA, factor float64) color.RGBA {
 		B: uint8(math.Max(0, math.Min(float64(int64(b)-factorInt), 255))),
 		A: uint8(a),
 	}
+}
+
+func Complementary(baseColor color.RGBA) color.RGBA {
+	r, g, b, a := baseColor.R, baseColor.G, baseColor.B, baseColor.A
+
+	return color.RGBA{
+		R: 255 - r,
+		G: 255 - g,
+		B: 255 - b,
+		A: a,
+	}
+
+}
+
+func Analogous(baseColor color.RGBA, degShift float64) (color.RGBA, color.RGBA, error) {
+	h, s, l := colorconv.ColorToHSL(baseColor)
+
+	h1 := math.Mod(h+degShift, 360)
+	h2 := math.Mod(h-degShift, 360)
+
+	if h1 < 0 {
+		h1 = 360 + h1
+	}
+	if h2 < 0 {
+		h2 = 360 + h2
+	}
+
+	r1, g1, b1, err := colorconv.HSLToRGB(h1, s, l)
+	if err != nil {
+		return color.RGBA{}, color.RGBA{}, err
+	}
+	r2, g2, b2, err := colorconv.HSLToRGB(h2, s, l)
+	if err != nil {
+		return color.RGBA{}, color.RGBA{}, err
+	}
+
+	c1 := color.RGBA{r1, g1, b1, baseColor.A}
+	c2 := color.RGBA{r2, g2, b2, baseColor.A}
+
+	return c1, c2, nil
+
+}
+
+func Desaturate(baseColor color.RGBA, amount float64) (color.RGBA, error) {
+	h, s, l := colorconv.ColorToHSL(baseColor)
+
+	r, g, b, err := colorconv.HSLToRGB(h, math.Min(s*amount, 1), l)
+	if err != nil {
+		return color.RGBA{}, err
+	}
+	c1 := color.RGBA{r, g, b, baseColor.A}
+
+	return c1, nil
 }
 
 func GetFactionBaseColor(factionID string) color.RGBA {

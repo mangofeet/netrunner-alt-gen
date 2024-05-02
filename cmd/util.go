@@ -191,6 +191,7 @@ func drawMargin(ctx *canvas.Context, x, y, w, h float64, c color.Color) {
 
 }
 
+// returns nil when the color is empty or unparsable
 func parseColor(colorStr string) *color.RGBA {
 
 	if colorStr == "" {

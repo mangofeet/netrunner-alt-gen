@@ -17,6 +17,8 @@ github.com/blend/go-sdk v1.20220411.3/go.mod h1:7lnH8fTi6U4i1fArEXRyOIY2E1X4MALg
 github.com/campoy/embedmd v1.0.0 h1:V4kI2qTJJLf4J29RzI/MAt2c3Bl4dQSYPuflzwFH2hY=
 github.com/campoy/embedmd v1.0.0/go.mod h1:oxyr9RCiSXg0M3VJ3ks0UGfp98BpSSGr0kpiX3MzVl8=
 github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
+github.com/crazy3lf/colorconv v1.2.0 h1:UM7kSZWnwFMGiC+PpYrjxQSOd6sEyWb+dRKKTd3KslA=
+github.com/crazy3lf/colorconv v1.2.0/go.mod h1:2jTJ7QCWCj2sSLOhF4Gzi0J5/hoX8/VY8VzNvXAlD1I=
 github.com/go-fonts/dejavu v0.1.0 h1:JSajPXURYqpr+Cu8U9bt8K+XcACIHWqWrvWCKyeFmVQ=
 github.com/go-fonts/dejavu v0.1.0/go.mod h1:4Wt4I4OU2Nq9asgDCteaAaWZOV24E+0/Pwo0gppep4g=
 github.com/go-fonts/latin-modern v0.3.1 h1:/cT8A7uavYKvglYXvrdDw4oS5ZLkcOU22fa2HJ1/JVM=
