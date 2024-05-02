@@ -213,6 +213,9 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 	strokeWidth := getStrokeWidth(ctx)
 	_, canvasHeight := ctx.Size()
 
+	originalFontSize := fontSize
+	extraFontSize := originalFontSize * 0.8
+	maxExtraFontSize := extraFontSize
 	textBottom := canvasHeight * 0.0592
 
 	paddingLR, paddingTB := getCardTextPadding(ctx)
@@ -229,7 +232,7 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 	cText := getCardText(card.Attributes.Text, fontSize, w, h, box.align)
 	var fTexts []*canvas.Text
 	for _, txt := range extra {
-		fTexts = append(fTexts, getCardText(txt.content, fontSize, w*0.85, h, txt.align))
+		fTexts = append(fTexts, getCardText(txt.content, extraFontSize, w*0.85, h, txt.align))
 	}
 
 	var leftoverText string
@@ -246,11 +249,12 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 
 	for y-lastLineH < textBottom {
 		fontSize -= strokeWidth
+		extraFontSize = math.Min(maxExtraFontSize, fontSize)
 
 		// remake font boxes with new font size
 		cText = getCardText(card.Attributes.Text, fontSize, w, h, box.align)
 		for i, txt := range extra {
-			fTexts[i] = getCardText(txt.content, fontSize, w*0.85, h, txt.align)
+			fTexts[i] = getCardText(txt.content, extraFontSize, w*0.85, h, txt.align)
 		}
 
 		// get new last line height
@@ -301,6 +305,7 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 	newCardTextX += w * 0.08
 	y = y - (lastLineH + fontSize*0.4)
 	widestLine := 0.0
+	extraFontSize = math.Min(maxExtraFontSize, fontSize)
 	for _, ln := range extra {
 
 		textWidth := w - (newCardTextX - x) - w*0.03
@@ -308,7 +313,7 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 			textWidth = math.Min(widestLine*1.2, textWidth)
 		}
 
-		txt := getCardText(ln.content, fontSize, textWidth, h, ln.align)
+		txt := getCardText(ln.content, extraFontSize, textWidth, h, ln.align)
 		ctx.DrawText(newCardTextX, y, txt)
 
 		widestLine = math.Max(txt.Bounds().W, widestLine)
