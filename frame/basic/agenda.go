@@ -86,10 +86,10 @@ func (fb FrameBasic) Agenda() art.Drawer {
 				canvas.Center, canvas.Center, 0, 0))
 		}
 
+		fb.drawInfluenceAndOrFactionSymbol(ctx, card, boxText.left, factionColor)
+
 		drawCardText(ctx, card, fontSizeCard, boxText.height*0.6, canvasWidth*0.02, boxText, fb.getAdditionalText()...)
 		drawTypeText(ctx, card, fontSizeCard, boxType)
-
-		fb.drawInfluenceAndOrFactionSymbol(ctx, card, boxText.left, factionColor)
 
 		return nil
 	})

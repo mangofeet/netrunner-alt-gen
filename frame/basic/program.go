@@ -68,7 +68,8 @@ func (fb FrameBasic) Program() art.Drawer {
 		ctx.SetStrokeColor(textColor)
 		ctx.SetStrokeWidth(strokeWidth)
 
-		ctx.DrawPath(canvasWidth*-0.04, 0, strength(canvasWidth, canvasHeight))
+		strengthPath := strength(canvasWidth, canvasHeight)
+		ctx.DrawPath(canvasWidth*-0.04, 0, strengthPath)
 
 		ctx.Pop()
 
@@ -108,7 +109,7 @@ func (fb FrameBasic) Program() art.Drawer {
 			canvasWidth/5, 0,
 			canvas.Center, canvas.Center, 0, 0))
 
-		drawCardText(ctx, card, fontSizeCard, boxText.height*0.45, canvasWidth*0.06, boxText, fb.getAdditionalText()...)
+		drawCardText(ctx, card, fontSizeCard, strengthPath.Bounds().H, canvasWidth*0.06, boxText, fb.getAdditionalText()...)
 		drawTypeText(ctx, card, fontSizeCard, boxType)
 
 		return nil

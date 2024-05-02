@@ -2,6 +2,7 @@ package basic
 
 import (
 	"fmt"
+	"math"
 	"regexp"
 	"strings"
 
@@ -210,13 +211,18 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 	}
 
 	strokeWidth := getStrokeWidth(ctx)
+	_, canvasHeight := ctx.Size()
+
+	textBottom := canvasHeight * 0.0592
 
 	paddingLR, paddingTB := getCardTextPadding(ctx)
 	x := box.left + paddingLR
-	y := box.height - paddingTB
-	if box.top != 0 {
-		y = box.top - paddingTB
+	if box.top == 0 {
+		box.top = box.height
+	} else { // this is for ice
+		textBottom = box.top - box.height + paddingTB
 	}
+	y := box.top - paddingTB
 	w := box.right - box.left - (paddingLR * 2.5)
 	h := box.height
 
@@ -228,30 +234,41 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 
 	var leftoverText string
 
-	_, lastLineH := cText.Heights()
+	lastLineH := cText.Bounds().H
 
+	if len(fTexts) > 0 {
+		lastLineH += fontSize * 0.3
+	}
 	for _, txt := range fTexts {
-		_, extraH := txt.Heights()
+		extraH := txt.Bounds().H
 		lastLineH += extraH
 	}
 
-	for lastLineH > h*0.75 {
+	for y-lastLineH < textBottom {
 		fontSize -= strokeWidth
+
+		// remake font boxes with new font size
 		cText = getCardText(card.Attributes.Text, fontSize, w, h, box.align)
-		fTexts = []*canvas.Text{}
-		for _, txt := range extra {
-			fTexts = append(fTexts, getCardText(txt.content, fontSize, w*0.85, h, txt.align))
+		for i, txt := range extra {
+			fTexts[i] = getCardText(txt.content, fontSize, w*0.85, h, txt.align)
 		}
-		_, lastLineH = cText.Heights()
+
+		// get new last line height
+		lastLineH = cText.Bounds().H
+		if len(fTexts) > 0 {
+			lastLineH += fontSize * 0.3
+		}
 		for _, txt := range fTexts {
-			_, extraH := txt.Heights()
+			extraH := txt.Bounds().H
 			lastLineH += extraH
 		}
+
 	}
 
 	i := 0
-	_, lastLineH = cText.Heights()
-	for lastLineH > indentCutoff {
+	lastLineH = cText.Bounds().H
+
+	for y-lastLineH < indentCutoff {
 
 		i++
 
@@ -262,7 +279,7 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 
 		cText = getCardText(newText, fontSize, w, h, box.align)
 
-		_, lastLineH = cText.Heights()
+		lastLineH = cText.Bounds().H
 
 	}
 
@@ -278,14 +295,24 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 
 		cText := getCardText(leftoverText, fontSize, w-(newCardTextX-x)-w*0.03, h, box.align)
 		ctx.DrawText(newCardTextX, y, cText)
-		_, lastLineH = cText.Heights()
+		lastLineH = cText.Bounds().H
 	}
 
 	newCardTextX += w * 0.08
 	y = y - (lastLineH + fontSize*0.4)
-	for _, txt := range fTexts {
+	widestLine := 0.0
+	for _, ln := range extra {
+
+		textWidth := w - (newCardTextX - x) - w*0.03
+		if ln.align == canvas.Right {
+			textWidth = math.Min(widestLine*1.2, textWidth)
+		}
+
+		txt := getCardText(ln.content, fontSize, textWidth, h, ln.align)
 		ctx.DrawText(newCardTextX, y, txt)
-		_, lastLineH = txt.Heights()
+
+		widestLine = math.Max(txt.Bounds().W, widestLine)
+		lastLineH = txt.Bounds().H
 		y = y - (lastLineH)
 	}
 

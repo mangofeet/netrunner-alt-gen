@@ -334,7 +334,7 @@ func drawLink(ctx *canvas.Context, card *nrdb.Printing) {
 		canvas.Center, canvas.Center, 0, 0))
 }
 
-func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor color.RGBA) {
+func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor color.RGBA) *canvas.Path {
 
 	strokeWidth := getStrokeWidth(ctx)
 
@@ -345,6 +345,7 @@ func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *
 	influenceWidth := canvasHeight / 42
 	factionY := influenceHeight*0.2 + influenceWidth*1.2
 
+	var influencePath *canvas.Path
 	if card.Attributes.InfluenceCost != nil {
 
 		influenceCost := *card.Attributes.InfluenceCost
@@ -357,7 +358,8 @@ func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *
 		// center around the give point
 		boxX := x - (influenceWidth / 2)
 
-		ctx.DrawPath(boxX, 0, influenceBox(influenceHeight, influenceWidth))
+		influencePath = influenceBox(influenceHeight, influenceWidth)
+		ctx.DrawPath(boxX, 0, influencePath)
 
 		ctx.Pop()
 
@@ -390,13 +392,19 @@ func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *
 		}
 	}
 
-	if err := drawFactionSybmol(ctx, card, x, factionY, influenceWidth*2); err != nil {
+	factionPath, err := drawFactionSybmol(ctx, card, x, factionY, influenceWidth*2)
+	if err != nil {
 		panic(err)
 	}
 
+	if influencePath != nil {
+		return influencePath.Join(factionPath)
+	}
+	return factionPath
+
 }
 
-func drawFactionSybmol(ctx *canvas.Context, card *nrdb.Printing, x, y, width float64) error {
+func drawFactionSybmol(ctx *canvas.Context, card *nrdb.Printing, x, y, width float64) (*canvas.Path, error) {
 	strokeWidth := getStrokeWidth(ctx)
 
 	bubbleRadius := width * 0.6
@@ -411,11 +419,11 @@ func drawFactionSybmol(ctx *canvas.Context, card *nrdb.Printing, x, y, width flo
 
 	factionImageFile, err := assets.FS.Open(fmt.Sprintf("%s.png", card.Attributes.FactionID))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	factionImage, err := png.Decode(factionImageFile)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	factionImageWidth := float64(factionImage.Bounds().Max.X)
@@ -435,7 +443,7 @@ func drawFactionSybmol(ctx *canvas.Context, card *nrdb.Printing, x, y, width flo
 			Scale(factionScaleFactor, factionScaleFactor),
 	)
 
-	return nil
+	return circle, nil
 
 }
 
