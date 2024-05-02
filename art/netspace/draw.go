@@ -38,7 +38,7 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	if drawer.Color != nil {
 		baseColor = *drawer.Color
 	}
-	altColor1, altColor2, err := art.Analogous(baseColor, 30)
+	altColor1, altColor2, err := art.Analogous(baseColor, 20)
 	if err != nil {
 		return fmt.Errorf("getting analogous colors: %w", err)
 	}
@@ -49,7 +49,10 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		altColor2 = *drawer.AltColor2
 	}
 
-	altColor3 := art.Complementary(baseColor)
+	altColor3, _, err := art.Analogous(baseColor, 40)
+	if err != nil {
+		return fmt.Errorf("getting third analog: %w", err)
+	}
 	altColor3, err = art.Desaturate(altColor3, 0.5)
 	if err != nil {
 		return fmt.Errorf("getting desaturated compliment: %w", err)

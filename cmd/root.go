@@ -64,9 +64,9 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&flavorAttribution, "flavor-attribution", "", "", `Flavor text attribution to add to the generated card, for "quotes"`)
 	rootCmd.PersistentFlags().BoolVarP(&skipFlavor, "skip-flavor", "", false, `Don't render default flavor text`)
 	rootCmd.PersistentFlags().StringVarP(&baseColor, "base-color", "c", "", `Alternate base color for the card, defaults to pre-defined faction colors`)
-	rootCmd.PersistentFlags().StringVarP(&altColor1, "alt-color-1", "", "", `Alternate alt color for the card, defaults to pre-defined faction color analogue +30`)
-	rootCmd.PersistentFlags().StringVarP(&altColor2, "alt-color-2", "", "", `Alternate alt color for the card, defaults to pre-defined faction color analogue -30`)
-	rootCmd.PersistentFlags().StringVarP(&altColor3, "alt-color-3", "", "", `Alternate alt color for the card, defaults to pre-defined faction color compliment`)
+	rootCmd.PersistentFlags().StringVarP(&altColor1, "alt-color-1", "", "", `Alternate alt color for the card, defaults to pre-defined faction color analogue +20`)
+	rootCmd.PersistentFlags().StringVarP(&altColor2, "alt-color-2", "", "", `Alternate alt color for the card, defaults to pre-defined faction color analogue -20`)
+	rootCmd.PersistentFlags().StringVarP(&altColor3, "alt-color-3", "", "", `Alternate alt color for the card, defaults to pre-defined faction color analogue +40`)
 	rootCmd.PersistentFlags().Float64VarP(&textBoxFactor, "text-box-height", "", 33.3, `Percentage of total card height taken up by the main text box`)
 
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMin, "min-walkers", "m", 3000, `Minimum amount of walkers`)
