@@ -73,7 +73,7 @@ func (fb FrameBasic) CorpID() art.Drawer {
 		subtitleTextY := (subtitleBoxTop - (subtitleBoxHeight-subtitleText.Bounds().H)*0.5)
 		ctx.DrawText(subtitleTextX, subtitleTextY, subtitleText)
 
-		drawCardText(ctx, card, fontSizeCard, canvasHeight, 0, boxText, fb.getAdditionalText()...)
+		drawCardText(ctx, card, fontSizeCard, 0, 0, boxText, fb.getAdditionalText()...)
 		drawTypeText(ctx, card, fontSizeCard, boxType)
 
 		drawFactionSybmol(ctx, card, canvasWidth*0.15, subtitleBoxBottom+(titleBoxHeight+subtitleBoxHeight)*0.5, (titleBoxHeight + subtitleBoxHeight))
