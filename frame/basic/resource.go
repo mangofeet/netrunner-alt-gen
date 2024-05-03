@@ -15,11 +15,9 @@ func (fb FrameBasic) Resource() art.Drawer {
 
 		strokeWidth := getStrokeWidth(ctx)
 
-		factionColor := fb.getColor(card)
-
 		ctx.Push()
-		ctx.SetFillColor(bgColor)
-		ctx.SetStrokeColor(textColor)
+		ctx.SetFillColor(fb.getColorBG())
+		ctx.SetStrokeColor(fb.getColorBorder())
 		ctx.SetStrokeWidth(strokeWidth)
 
 		costContainerR := getCostContainerRadius(ctx)
@@ -42,11 +40,11 @@ func (fb FrameBasic) Resource() art.Drawer {
 		ctx.Pop()
 
 		// outline for cost circle
-		drawCostCircle(ctx, bgColor)
+		fb.drawCostCircle(ctx, fb.getColorBG())
 
 		boxText, boxType := fb.drawTextBox(ctx, canvasHeight/48, cornerIn)
 
-		fb.drawInfluenceAndOrFactionSymbol(ctx, card, boxText.right, factionColor)
+		fb.drawInfluenceAndOrFactionSymbol(ctx, card, boxText.right)
 
 		// render card text
 
@@ -61,20 +59,20 @@ func (fb FrameBasic) Resource() art.Drawer {
 			titleTextX = titleBoxLeft + (costContainerR * 0.4)
 		}
 		titleTextY := titleBoxTop - titleBoxHeight*0.1
-		ctx.DrawText(titleTextX, titleTextY, getCardText(getTitle(card), fontSizeTitle, canvasWidth, titleBoxHeight, canvas.Left))
+		ctx.DrawText(titleTextX, titleTextY, fb.getCardText(getTitle(card), fontSizeTitle, canvasWidth, titleBoxHeight, canvas.Left))
 		// ctx.DrawText(titleTextX, titleTextY, canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
 
 		if card.Attributes.Cost != nil {
 			costTextX := costContainerStart
 			costTextY := titleBoxBottom + titleBoxHeight/2
 			ctx.DrawText(costTextX, costTextY, canvas.NewTextBox(
-				getFont(fontSizeCost, canvas.FontBlack), fmt.Sprint(*card.Attributes.Cost),
+				fb.getFont(fontSizeCost, canvas.FontBlack), fmt.Sprint(*card.Attributes.Cost),
 				costContainerR*2, 0,
 				canvas.Center, canvas.Center, 0, 0))
 		}
 
-		drawCardText(ctx, card, fontSizeCard, 0, 0, boxText, fb.getAdditionalText()...)
-		drawTypeText(ctx, card, fontSizeCard, boxType)
+		fb.drawCardText(ctx, card, fontSizeCard, 0, 0, boxText, fb.getAdditionalText()...)
+		fb.drawTypeText(ctx, card, fontSizeCard, boxType)
 
 		return nil
 	})

@@ -10,10 +10,12 @@ import (
 
 type FrameBasic struct {
 	Flavor, FlavorAttribution string
-	Color                     *color.RGBA
 	TextBoxHeightFactor       *float64
 	Version                   string
 	Designer                  string
+
+	ColorBG, ColorBorder, ColorText,
+	ColorInfluenceBG, ColorStrengthBG, ColorFactionBG *color.RGBA
 }
 
 func (fb FrameBasic) getAdditionalText() []additionalText {
@@ -36,13 +38,57 @@ func (fb FrameBasic) getAdditionalText() []additionalText {
 	return extra
 }
 
-func (fb FrameBasic) getColor(card *nrdb.Printing) color.RGBA {
+func (fb FrameBasic) getColorBG() color.RGBA {
 
-	if fb.Color != nil {
-		return *fb.Color
+	if fb.ColorBG != nil {
+		return *fb.ColorBG
 	}
 
-	baseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
-	return art.Darken(baseColor, 0.811)
+	return colorDefaultBG
+}
 
+func (fb FrameBasic) getColorBorder() color.RGBA {
+
+	if fb.ColorBorder != nil {
+		return *fb.ColorBorder
+	}
+
+	return colorDefaultText
+}
+
+func (fb FrameBasic) getColorText() color.RGBA {
+
+	if fb.ColorText != nil {
+		return *fb.ColorText
+	}
+
+	return colorDefaultText
+}
+
+func (fb FrameBasic) getColorInfluenceBG(card *nrdb.Printing) color.RGBA {
+
+	if fb.ColorInfluenceBG != nil {
+		return *fb.ColorInfluenceBG
+	}
+
+	return art.GetFactionBaseColor(card.Attributes.FactionID)
+}
+
+func (fb FrameBasic) getColorStrenthBG(card *nrdb.Printing) color.RGBA {
+
+	if fb.ColorStrengthBG != nil {
+		return *fb.ColorStrengthBG
+	}
+
+	return art.GetFactionBaseColor(card.Attributes.FactionID)
+
+}
+
+func (fb FrameBasic) getColorFactionBG() color.RGBA {
+
+	if fb.ColorFactionBG != nil {
+		return *fb.ColorFactionBG
+	}
+
+	return colorDefaultOpaqueBG
 }

@@ -57,6 +57,6 @@ func loadFont(name, backup string, style canvas.FontStyle) error {
 	return nil
 }
 
-func getFont(size float64, style canvas.FontStyle) *canvas.FontFace {
-	return fontFamily.Face(size, textColor, style)
+func (fb FrameBasic) getFont(size float64, style canvas.FontStyle) *canvas.FontFace {
+	return fontFamily.Face(size, fb.getColorText(), style)
 }

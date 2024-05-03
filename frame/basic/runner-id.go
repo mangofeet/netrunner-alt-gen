@@ -66,8 +66,8 @@ func (fb FrameBasic) RunnerID() art.Drawer {
 		subtitlePath.Close()
 
 		ctx.Push()
-		ctx.SetFillColor(bgColor)
-		ctx.SetStrokeColor(textColor)
+		ctx.SetFillColor(fb.getColorBG())
+		ctx.SetStrokeColor(fb.getColorBorder())
 		ctx.SetStrokeWidth(strokeWidth)
 
 		ctx.DrawPath(0, 0, titlePath)
@@ -77,8 +77,8 @@ func (fb FrameBasic) RunnerID() art.Drawer {
 		boxText, boxType := fb.drawTextBox(ctx, canvasHeight/96, cornerStraight)
 
 		fb.drawRunnerLimits(ctx, card, boxText)
-		drawMU(ctx, card, false)
-		drawLink(ctx, card)
+		fb.drawMU(ctx, card, false)
+		fb.drawLink(ctx, card)
 
 		// render card text
 
@@ -95,20 +95,20 @@ func (fb FrameBasic) RunnerID() art.Drawer {
 		titleTextX := titleBoxLeftBottom + titleBoxHeight*0.3
 		titleTextMaxWidth := factionBubbleX - titleTextX - factionBubbleWidth*0.7
 
-		titleText := getTitleText(ctx, card, fontSizeTitle, titleTextMaxWidth, titleBoxHeight, canvas.Left)
+		titleText := fb.getTitleText(ctx, card, fontSizeTitle, titleTextMaxWidth, titleBoxHeight, canvas.Left)
 		titleTextY := titleBoxTop - titleBoxHeight*0.1
 		ctx.DrawText(titleTextX, titleTextY, titleText)
 
 		subtitleTextX := subtitleBoxLeft + subtitleBoxHeight*0.6
 		subtitleTextMaxWidth := factionBubbleX - subtitleTextX - factionBubbleWidth*0.7
 
-		subtitleText := getSubtitleText(ctx, card, fontSizeSubtitle, subtitleTextMaxWidth, subtitleBoxHeight, canvas.Left)
+		subtitleText := fb.getSubtitleText(ctx, card, fontSizeSubtitle, subtitleTextMaxWidth, subtitleBoxHeight, canvas.Left)
 		subtitleTextY := (subtitleBoxTop - (subtitleBoxHeight-subtitleText.Bounds().H)*0.5)
 		ctx.DrawText(subtitleTextX, subtitleTextY, subtitleText)
 
-		drawCardText(ctx, card, fontSizeCard, getRunnerLimitsBottom(ctx)+getRunnerLimitsHeight(ctx), canvasWidth*0.06, boxText, fb.getAdditionalText()...)
-		drawTypeText(ctx, card, fontSizeCard, boxType)
-		drawFactionSybmol(ctx, card, factionBubbleX, factionBubbleY, factionBubbleWidth)
+		fb.drawCardText(ctx, card, fontSizeCard, getRunnerLimitsBottom(ctx)+getRunnerLimitsHeight(ctx), canvasWidth*0.06, boxText, fb.getAdditionalText()...)
+		fb.drawTypeText(ctx, card, fontSizeCard, boxType)
+		fb.drawFactionSybmol(ctx, card, factionBubbleX, factionBubbleY, factionBubbleWidth)
 
 		return nil
 	})

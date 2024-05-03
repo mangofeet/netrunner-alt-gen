@@ -30,15 +30,18 @@ func generateCardNetspace(cardName string) error {
 	log.Printf("generating %s", printing.Attributes.StrippedTitle)
 
 	ns := netspace.Netspace{
-		MinWalkers: netspaceWalkersMin,
-		MaxWalkers: netspaceWalkersMax,
-		Color:      parseColor(baseColor),
-		AltColor1:  parseColor(altColor1),
-		AltColor2:  parseColor(altColor2),
-		AltColor3:  parseColor(altColor3),
-		GridColor1: parseColor(gridColor1),
-		GridColor2: parseColor(gridColor2),
-		GridColor3: parseColor(gridColor3),
+		MinWalkers:   netspaceWalkersMin,
+		MaxWalkers:   netspaceWalkersMax,
+		Color:        parseColor(baseColor),
+		ColorBG:      parseColor(netspaceColorBG),
+		WalkerColor1: parseColor(walkerColor1),
+		WalkerColor2: parseColor(walkerColor2),
+		WalkerColor3: parseColor(walkerColor3),
+		WalkerColor4: parseColor(walkerColor4),
+		GridColor1:   parseColor(gridColor1),
+		GridColor2:   parseColor(gridColor2),
+		GridColor3:   parseColor(gridColor3),
+		GridColor4:   parseColor(gridColor4),
 	}
 
 	return generateCard(ns, printing)

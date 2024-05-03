@@ -40,16 +40,20 @@ const safeHeight = 3924.0
 // const cardHeight = 88.0
 
 var (
-	drawMarginLines                            bool
-	frame, outputDir                           string
-	baseColor, altColor1, altColor2, altColor3 string
-	skipFlavor                                 bool
-	flavorText, flavorAttribution              string
-	textBoxFactor                              float64
+	drawMarginLines                                                   bool
+	outputDir                                                         string
+	baseColor, walkerColor1, walkerColor2, walkerColor3, walkerColor4 string
+	skipFlavor                                                        bool
+	flavorText, flavorAttribution                                     string
+	textBoxFactor                                                     float64
+
+	frame, frameColorBackground, frameColorBorder, frameColorText,
+	frameColorInfluenceBG, frameColorStrengthBG, frameColorFactionBG string
 
 	// netspace
-	netspaceWalkersMin, netspaceWalkersMax int
-	gridColor1, gridColor2, gridColor3     string
+	netspaceWalkersMin, netspaceWalkersMax         int
+	netspaceColorBG                                string
+	gridColor1, gridColor2, gridColor3, gridColor4 string
 
 	// set by ldflags
 	version string = "local"
@@ -57,26 +61,37 @@ var (
 
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&drawMarginLines, "draw-margin-lines", "", false, `Draw bleed and "safe area" lines`)
-	rootCmd.PersistentFlags().StringVarP(&frame, "frame", "f", "basic", `Frame to draw, use "none" to skip drawing a frame`)
 	rootCmd.PersistentFlags().StringVarP(&outputDir, "output", "o", "output", `Output directory name`)
 
 	rootCmd.PersistentFlags().StringVarP(&flavorText, "flavor", "", "", `Flavor text to add to the generated card`)
 	rootCmd.PersistentFlags().StringVarP(&flavorAttribution, "flavor-attribution", "", "", `Flavor text attribution to add to the generated card, for "quotes"`)
 	rootCmd.PersistentFlags().BoolVarP(&skipFlavor, "skip-flavor", "", false, `Don't render default flavor text`)
 	rootCmd.PersistentFlags().StringVarP(&baseColor, "base-color", "c", "", `Alternate base color for the card, defaults to pre-defined faction colors`)
-	rootCmd.PersistentFlags().StringVarP(&altColor1, "alt-color-1", "", "", `Alternate alt color for the card, defaults to pre-defined faction color analogue +20`)
-	rootCmd.PersistentFlags().StringVarP(&altColor2, "alt-color-2", "", "", `Alternate alt color for the card, defaults to pre-defined faction color analogue -20`)
-	rootCmd.PersistentFlags().StringVarP(&altColor3, "alt-color-3", "", "", `Alternate alt color for the card, defaults to pre-defined faction color analogue +40`)
 	rootCmd.PersistentFlags().Float64VarP(&textBoxFactor, "text-box-height", "", 33.3, `Percentage of total card height taken up by the main text box`)
+
+	rootCmd.PersistentFlags().StringVarP(&frame, "frame", "f", "basic", `Frame to draw, use "none" to skip drawing a frame`)
+	rootCmd.PersistentFlags().StringVarP(&frameColorBackground, "frame-color-background", "", "1c1c1c99", `Background color for frame text boxes`)
+	rootCmd.PersistentFlags().StringVarP(&frameColorBorder, "frame-color-border", "", "dcdccc", `Border color for frame text boxes`)
+	rootCmd.PersistentFlags().StringVarP(&frameColorText, "frame-color-text", "", "dcdccc", `Text color for frame text boxes`)
+	rootCmd.PersistentFlags().StringVarP(&frameColorInfluenceBG, "frame-color-influence-bg", "", "", `Background color for the influence cost indicator, defaults to pre-defined faction colors or specified base color. If set to "faction", it will use the faction color regardless of the base color`)
+	rootCmd.PersistentFlags().StringVarP(&frameColorStrengthBG, "frame-color-strength-bg", "", "", `Background color for the strength bubble on ice and programs, defaults to pre-defined faction colors or specified base color. If set to "faction", it will use the faction color regardless of the base color`)
+	rootCmd.PersistentFlags().StringVarP(&frameColorFactionBG, "frame-color-faction-bg", "", "1c1c1c", `Background color for the faction symbol`)
 
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMin, "min-walkers", "m", 3000, `Minimum amount of walkers`)
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMax, "max-walkers", "M", 10000, `Maximum amount of walkers`)
+	netspaceCmd.Flags().StringVarP(&netspaceColorBG, "color-bg", "", "", `Background color for the generated art, defaults to --base-color value`)
+	netspaceCmd.Flags().StringVarP(&walkerColor1, "walker-color-1", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue +10 - +30`)
+	netspaceCmd.Flags().StringVarP(&walkerColor2, "walker-color-2", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue -10 - -30`)
+	netspaceCmd.Flags().StringVarP(&walkerColor3, "walker-color-3", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue +30 - +50`)
+	netspaceCmd.Flags().StringVarP(&walkerColor3, "walker-color-4", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue -30 - -50`)
 	netspaceCmd.Flags().StringVarP(&gridColor1, "grid-color-1", "", "",
 		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-1, will be randomly desaturated by algorithm`)
 	netspaceCmd.Flags().StringVarP(&gridColor2, "grid-color-2", "", "",
 		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-2, will be randomly desaturated by algorithm`)
 	netspaceCmd.Flags().StringVarP(&gridColor3, "grid-color-3", "", "",
 		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-3, will be randomly desaturated by algorithm`)
+	netspaceCmd.Flags().StringVarP(&gridColor4, "grid-color-4", "", "",
+		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-4, will be randomly desaturated by algorithm`)
 
 	rootCmd.AddCommand(netspaceCmd)
 	rootCmd.AddCommand(emptyCmd)

@@ -13,16 +13,14 @@ func (fb FrameBasic) Upgrade() art.Drawer {
 
 		strokeWidth := getStrokeWidth(ctx)
 
-		factionColor := fb.getColor(card)
-
 		ctx.Push()
-		ctx.SetFillColor(bgColor)
-		ctx.SetStrokeColor(textColor)
+		ctx.SetFillColor(fb.getColorBG())
+		ctx.SetStrokeColor(fb.getColorBorder())
 		ctx.SetStrokeWidth(strokeWidth)
 
 		titleBoxHeight := getTitleBoxHeight(ctx)
 		fontSizeCost := titleBoxHeight * 2.3
-		boxResIcon, err := drawRezCost(ctx, card, fontSizeCost)
+		boxResIcon, err := fb.drawRezCost(ctx, card, fontSizeCost)
 		if err != nil {
 			return err
 		}
@@ -49,9 +47,9 @@ func (fb FrameBasic) Upgrade() art.Drawer {
 			boxText, boxType = fb.drawTextBox(ctx, canvasHeight/192, cornerRounded)
 		}
 
-		fb.drawInfluenceAndOrFactionSymbol(ctx, card, boxText.left, factionColor)
+		fb.drawInfluenceAndOrFactionSymbol(ctx, card, boxText.left)
 
-		if _, err := drawTrashCost(ctx, card); err != nil {
+		if _, err := fb.drawTrashCost(ctx, card); err != nil {
 			return err
 		}
 		// render card text
@@ -68,13 +66,13 @@ func (fb FrameBasic) Upgrade() art.Drawer {
 
 		titleTextMaxWidth := (canvasWidth * 0.9) - titleBoxLeftIn
 
-		titleText := getTitleText(ctx, card, fontSizeTitle, titleTextMaxWidth, titleBoxHeight, canvas.Left)
+		titleText := fb.getTitleText(ctx, card, fontSizeTitle, titleTextMaxWidth, titleBoxHeight, canvas.Left)
 		titleTextY := (titleBoxTop - (titleBoxHeight-titleText.Bounds().H)*0.5)
 		ctx.DrawText(titleTextX, titleTextY, titleText)
 		// canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
 
-		drawCardText(ctx, card, fontSizeCard, boxText.height*0.6, canvasWidth*0.02, boxText, fb.getAdditionalText()...)
-		drawTypeText(ctx, card, fontSizeCard, boxType)
+		fb.drawCardText(ctx, card, fontSizeCard, boxText.height*0.6, canvasWidth*0.02, boxText, fb.getAdditionalText()...)
+		fb.drawTypeText(ctx, card, fontSizeCard, boxType)
 
 		return nil
 

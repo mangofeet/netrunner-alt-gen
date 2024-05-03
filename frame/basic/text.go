@@ -38,38 +38,38 @@ func getSubtitle(card *nrdb.Printing) string {
 	return subtitle
 }
 
-func getTitleText(ctx *canvas.Context, card *nrdb.Printing, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
-	return getFittedText(ctx, getTitle(card), fontSize, maxWidth, height, align)
+func (fb FrameBasic) getTitleText(ctx *canvas.Context, card *nrdb.Printing, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
+	return fb.getFittedText(ctx, getTitle(card), fontSize, maxWidth, height, align)
 }
 
-func getSubtitleText(ctx *canvas.Context, card *nrdb.Printing, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
-	return getFittedText(ctx, getSubtitle(card), fontSize, maxWidth, height, align)
+func (fb FrameBasic) getSubtitleText(ctx *canvas.Context, card *nrdb.Printing, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
+	return fb.getFittedText(ctx, getSubtitle(card), fontSize, maxWidth, height, align)
 }
 
-func getFittedText(ctx *canvas.Context, title string, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
+func (fb FrameBasic) getFittedText(ctx *canvas.Context, title string, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
 
-	text := getCardText(title, fontSize, maxWidth*2, height, align)
+	text := fb.getCardText(title, fontSize, maxWidth*2, height, align)
 
 	strokeWidth := getStrokeWidth(ctx)
 
 	for text.Bounds().W > maxWidth {
 		fontSize -= strokeWidth
-		text = getCardText(title, fontSize, maxWidth*2, height, align)
+		text = fb.getCardText(title, fontSize, maxWidth*2, height, align)
 	}
 
 	// get it a final time to get the width correct
-	text = getCardText(title, fontSize, maxWidth, height, align)
+	text = fb.getCardText(title, fontSize, maxWidth, height, align)
 
 	return text
 }
 
-func getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64, align canvas.TextAlign) *canvas.Text {
+func (fb FrameBasic) getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64, align canvas.TextAlign) *canvas.Text {
 
-	regFace := getFont(fontSize, canvas.FontRegular)
-	boldFace := getFont(fontSize, canvas.FontBold)
-	italicFace := getFont(fontSize, canvas.FontItalic)
-	arrowFace := getFont(fontSize, canvas.FontExtraBold)
-	uniqueFace := getFont(fontSize, canvas.FontExtraBold)
+	regFace := fb.getFont(fontSize, canvas.FontRegular)
+	boldFace := fb.getFont(fontSize, canvas.FontBold)
+	italicFace := fb.getFont(fontSize, canvas.FontItalic)
+	arrowFace := fb.getFont(fontSize, canvas.FontExtraBold)
+	uniqueFace := fb.getFont(fontSize, canvas.FontExtraBold)
 
 	rt := canvas.NewRichText(regFace)
 
@@ -84,19 +84,19 @@ func getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64, alig
 
 		if strings.Contains(part, "→") {
 			subParts := strings.Split(part, "→")
-			writeTextPart(rt, subParts[0], regFace, boldFace, italicFace)
+			fb.writeTextPart(rt, subParts[0], regFace, boldFace, italicFace)
 			rt.WriteFace(arrowFace, "→")
 			part = subParts[1]
 		}
 
 		if strings.Contains(part, "♦") {
 			subParts := strings.Split(part, "♦")
-			writeTextPart(rt, subParts[0], regFace, boldFace, italicFace)
+			fb.writeTextPart(rt, subParts[0], regFace, boldFace, italicFace)
 			rt.WriteFace(uniqueFace, "♦")
 			part = subParts[1]
 		}
 
-		writeTextPart(rt, part, regFace, boldFace, italicFace)
+		fb.writeTextPart(rt, part, regFace, boldFace, italicFace)
 	}
 
 	return rt.ToText(
@@ -106,36 +106,36 @@ func getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64, alig
 
 }
 
-func writeTextPart(rt *canvas.RichText, text string, regFace, boldFace, italicFace *canvas.FontFace) {
+func (fb FrameBasic) writeTextPart(rt *canvas.RichText, text string, regFace, boldFace, italicFace *canvas.FontFace) {
 
 	text = strings.ReplaceAll(text, "\n", "\n\n")
 	text = strings.ReplaceAll(text, "<BR>", "\n")
 
 	if strings.Contains(text, "</strong>") {
 		subParts := strings.Split(text, "</strong>")
-		writeChunk(rt, subParts[0], boldFace)
+		fb.writeChunk(rt, subParts[0], boldFace)
 		text = subParts[1]
 	}
 
 	if strings.Contains(text, "</em>") {
 		subParts := strings.Split(text, "</em>")
-		writeChunk(rt, subParts[0], italicFace)
+		fb.writeChunk(rt, subParts[0], italicFace)
 		text = subParts[1]
 	}
 
-	writeChunk(rt, text, regFace)
+	fb.writeChunk(rt, text, regFace)
 
 }
 
 var replacementCheck = regexp.MustCompile(`\[[a-z-]+\]`)
 
-func replaceSymbol(rt *canvas.RichText, symbol, svgName, text string, face *canvas.FontFace, scaleFactor, translateFactor float64) string {
+func (fb FrameBasic) replaceSymbol(rt *canvas.RichText, symbol, svgName, text string, face *canvas.FontFace, scaleFactor, translateFactor float64) string {
 	if strings.Contains(text, symbol) {
 		subParts := strings.Split(text, symbol)
 		for _, chunk := range subParts[:len(subParts)-1] {
-			writeChunk(rt, chunk, face)
+			fb.writeChunk(rt, chunk, face)
 			path := mustLoadGameAsset(svgName).Scale(face.Size*scaleFactor, face.Size*scaleFactor).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1*translateFactor))
-			rt.WritePath(path, textColor, canvas.FontMiddle)
+			rt.WritePath(path, fb.getColorText(), canvas.FontMiddle)
 		}
 		text = subParts[len(subParts)-1]
 		if len(text) == 0 || (text[0] != ' ' && text[0] != ',' && text[0] != '.') {
@@ -147,18 +147,18 @@ func replaceSymbol(rt *canvas.RichText, symbol, svgName, text string, face *canv
 
 }
 
-func writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
+func (fb FrameBasic) writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
 
-	text = replaceSymbol(rt, "[mu]", "MU", text, face, 0.0002, 0.8)
-	text = replaceSymbol(rt, "[credit]", "CREDIT", text, face, 0.000025, 0.8)
-	text = replaceSymbol(rt, "[recurring-credit]", "RECURRING_CREDIT", text, face, 0.00014, 0.8)
-	text = replaceSymbol(rt, "[click]", "CLICK", text, face, 0.0002, 1)
-	text = replaceSymbol(rt, "[subroutine]", "SUBROUTINE", text, face, 0.0002, 1)
-	text = replaceSymbol(rt, "[trash]", "TRASH_ABILITY", text, face, 0.0002, 1)
-	text = replaceSymbol(rt, "[interrupt]", "INTERRUPT", text, face, 0.0002, 1)
+	text = fb.replaceSymbol(rt, "[mu]", "MU", text, face, 0.0002, 0.8)
+	text = fb.replaceSymbol(rt, "[credit]", "CREDIT", text, face, 0.000025, 0.8)
+	text = fb.replaceSymbol(rt, "[recurring-credit]", "RECURRING_CREDIT", text, face, 0.00014, 0.8)
+	text = fb.replaceSymbol(rt, "[click]", "CLICK", text, face, 0.0002, 1)
+	text = fb.replaceSymbol(rt, "[subroutine]", "SUBROUTINE", text, face, 0.0002, 1)
+	text = fb.replaceSymbol(rt, "[trash]", "TRASH_ABILITY", text, face, 0.0002, 1)
+	text = fb.replaceSymbol(rt, "[interrupt]", "INTERRUPT", text, face, 0.0002, 1)
 
 	if replacementCheck.MatchString(text) {
-		writeChunk(rt, text, face)
+		fb.writeChunk(rt, text, face)
 		return
 	}
 
@@ -212,7 +212,7 @@ type additionalText struct {
 	align    canvas.TextAlign
 }
 
-func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCutoff, indent float64, box textBoxDimensions, extra ...additionalText) {
+func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCutoff, indent float64, box textBoxDimensions, extra ...additionalText) {
 
 	if box.align == 0 {
 		box.align = canvas.Left
@@ -237,10 +237,10 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 	w := box.right - box.left - (paddingLR * 2.5)
 	h := box.height
 
-	cText := getCardText(card.Attributes.Text, fontSize, w, h, box.align)
+	cText := fb.getCardText(card.Attributes.Text, fontSize, w, h, box.align)
 	var fTexts []*canvas.Text
 	for _, txt := range extra {
-		fTexts = append(fTexts, getCardText(txt.content, extraFontSize, w*0.85, h, txt.align))
+		fTexts = append(fTexts, fb.getCardText(txt.content, extraFontSize, w*0.85, h, txt.align))
 	}
 
 	var leftoverText string
@@ -260,9 +260,9 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 		extraFontSize = math.Min(maxExtraFontSize, fontSize)
 
 		// remake font boxes with new font size
-		cText = getCardText(card.Attributes.Text, fontSize, w, h, box.align)
+		cText = fb.getCardText(card.Attributes.Text, fontSize, w, h, box.align)
 		for i, txt := range extra {
-			fTexts[i] = getCardText(txt.content, extraFontSize, w*0.85, h, txt.align)
+			fTexts[i] = fb.getCardText(txt.content, extraFontSize, w*0.85, h, txt.align)
 		}
 
 		// get new last line height
@@ -289,7 +289,7 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 		leftoverText = strings.Join(lines[len(lines)-i:], "\n")
 		newText := strings.Join(lines[:len(lines)-i], "\n")
 
-		cText = getCardText(newText, fontSize, w, h, box.align)
+		cText = fb.getCardText(newText, fontSize, w, h, box.align)
 
 		lastLineH = cText.Bounds().H
 
@@ -305,7 +305,7 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 			y = y - (lastLineH + fontSize*0.4)
 		}
 
-		cText := getCardText(leftoverText, fontSize, w-(newCardTextX-x)-w*0.03, h, box.align)
+		cText := fb.getCardText(leftoverText, fontSize, w-(newCardTextX-x)-w*0.03, h, box.align)
 		ctx.DrawText(newCardTextX, y, cText)
 		lastLineH = cText.Bounds().H
 	}
@@ -321,7 +321,7 @@ func drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCuto
 			textWidth = math.Min(widestLine*1.2, textWidth)
 		}
 
-		txt := getCardText(ln.content, extraFontSize, textWidth, h, ln.align)
+		txt := fb.getCardText(ln.content, extraFontSize, textWidth, h, ln.align)
 		ctx.DrawText(newCardTextX, y, txt)
 
 		widestLine = math.Max(txt.Bounds().W, widestLine)
@@ -341,7 +341,7 @@ func getCardTextPadding(ctx *canvas.Context) (lr, tb float64) {
 
 }
 
-func drawTypeText(ctx *canvas.Context, card *nrdb.Printing, fontSize float64, box textBoxDimensions) {
+func (fb FrameBasic) drawTypeText(ctx *canvas.Context, card *nrdb.Printing, fontSize float64, box textBoxDimensions) {
 
 	if box.align == 0 {
 		box.align = canvas.Left
@@ -353,7 +353,7 @@ func drawTypeText(ctx *canvas.Context, card *nrdb.Printing, fontSize float64, bo
 	h := box.height
 	box.top = box.bottom + box.height
 
-	typeText := getTypeText(card, fontSize, w, h, box.align)
+	typeText := fb.getTypeText(card, fontSize, w, h, box.align)
 
 	x := box.left + paddingLR
 	y := box.top - (box.height-(typeText.Bounds().H))*0.5
@@ -362,14 +362,14 @@ func drawTypeText(ctx *canvas.Context, card *nrdb.Printing, fontSize float64, bo
 
 }
 
-func getTypeText(card *nrdb.Printing, fontSize, w, h float64, align canvas.TextAlign) *canvas.Text {
+func (fb FrameBasic) getTypeText(card *nrdb.Printing, fontSize, w, h float64, align canvas.TextAlign) *canvas.Text {
 	var tText *canvas.Text
 	typeName := getTypeName(card.Attributes.CardTypeID)
 
 	if card.Attributes.DisplaySubtypes != nil {
-		tText = getCardText(fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSize, w, h, align)
+		tText = fb.getCardText(fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSize, w, h, align)
 	} else {
-		tText = getCardText(fmt.Sprintf("<strong>%s</strong>", typeName), fontSize, w, h, align)
+		tText = fb.getCardText(fmt.Sprintf("<strong>%s</strong>", typeName), fontSize, w, h, align)
 	}
 
 	return tText

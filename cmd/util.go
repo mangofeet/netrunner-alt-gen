@@ -26,8 +26,14 @@ func getFramer(card *nrdb.Printing) (art.Drawer, error) {
 		}
 
 		frm := basic.FrameBasic{
-			Color:               parseColor(baseColor),
 			TextBoxHeightFactor: &textBoxFactor,
+
+			ColorBG:          parseColor(frameColorBackground),
+			ColorBorder:      parseColor(frameColorBorder),
+			ColorText:        parseColor(frameColorText),
+			ColorInfluenceBG: parseColorInstruction(frameColorInfluenceBG, card),
+			ColorStrengthBG:  parseColorInstruction(frameColorStrengthBG, card),
+			ColorFactionBG:   parseColor(frameColorFactionBG),
 		}
 
 		if flavorText != "" {
@@ -125,7 +131,7 @@ func getCardData(cardName string) (*nrdb.Printing, error) {
 		for _, card := range cards {
 			log.Printf("%s - %s", card.LatestPrintingID(), card.StrippedTitle())
 		}
-		return nil, fmt.Errorf("mulitple results")
+		return nil, fmt.Errorf("mulitple results, run using the printing ID from the options above")
 	}
 
 	card := cards[0]
@@ -189,6 +195,15 @@ func drawMargin(ctx *canvas.Context, x, y, w, h float64, c color.Color) {
 	ctx.Stroke()
 	ctx.Pop()
 
+}
+
+func parseColorInstruction(colorStr string, card *nrdb.Printing) *color.RGBA {
+	if strings.ToLower(colorStr) == "faction" {
+		clr := art.GetFactionBaseColor(card.Attributes.FactionID)
+		return &clr
+	}
+
+	return parseColor(colorStr)
 }
 
 // returns nil when the color is empty or unparsable

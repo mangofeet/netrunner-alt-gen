@@ -39,8 +39,8 @@ func (fb FrameBasic) CorpID() art.Drawer {
 		subtitlePath.Close()
 
 		ctx.Push()
-		ctx.SetFillColor(bgColor)
-		ctx.SetStrokeColor(textColor)
+		ctx.SetFillColor(fb.getColorBG())
+		ctx.SetStrokeColor(fb.getColorBorder())
 		ctx.SetStrokeWidth(strokeWidth)
 		ctx.DrawPath(0, 0, titlePath)
 		ctx.DrawPath(0, 0, subtitlePath)
@@ -61,22 +61,22 @@ func (fb FrameBasic) CorpID() art.Drawer {
 		titleTextX := canvasWidth * 0.25
 		titleTextMaxWidth := titleBoxRightIn - titleTextX
 
-		titleText := getTitleText(ctx, card, fontSizeTitle, titleTextMaxWidth, titleBoxHeight, canvas.Left)
+		titleText := fb.getTitleText(ctx, card, fontSizeTitle, titleTextMaxWidth, titleBoxHeight, canvas.Left)
 		titleTextY := (titleBoxTop - (titleBoxHeight-titleText.Bounds().H)*0.5)
 		ctx.DrawText(titleTextX, titleTextY, titleText)
 		// canvas.NewTextLine(getFont(fontSizeTitle, canvas.FontRegular), getTitleText(card), canvas.Left))
 
 		subtitleTextX := titleTextX
 		subtitleTextMaxWidth := subtitleBoxRightIn - subtitleTextX
-		subtitleText := getSubtitleText(ctx, card, fontSizeSubtitle, subtitleTextMaxWidth, subtitleBoxHeight, canvas.Left)
+		subtitleText := fb.getSubtitleText(ctx, card, fontSizeSubtitle, subtitleTextMaxWidth, subtitleBoxHeight, canvas.Left)
 
 		subtitleTextY := (subtitleBoxTop - (subtitleBoxHeight-subtitleText.Bounds().H)*0.5)
 		ctx.DrawText(subtitleTextX, subtitleTextY, subtitleText)
 
-		drawCardText(ctx, card, fontSizeCard, 0, 0, boxText, fb.getAdditionalText()...)
-		drawTypeText(ctx, card, fontSizeCard, boxType)
+		fb.drawCardText(ctx, card, fontSizeCard, 0, 0, boxText, fb.getAdditionalText()...)
+		fb.drawTypeText(ctx, card, fontSizeCard, boxType)
 
-		drawFactionSybmol(ctx, card, canvasWidth*0.15, subtitleBoxBottom+(titleBoxHeight+subtitleBoxHeight)*0.5, (titleBoxHeight + subtitleBoxHeight))
+		fb.drawFactionSybmol(ctx, card, canvasWidth*0.15, subtitleBoxBottom+(titleBoxHeight+subtitleBoxHeight)*0.5, (titleBoxHeight + subtitleBoxHeight))
 
 		return nil
 

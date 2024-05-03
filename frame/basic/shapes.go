@@ -59,7 +59,7 @@ func getRunnerLimitsHeight(ctx *canvas.Context) float64 {
 	return canvasWidth * 0.08
 }
 
-func drawCostCircle(ctx *canvas.Context, bgColor color.Color) {
+func (fb FrameBasic) drawCostCircle(ctx *canvas.Context, bgColor color.Color) {
 
 	strokeWidth := getStrokeWidth(ctx)
 	costContainerR := getCostContainerRadius(ctx)
@@ -69,7 +69,7 @@ func drawCostCircle(ctx *canvas.Context, bgColor color.Color) {
 
 	ctx.Push()
 	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeColor(fb.getColorBorder())
 	ctx.SetStrokeWidth(strokeWidth)
 
 	path := canvas.Circle(costContainerR)
@@ -79,7 +79,7 @@ func drawCostCircle(ctx *canvas.Context, bgColor color.Color) {
 
 }
 
-func drawRezCost(ctx *canvas.Context, card *nrdb.Printing, fontSize float64) (*textBoxDimensions, error) {
+func (fb FrameBasic) drawRezCost(ctx *canvas.Context, card *nrdb.Printing, fontSize float64) (*textBoxDimensions, error) {
 	canvasWidth, canvasHeight := ctx.Size()
 
 	strokeWidth := getStrokeWidth(ctx)
@@ -92,8 +92,8 @@ func drawRezCost(ctx *canvas.Context, card *nrdb.Printing, fontSize float64) (*t
 	rezCostImage = rezCostImage.Transform(canvas.Identity.ReflectY()).Scale(0.1, 0.1)
 
 	ctx.Push()
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
+	ctx.SetFillColor(fb.getColorBG())
+	ctx.SetStrokeColor(fb.getColorBorder())
 	ctx.SetStrokeWidth(strokeWidth * 0.5)
 
 	costIconX := canvasWidth * 0.066
@@ -107,7 +107,7 @@ func drawRezCost(ctx *canvas.Context, card *nrdb.Printing, fontSize float64) (*t
 		costTextX := costIconX * 1.03
 		costTextY := costIconY - rezCostImage.Bounds().H*0.5
 		ctx.DrawText(costTextX, costTextY, canvas.NewTextBox(
-			getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.Cost),
+			fb.getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.Cost),
 			rezCostImage.Bounds().W, 0,
 			canvas.Center, canvas.Center, 0, 0))
 	}
@@ -134,16 +134,18 @@ func (fb FrameBasic) drawAgendaPoints(ctx *canvas.Context, card *nrdb.Printing, 
 
 	iconX := canvasWidth * 0.085
 	iconY := fb.getTextBoxHeight(ctx) + icon.Bounds().H*1.8
+
+	iconColorBase := fb.getColorBorder()
 	iconColor := color.RGBA{
-		R: textColor.R,
-		G: textColor.G,
-		B: textColor.B,
+		R: iconColorBase.R,
+		G: iconColorBase.G,
+		B: iconColorBase.B,
 		A: 0x44,
 	}
 
 	ctx.Push()
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
+	ctx.SetFillColor(fb.getColorBG())
+	ctx.SetStrokeColor(fb.getColorBorder())
 	ctx.SetStrokeWidth(strokeWidth)
 	circle := canvas.Circle(icon.Bounds().H * 0.6)
 	ctx.DrawPath(iconX+icon.Bounds().W*0.53, iconY-icon.Bounds().H*0.46, circle)
@@ -158,7 +160,7 @@ func (fb FrameBasic) drawAgendaPoints(ctx *canvas.Context, card *nrdb.Printing, 
 		textX := iconX * 1.03
 		textY := iconY - icon.Bounds().H*0.4
 		ctx.DrawText(textX, textY, canvas.NewTextBox(
-			getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.AgendaPoints),
+			fb.getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.AgendaPoints),
 			icon.Bounds().W, 0,
 			canvas.Center, canvas.Center, 0, 0))
 	}
@@ -185,7 +187,7 @@ func loadTrashCostPath() *canvas.Path {
 
 }
 
-func drawTrashCost(ctx *canvas.Context, card *nrdb.Printing) (*textBoxDimensions, error) {
+func (fb FrameBasic) drawTrashCost(ctx *canvas.Context, card *nrdb.Printing) (*textBoxDimensions, error) {
 
 	if card.Attributes.TrashCost == nil {
 		return nil, nil
@@ -203,8 +205,8 @@ func drawTrashCost(ctx *canvas.Context, card *nrdb.Printing) (*textBoxDimensions
 	iconY := canvasHeight * 0.145
 
 	ctx.Push()
-	ctx.SetFill(bgColor)
-	ctx.SetStrokeColor(textColor)
+	ctx.SetFill(fb.getColorBG())
+	ctx.SetStrokeColor(fb.getColorBorder())
 	ctx.SetStrokeWidth(strokeWidth)
 	ctx.DrawPath(iconX, iconY, image)
 	ctx.Pop()
@@ -213,7 +215,7 @@ func drawTrashCost(ctx *canvas.Context, card *nrdb.Printing) (*textBoxDimensions
 		textX := iconX + image.Bounds().W*0.45
 		textY := iconY - image.Bounds().H
 		ctx.DrawText(textX, textY, canvas.NewTextBox(
-			getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.TrashCost),
+			fb.getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.TrashCost),
 			image.Bounds().W, 0,
 			canvas.Center, canvas.Center, 0, 0))
 	}
@@ -226,7 +228,7 @@ func drawTrashCost(ctx *canvas.Context, card *nrdb.Printing) (*textBoxDimensions
 	}, nil
 }
 
-func drawMU(ctx *canvas.Context, card *nrdb.Printing, drawBox bool) {
+func (fb FrameBasic) drawMU(ctx *canvas.Context, card *nrdb.Printing, drawBox bool) {
 	canvasWidth, _ := ctx.Size()
 
 	strokeWidth := getStrokeWidth(ctx)
@@ -245,8 +247,8 @@ func drawMU(ctx *canvas.Context, card *nrdb.Printing, drawBox bool) {
 
 	if drawBox {
 		ctx.Push()
-		ctx.SetFillColor(bgColor)
-		ctx.SetStrokeColor(textColor)
+		ctx.SetFillColor(fb.getColorBG())
+		ctx.SetStrokeColor(fb.getColorBorder())
 		ctx.SetStrokeWidth(strokeWidth)
 
 		boxPath := &canvas.Path{}
@@ -261,7 +263,7 @@ func drawMU(ctx *canvas.Context, card *nrdb.Printing, drawBox bool) {
 	}
 
 	ctx.Push()
-	ctx.SetFillColor(textColor)
+	ctx.SetFillColor(fb.getColorText())
 
 	muIconX := muBoxX
 	muIconY := muBoxY + (muImage.Bounds().H * 0.2)
@@ -289,13 +291,13 @@ func drawMU(ctx *canvas.Context, card *nrdb.Printing, drawBox bool) {
 	muTextY := muBoxY
 	fontSize := getTitleBoxHeight(ctx) * 1.2
 	ctx.DrawText(muTextX, muTextY, canvas.NewTextBox(
-		getFont(fontSize, canvas.FontBlack), muText,
+		fb.getFont(fontSize, canvas.FontBlack), muText,
 		muBoxW, muBoxH,
 		canvas.Center, canvas.Center, 0, 0))
 
 }
 
-func drawLink(ctx *canvas.Context, card *nrdb.Printing) {
+func (fb FrameBasic) drawLink(ctx *canvas.Context, card *nrdb.Printing) {
 	canvasWidth, _ := ctx.Size()
 
 	// link icon
@@ -311,7 +313,7 @@ func drawLink(ctx *canvas.Context, card *nrdb.Printing) {
 	boxH := icon.Bounds().H + icon.Bounds().H*1.8
 
 	ctx.Push()
-	ctx.SetFillColor(textColor)
+	ctx.SetFillColor(fb.getColorText())
 
 	iconX := boxX + (icon.Bounds().W * 2.5)
 	iconY := boxY + (icon.Bounds().H * 1.1)
@@ -329,12 +331,12 @@ func drawLink(ctx *canvas.Context, card *nrdb.Printing) {
 	textY := boxY + boxW*0.2
 	fontSize := getTitleBoxHeight(ctx) * 2
 	ctx.DrawText(textX, textY, canvas.NewTextBox(
-		getFont(fontSize, canvas.FontBlack), text,
+		fb.getFont(fontSize, canvas.FontBlack), text,
 		boxW, boxH,
 		canvas.Center, canvas.Center, 0, 0))
 }
 
-func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *nrdb.Printing, x float64, bgColor color.RGBA) *canvas.Path {
+func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *nrdb.Printing, x float64) *canvas.Path {
 
 	strokeWidth := getStrokeWidth(ctx)
 
@@ -351,8 +353,8 @@ func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *
 		influenceCost := *card.Attributes.InfluenceCost
 
 		ctx.Push()
-		ctx.SetFillColor(bgColor)
-		ctx.SetStrokeColor(textColor)
+		ctx.SetFillColor(fb.getColorInfluenceBG(card))
+		ctx.SetStrokeColor(fb.getColorBorder())
 		ctx.SetStrokeWidth(strokeWidth)
 
 		// center around the give point
@@ -374,7 +376,7 @@ func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *
 
 			ctx.Push()
 			ctx.SetStrokeWidth(strokeWidth * 0.75)
-			ctx.SetStrokeColor(textColor)
+			ctx.SetStrokeColor(fb.getColorBorder())
 			ctx.SetFill(transparent)
 
 			pip := canvas.Circle(pipR)
@@ -384,7 +386,7 @@ func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *
 
 			if i >= 5-float64(influenceCost) {
 				ctx.Push()
-				ctx.SetFill(textColor)
+				ctx.SetFill(fb.getColorBorder())
 				pip := canvas.Circle(pipR * 0.5)
 				ctx.DrawPath(x, pipY, pip)
 				ctx.Pop()
@@ -392,7 +394,7 @@ func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *
 		}
 	}
 
-	factionPath, err := drawFactionSybmol(ctx, card, x, factionY, influenceWidth*2)
+	factionPath, err := fb.drawFactionSybmol(ctx, card, x, factionY, influenceWidth*2)
 	if err != nil {
 		panic(err)
 	}
@@ -404,15 +406,15 @@ func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *
 
 }
 
-func drawFactionSybmol(ctx *canvas.Context, card *nrdb.Printing, x, y, width float64) (*canvas.Path, error) {
+func (fb FrameBasic) drawFactionSybmol(ctx *canvas.Context, card *nrdb.Printing, x, y, width float64) (*canvas.Path, error) {
 	strokeWidth := getStrokeWidth(ctx)
 
 	bubbleRadius := width * 0.6
 
 	circle := canvas.Circle(bubbleRadius)
 	ctx.Push()
-	ctx.SetFill(bgColorOpaque)
-	ctx.SetStrokeColor(textColor)
+	ctx.SetFill(fb.getColorFactionBG())
+	ctx.SetStrokeColor(fb.getColorBorder())
 	ctx.SetStrokeWidth(strokeWidth)
 	ctx.DrawPath(x, y, circle)
 	ctx.Pop()
@@ -535,8 +537,8 @@ func (fb FrameBasic) drawTextBoxToSize(ctx *canvas.Context, textBoxLeft, textBox
 
 	// text box
 	ctx.Push()
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
+	ctx.SetFillColor(fb.getColorBG())
+	ctx.SetStrokeColor(fb.getColorBorder())
 	ctx.SetStrokeWidth(strokeWidth)
 
 	ctx.MoveTo(textBoxLeft, 0)
@@ -553,8 +555,8 @@ func (fb FrameBasic) drawTextBoxToSize(ctx *canvas.Context, textBoxLeft, textBox
 
 	// type box
 	ctx.Push()
-	ctx.SetFillColor(bgColor)
-	ctx.SetStrokeColor(textColor)
+	ctx.SetFillColor(fb.getColorBG())
+	ctx.SetStrokeColor(fb.getColorBorder())
 	ctx.SetStrokeWidth(strokeWidth)
 
 	// typeBoxHeight := math.Max(textBoxHeight*0.17, canvasHeight*0.056661)
@@ -600,7 +602,7 @@ func (fb FrameBasic) drawRunnerLimits(ctx *canvas.Context, card *nrdb.Printing, 
 
 	canvasWidth, _ := ctx.Size()
 
-	factionColor := fb.getColor(card)
+	factionColor := fb.getColorInfluenceBG(card)
 	influenceColor := color.RGBA{
 		R: 0x3f,
 		G: 0x3f,
@@ -619,7 +621,7 @@ func (fb FrameBasic) drawRunnerLimits(ctx *canvas.Context, card *nrdb.Printing, 
 
 	ctx.Push()
 	ctx.SetFillColor(factionColor)
-	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeColor(fb.getColorBorder())
 	ctx.SetStrokeWidth(strokeWidth)
 
 	ctx.MoveTo(deckBoxLeft, bottom)
@@ -635,7 +637,7 @@ func (fb FrameBasic) drawRunnerLimits(ctx *canvas.Context, card *nrdb.Printing, 
 
 	ctx.Push()
 	ctx.SetFillColor(influenceColor)
-	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeColor(fb.getColorBorder())
 	ctx.SetStrokeWidth(strokeWidth)
 
 	ctx.MoveTo(influenceBoxLeft, bottom+corner)
@@ -655,14 +657,14 @@ func (fb FrameBasic) drawRunnerLimits(ctx *canvas.Context, card *nrdb.Printing, 
 	textDeckX := deckBoxLeft
 	textDeckY := top
 	ctx.DrawText(textDeckX, textDeckY, canvas.NewTextBox(
-		getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.MinimumDeckSize),
+		fb.getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.MinimumDeckSize),
 		width, height,
 		canvas.Center, canvas.Center, 0, 0))
 
 	textInfluenceX := influenceBoxLeft
 	textInfluenceY := top
 	ctx.DrawText(textInfluenceX, textInfluenceY, canvas.NewTextBox(
-		getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.InfluenceLimit),
+		fb.getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.InfluenceLimit),
 		width, height,
 		canvas.Center, canvas.Center, 0, 0))
 }
@@ -671,7 +673,7 @@ func (fb FrameBasic) drawCorpLimits(ctx *canvas.Context, card *nrdb.Printing, bo
 
 	canvasWidth, _ := ctx.Size()
 
-	factionColor := fb.getColor(card)
+	factionColor := fb.getColorInfluenceBG(card)
 	influenceColor := color.RGBA{
 		R: 0x3f,
 		G: 0x3f,
@@ -687,14 +689,14 @@ func (fb FrameBasic) drawCorpLimits(ctx *canvas.Context, card *nrdb.Printing, bo
 
 	ctx.Push()
 	ctx.SetFillColor(factionColor)
-	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeColor(fb.getColorBorder())
 	ctx.SetStrokeWidth(strokeWidth)
 	ctx.DrawPath(deckX, y, canvas.Circle(radius))
 	ctx.Pop()
 
 	ctx.Push()
 	ctx.SetFillColor(influenceColor)
-	ctx.SetStrokeColor(textColor)
+	ctx.SetStrokeColor(fb.getColorBorder())
 	ctx.SetStrokeWidth(strokeWidth)
 	ctx.DrawPath(influenceX, y, canvas.Circle(radius))
 	ctx.Pop()
@@ -705,14 +707,14 @@ func (fb FrameBasic) drawCorpLimits(ctx *canvas.Context, card *nrdb.Printing, bo
 	textDeckX := deckX - radius
 	textDeckY := y + radius
 	ctx.DrawText(textDeckX, textDeckY, canvas.NewTextBox(
-		getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.MinimumDeckSize),
+		fb.getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.MinimumDeckSize),
 		radius*2, radius*2,
 		canvas.Center, canvas.Center, 0, 0))
 
 	textInfluenceX := influenceX - radius
 	textInfluenceY := y + radius
 	ctx.DrawText(textInfluenceX, textInfluenceY, canvas.NewTextBox(
-		getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.InfluenceLimit),
+		fb.getFont(fontSize, canvas.FontBlack), fmt.Sprint(*card.Attributes.InfluenceLimit),
 		radius*2, radius*2,
 		canvas.Center, canvas.Center, 0, 0))
 }

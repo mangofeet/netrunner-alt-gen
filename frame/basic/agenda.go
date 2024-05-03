@@ -16,11 +16,9 @@ func (fb FrameBasic) Agenda() art.Drawer {
 
 		strokeWidth := getStrokeWidth(ctx)
 
-		factionColor := fb.getColor(card)
-
 		ctx.Push()
-		ctx.SetFillColor(bgColor)
-		ctx.SetStrokeColor(textColor)
+		ctx.SetFillColor(fb.getColorBG())
+		ctx.SetStrokeColor(fb.getColorBorder())
 		ctx.SetStrokeWidth(strokeWidth)
 
 		costContainerR := getCostContainerRadius(ctx)
@@ -44,8 +42,8 @@ func (fb FrameBasic) Agenda() art.Drawer {
 
 		// outline for cost circle
 		ctx.Push()
-		ctx.SetFillColor(bgColor)
-		ctx.SetStrokeColor(textColor)
+		ctx.SetFillColor(fb.getColorBG())
+		ctx.SetStrokeColor(fb.getColorBorder())
 		ctx.SetStrokeWidth(strokeWidth)
 
 		path := canvas.Circle(costContainerR)
@@ -72,7 +70,7 @@ func (fb FrameBasic) Agenda() art.Drawer {
 
 		titleTextMaxWidth := titleBoxRight * 0.8
 		titleTextX := titleBoxRight - titleTextMaxWidth - titleBoxHeight*0.5
-		titleText := getTitleText(ctx, card, fontSizeTitle, titleTextMaxWidth, titleBoxHeight, canvas.Right)
+		titleText := fb.getTitleText(ctx, card, fontSizeTitle, titleTextMaxWidth, titleBoxHeight, canvas.Right)
 		titleTextY := (titleBoxTop - (titleBoxHeight-titleText.Bounds().H)*0.5)
 
 		ctx.DrawText(titleTextX, titleTextY, titleText)
@@ -81,15 +79,15 @@ func (fb FrameBasic) Agenda() art.Drawer {
 			costTextX := costContainerStart
 			costTextY := titleBoxBottom + titleBoxHeight/2
 			ctx.DrawText(costTextX, costTextY, canvas.NewTextBox(
-				getFont(fontSizeCost, canvas.FontBlack), fmt.Sprint(*card.Attributes.AdvancementRequirement),
+				fb.getFont(fontSizeCost, canvas.FontBlack), fmt.Sprint(*card.Attributes.AdvancementRequirement),
 				costContainerR*2, 0,
 				canvas.Center, canvas.Center, 0, 0))
 		}
 
-		fb.drawInfluenceAndOrFactionSymbol(ctx, card, boxText.left, factionColor)
+		fb.drawInfluenceAndOrFactionSymbol(ctx, card, boxText.left)
 
-		drawCardText(ctx, card, fontSizeCard, boxText.height*0.2, canvasWidth*0.02, boxText, fb.getAdditionalText()...)
-		drawTypeText(ctx, card, fontSizeCard, boxType)
+		fb.drawCardText(ctx, card, fontSizeCard, boxText.height*0.2, canvasWidth*0.02, boxText, fb.getAdditionalText()...)
+		fb.drawTypeText(ctx, card, fontSizeCard, boxType)
 
 		return nil
 	})
