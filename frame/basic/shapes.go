@@ -668,13 +668,8 @@ func (fb FrameBasic) drawCorpLimits(ctx *canvas.Context, card *nrdb.Printing, bo
 
 	canvasWidth, _ := ctx.Size()
 
-	factionColor := fb.getColorInfluenceBG(card)
-	influenceColor := color.RGBA{
-		R: 0x3f,
-		G: 0x3f,
-		B: 0x3f,
-		A: 0xff,
-	}
+	deckColor := fb.getColorMinDeckBG(card)
+	influenceColor := fb.getColorInfluenceLimitBG()
 	strokeWidth := getStrokeWidth(ctx)
 
 	radius := canvasWidth * 0.04
@@ -683,7 +678,7 @@ func (fb FrameBasic) drawCorpLimits(ctx *canvas.Context, card *nrdb.Printing, bo
 	influenceX := box.right + radius*0.5
 
 	ctx.Push()
-	ctx.SetFillColor(factionColor)
+	ctx.SetFillColor(deckColor)
 	ctx.SetStrokeColor(fb.getColorBorder())
 	ctx.SetStrokeWidth(strokeWidth)
 	ctx.DrawPath(deckX, y, canvas.Circle(radius))
