@@ -18,11 +18,13 @@ func Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	canvasWidth, canvasHeight := ctx.Size()
 
-	startX := float64(prng.Next(seed, int64(canvasWidth/2)) + int64(canvasWidth/4))
-	startY := float64(prng.Next(seed, int64(canvasHeight/6)) + (int64(canvasHeight/8) * 5))
+	rngGlobal := prng.NewGenerator(seed, nil)
+
+	startX := float64(rngGlobal.Next(int64(canvasWidth/2)) + int64(canvasWidth/4))
+	startY := float64(rngGlobal.Next(int64(canvasHeight/6)) + (int64(canvasHeight/8) * 5))
 
 	if card.Attributes.CardTypeID == "ice" {
-		startY = float64(prng.Next(seed, int64(canvasHeight/4)) + (int64(canvasHeight / 6)))
+		startY = float64(rngGlobal.Next(int64(canvasHeight/4)) + (int64(canvasHeight / 6)))
 	}
 
 	baseColor := art.GetFactionBaseColor(card.Attributes.FactionID)
@@ -39,15 +41,16 @@ func Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.Fill()
 	ctx.Pop()
 
-	noise := opensimplex.New(prng.Next(seed, math.MaxInt64))
+	noise := opensimplex.New(rngGlobal.Next(math.MaxInt64))
 
 	strokeWidth := canvasHeight * 0.0032
 
+	sequence := int64(1)
+
 	path := CircuitPath{
-		Seed:      seed,
+		RNG:       prng.NewGenerator(seed, &sequence),
 		Color:     baseColor,
 		PathWidth: strokeWidth,
-		Sequence:  1,
 		Noise:     noise,
 		X:         startX,
 		Y:         startY,
@@ -154,10 +157,9 @@ func (pg pathGroup) split(n int) []*pathGroup {
 }
 
 type CircuitPath struct {
-	Seed      string
+	RNG       prng.Generator
 	Color     color.RGBA
 	PathWidth float64
-	Sequence  int
 	Noise     opensimplex.Noise
 	X, Y      float64
 
@@ -175,7 +177,7 @@ func (wlk *CircuitPath) Draw(ctx *canvas.Context) {
 
 	canvasWidth, _ := ctx.Size()
 
-	wlk.startNodeSize = canvasWidth*0.03 + float64(prng.SequenceNext(wlk.Sequence, wlk.Seed, int64(canvasWidth*0.05)))
+	wlk.startNodeSize = canvasWidth*0.03 + float64(wlk.RNG.Next(int64(canvasWidth*0.05)))
 
 	wlk.startNode = canvas.Rect{
 		X: wlk.X - wlk.startNodeSize*0.5,
@@ -252,15 +254,15 @@ func (wlk *CircuitPath) Draw(ctx *canvas.Context) {
 
 		for _, group := range wlk.pathGroups {
 
-			movement := canvasWidth*0.05 + float64(prng.SequenceNext(wlk.Sequence, wlk.Seed, int64(canvasWidth*0.1)))
+			movement := canvasWidth*0.05 + float64(wlk.RNG.Next(int64(canvasWidth*0.1)))
 			group.move(movement)
 
-			// split := int(prng.SequenceNext(wlk.Sequence, wlk.Seed, int64(len(group.paths))))
+			// split := int(wlk.RNG.Next(int64(len(group.paths))))
 			// splitGroups := group.split(split)
 			splitGroups := group.split(0)
 
 			for _, g := range splitGroups {
-				dirChange := int(prng.SequenceNext(wlk.Sequence, wlk.Seed, 4))
+				dirChange := int(wlk.RNG.Next(4))
 
 				g.prevDirection = g.direction
 

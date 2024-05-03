@@ -4,32 +4,41 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"math/big"
-	"sync"
 )
 
-var globalSampleNum = int64(0)
-
-var sequenceSampleNumbers = map[int]int64{}
-
-var sequenceLock sync.Mutex
-
-func Next(seed string, sampleMax int64) int64 {
-	globalSampleNum++
-	result := prng(seed, fmt.Sprint(globalSampleNum), sampleMax)
-	return result
+type Generator interface {
+	Next(max int64) int64
+	Sample(sample, max int64) int64
 }
 
-func SequenceNext(sequence int, seed string, sampleMax int64) int64 {
-	sequenceLock.Lock()
-	defer sequenceLock.Unlock()
-
-	sequenceSampleNumbers[sequence]++
-	result := prng(seed, fmt.Sprintf("%d:%d", sequence, sequenceSampleNumbers[sequence]), sampleMax)
-	return result
+func NewGenerator(seed string, sequence *int64) Generator {
+	return &generator{
+		seed:     seed,
+		sequence: sequence,
+		sample:   0,
+	}
 }
 
-func Sample(seed string, sampleNum, sampleMax int64) int64 {
-	return prng(seed, fmt.Sprint(sampleNum), sampleMax)
+type generator struct {
+	seed     string
+	sequence *int64
+	sample   int64
+}
+
+func (gen *generator) Next(max int64) int64 {
+	gen.sample++
+	return gen.Sample(gen.sample, max)
+}
+
+func (gen *generator) Sample(sample, max int64) int64 {
+	return prng(gen.seed, gen.getSalt(sample), max)
+}
+
+func (gen *generator) getSalt(sample int64) string {
+	if gen.sequence == nil {
+		return fmt.Sprint(sample)
+	}
+	return fmt.Sprintf("%d:%d", *gen.sequence, sample)
 }
 
 func prng(seed, salt string, sampleMax int64) int64 {
