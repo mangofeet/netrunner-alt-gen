@@ -55,6 +55,7 @@ var (
 	netspaceWalkersMin, netspaceWalkersMax         int
 	netspaceColorBG                                string
 	gridColor1, gridColor2, gridColor3, gridColor4 string
+	gridPercent                                    float64
 
 	// set by ldflags
 	version string = "local"
@@ -105,6 +106,7 @@ If set to "faction", it will use the faction color regardless of the base color`
 		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-3, will be randomly desaturated by algorithm`)
 	netspaceCmd.Flags().StringVarP(&gridColor4, "grid-color-4", "", "",
 		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-4, will be randomly desaturated by algorithm`)
+	netspaceCmd.PersistentFlags().Float64VarP(&gridPercent, "grid-percent", "", -1, `Percentage of total walkers that will run on a grid`)
 
 	rootCmd.AddCommand(netspaceCmd)
 	rootCmd.AddCommand(emptyCmd)

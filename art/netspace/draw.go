@@ -15,6 +15,7 @@ import (
 
 type Netspace struct {
 	MinWalkers, MaxWalkers                                 int
+	GridPercent                                            *float64
 	Color, ColorBG                                         *color.RGBA
 	WalkerColor1, WalkerColor2, WalkerColor3, WalkerColor4 *color.RGBA
 	GridColor1, GridColor2, GridColor3, GridColor4         *color.RGBA
@@ -100,6 +101,9 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	nGrid := 0.0
 	if float64(numWalkers)*0.01 >= 1 {
 		nGrid = math.Max(float64(numWalkers)*0.01, float64(rngGlobal.Next(int64(float64(numWalkers)*0.02))))
+	}
+	if drawer.GridPercent != nil {
+		nGrid = *drawer.GridPercent
 	}
 
 	dirChangeStep := 30.0

@@ -29,9 +29,15 @@ func generateCardNetspace(cardName string) error {
 	}
 	log.Printf("generating %s", printing.Attributes.StrippedTitle)
 
+	var nGridP *float64
+	if gridPercent >= 0 {
+		nGridP = &gridPercent
+	}
+
 	ns := netspace.Netspace{
 		MinWalkers:   netspaceWalkersMin,
 		MaxWalkers:   netspaceWalkersMax,
+		GridPercent:  nGridP,
 		Color:        parseColor(baseColor),
 		ColorBG:      parseColor(netspaceColorBG),
 		WalkerColor1: parseColor(walkerColor1),
