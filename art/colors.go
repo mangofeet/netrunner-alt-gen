@@ -91,17 +91,17 @@ func GetFactionBaseColor(factionID string) color.RGBA {
 	switch factionID {
 	case "shaper":
 		return color.RGBA{
-			R: 0x4c,
-			G: 0xb1,
-			B: 0x48,
+			R: 0x15,
+			G: 0x73,
+			B: 0x0a,
 			A: 0xff,
 		}
 
 	case "anarch":
 		return color.RGBA{
-			R: 0xe2,
-			G: 0x6b,
-			B: 0x35,
+			R: 0x8f,
+			G: 0x3f,
+			B: 0x06,
 			A: 0xff,
 		}
 
@@ -115,25 +115,25 @@ func GetFactionBaseColor(factionID string) color.RGBA {
 
 	case "nbn":
 		return color.RGBA{
-			R: 0xff,
-			G: 0xde,
-			B: 0x00,
+			R: 0x8f,
+			G: 0x6a,
+			B: 0x06,
 			A: 0xff,
 		}
 
 	case "jinteki":
 		return color.RGBA{
-			R: 0x94,
-			G: 0x2c,
-			B: 0x4c,
+			R: 0x8f,
+			G: 0x07,
+			B: 0x15,
 			A: 0xff,
 		}
 
 	case "haas_bioroid":
 		return color.RGBA{
-			R: 0x5a,
-			G: 0x32,
-			B: 0x6d,
+			R: 0x52,
+			G: 0x23,
+			B: 0x69,
 			A: 0xff,
 		}
 
