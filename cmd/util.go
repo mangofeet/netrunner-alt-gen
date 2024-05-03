@@ -50,6 +50,8 @@ func getFramer(card *nrdb.Printing) (art.Drawer, error) {
 			// replace extra formatting tags for now...
 			flavor := strings.ReplaceAll(card.Attributes.Flavor, "<strong>", "")
 			flavor = strings.ReplaceAll(flavor, "</strong>", "")
+			// fix attributions when there isn't a newline
+			flavor = strings.Replace(flavor, `" -`, "\"\n-", 1)
 
 			parts := strings.Split(flavor, "\n")
 
