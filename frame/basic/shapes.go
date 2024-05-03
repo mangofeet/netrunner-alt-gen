@@ -602,13 +602,8 @@ func (fb FrameBasic) drawRunnerLimits(ctx *canvas.Context, card *nrdb.Printing, 
 
 	canvasWidth, _ := ctx.Size()
 
-	factionColor := fb.getColorInfluenceBG(card)
-	influenceColor := color.RGBA{
-		R: 0x3f,
-		G: 0x3f,
-		B: 0x3f,
-		A: 0xff,
-	}
+	deckColor := fb.getColorMinDeckBG(card)
+	influenceColor := fb.getColorInfluenceLimitBG()
 	strokeWidth := getStrokeWidth(ctx)
 
 	width := canvasWidth * 0.1
@@ -620,7 +615,7 @@ func (fb FrameBasic) drawRunnerLimits(ctx *canvas.Context, card *nrdb.Printing, 
 	corner := width * 0.25
 
 	ctx.Push()
-	ctx.SetFillColor(factionColor)
+	ctx.SetFillColor(deckColor)
 	ctx.SetStrokeColor(fb.getColorBorder())
 	ctx.SetStrokeWidth(strokeWidth)
 

@@ -48,7 +48,8 @@ var (
 	textBoxFactor                                                     float64
 
 	frame, frameColorBackground, frameColorBorder, frameColorText,
-	frameColorInfluenceBG, frameColorStrengthBG, frameColorFactionBG string
+	frameColorInfluenceBG, frameColorStrengthBG, frameColorFactionBG,
+	frameColorInfluenceLimitBG, frameColorMinDeckBG string
 
 	// netspace
 	netspaceWalkersMin, netspaceWalkersMax         int
@@ -73,9 +74,21 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&frameColorBackground, "frame-color-background", "", "1c1c1c99", `Background color for frame text boxes`)
 	rootCmd.PersistentFlags().StringVarP(&frameColorBorder, "frame-color-border", "", "dcdccc", `Border color for frame text boxes`)
 	rootCmd.PersistentFlags().StringVarP(&frameColorText, "frame-color-text", "", "dcdccc", `Text color for frame text boxes`)
-	rootCmd.PersistentFlags().StringVarP(&frameColorInfluenceBG, "frame-color-influence-bg", "", "", `Background color for the influence cost indicator, defaults to pre-defined faction colors or specified base color. If set to "faction", it will use the faction color regardless of the base color`)
-	rootCmd.PersistentFlags().StringVarP(&frameColorStrengthBG, "frame-color-strength-bg", "", "", `Background color for the strength bubble on ice and programs, defaults to pre-defined faction colors or specified base color. If set to "faction", it will use the faction color regardless of the base color`)
 	rootCmd.PersistentFlags().StringVarP(&frameColorFactionBG, "frame-color-faction-bg", "", "1c1c1c", `Background color for the faction symbol`)
+	rootCmd.PersistentFlags().StringVarP(&frameColorInfluenceBG, "frame-color-influence-bg", "", "",
+		`Background color for the influence cost indicator
+Defaults to pre-defined faction colors or specified base color
+If set to "faction", it will use the faction color regardless of the base color`)
+	rootCmd.PersistentFlags().StringVarP(&frameColorStrengthBG, "frame-color-strength-bg", "", "",
+		`Background color for the strength bubble on ice and programs
+Defaults to pre-defined faction colors or specified base color
+If set to "faction", it will use the faction color regardless of the base color`)
+	rootCmd.PersistentFlags().StringVarP(&frameColorInfluenceLimitBG, "frame-color-influence-limit-bg", "", "3f3f3f",
+		`Background color for the influence limit indicator on identities`)
+	rootCmd.PersistentFlags().StringVarP(&frameColorMinDeckBG, "frame-color-min-deck-bg", "", "",
+		`Background color for the min deck size on identites
+Defaults to pre-defined faction colors or specified base color
+If set to "faction", it will use the faction color regardless of the base color`)
 
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMin, "min-walkers", "m", 3000, `Minimum amount of walkers`)
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMax, "max-walkers", "M", 10000, `Maximum amount of walkers`)

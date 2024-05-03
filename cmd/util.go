@@ -28,12 +28,14 @@ func getFramer(card *nrdb.Printing) (art.Drawer, error) {
 		frm := basic.FrameBasic{
 			TextBoxHeightFactor: &textBoxFactor,
 
-			ColorBG:          parseColor(frameColorBackground),
-			ColorBorder:      parseColor(frameColorBorder),
-			ColorText:        parseColor(frameColorText),
-			ColorInfluenceBG: parseColorInstruction(frameColorInfluenceBG, card),
-			ColorStrengthBG:  parseColorInstruction(frameColorStrengthBG, card),
-			ColorFactionBG:   parseColor(frameColorFactionBG),
+			ColorBG:               parseColor(frameColorBackground),
+			ColorBorder:           parseColor(frameColorBorder),
+			ColorText:             parseColor(frameColorText),
+			ColorInfluenceBG:      parseColorInstruction(frameColorInfluenceBG, card),
+			ColorStrengthBG:       parseColorInstruction(frameColorStrengthBG, card),
+			ColorFactionBG:        parseColor(frameColorFactionBG),
+			ColorInfluenceLimitBG: parseColor(frameColorInfluenceLimitBG),
+			ColorMinDeckBG:        parseColorInstruction(frameColorMinDeckBG, card),
 		}
 
 		if flavorText != "" {

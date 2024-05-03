@@ -15,6 +15,7 @@ type FrameBasic struct {
 	Designer                  string
 
 	ColorBG, ColorBorder, ColorText,
+	ColorInfluenceLimitBG, ColorMinDeckBG,
 	ColorInfluenceBG, ColorStrengthBG, ColorFactionBG *color.RGBA
 }
 
@@ -91,4 +92,22 @@ func (fb FrameBasic) getColorFactionBG() color.RGBA {
 	}
 
 	return colorDefaultOpaqueBG
+}
+
+func (fb FrameBasic) getColorInfluenceLimitBG() color.RGBA {
+
+	if fb.ColorInfluenceLimitBG != nil {
+		return *fb.ColorInfluenceLimitBG
+	}
+
+	return colorDefaultOpaqueBG
+}
+
+func (fb FrameBasic) getColorMinDeckBG(card *nrdb.Printing) color.RGBA {
+
+	if fb.ColorMinDeckBG != nil {
+		return *fb.ColorMinDeckBG
+	}
+
+	return art.GetFactionBaseColor(card.Attributes.FactionID)
 }
