@@ -63,7 +63,7 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		walkerColor4 = *drawer.WalkerColor4
 	}
 
-	gridColor1, gridColor2, gridColor3, gridColor4 := walkerColor1, walkerColor2, walkerColor3, walkerColor4
+	gridColor1, gridColor2, gridColor3, gridColor4 := baseColor, baseColor, baseColor, baseColor
 	if drawer.GridColor1 != nil {
 		gridColor1 = *drawer.GridColor1
 	}
@@ -178,7 +178,7 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			colorFactor = -2 * int64(math.Abs(float64(colorFactor)))
 			grid = true
 			strokeWidth = 1.5
-			switch rngGlobal.Next(6) {
+			switch rngGlobal.Next(4) {
 			case 1:
 				thisColor = gridColor1
 			case 2:
