@@ -12,18 +12,38 @@ import (
 	"github.com/tdewolff/canvas/renderers"
 )
 
-func generateCard(drawer art.Drawer, card *nrdb.Printing) error {
+func generateCard(drawer art.Drawer, card *nrdb.Printing, algorithm, designer string) error {
 
 	cnv := canvas.New(canvasWidth, canvasHeight)
 
 	ctx := canvas.NewContext(cnv)
 
-	framer, err := getFramer(card)
-	if err != nil {
+	if err := drawer.Draw(ctx, card); err != nil {
 		return err
 	}
 
-	if err := drawer.Draw(ctx, card); err != nil {
+	var backCnv *canvas.Canvas
+	if makeBack {
+		backCnv = canvas.New(canvasWidth, canvasHeight)
+		cnv.RenderTo(backCnv)
+	}
+
+	if err := output(cnv, ctx, card, algorithm, designer); err != nil {
+		return err
+	}
+
+	if makeBack {
+		frame = frame + "-back"
+		output(backCnv, canvas.NewContext(backCnv), card, algorithm, designer)
+	}
+
+	return nil
+
+}
+
+func output(cnv *canvas.Canvas, ctx *canvas.Context, card *nrdb.Printing, algorithm, designer string) error {
+	framer, err := getFramer(card, algorithm, designer)
+	if err != nil {
 		return err
 	}
 
@@ -55,5 +75,4 @@ func generateCard(drawer art.Drawer, card *nrdb.Printing) error {
 	log.Println("done")
 
 	return nil
-
 }

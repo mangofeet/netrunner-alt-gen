@@ -19,6 +19,7 @@ var netspaceCmd = &cobra.Command{
 		if err := generateCardNetspace(cardName); err != nil {
 			log.Println("error:", err)
 		}
+
 	},
 }
 
@@ -50,5 +51,5 @@ func generateCardNetspace(cardName string) error {
 		GridColor4:   parseColor(gridColor4),
 	}
 
-	return generateCard(ns, printing)
+	return generateCard(ns, printing, "NetSpace", "mangofeet")
 }

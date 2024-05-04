@@ -40,7 +40,7 @@ const safeHeight = 3924.0
 // const cardHeight = 88.0
 
 var (
-	drawMarginLines                                                   bool
+	drawMarginLines, makeBack                                         bool
 	outputDir                                                         string
 	baseColor, walkerColor1, walkerColor2, walkerColor3, walkerColor4 string
 	skipFlavor                                                        bool
@@ -57,12 +57,16 @@ var (
 	gridColor1, gridColor2, gridColor3, gridColor4 string
 	gridPercent                                    float64
 
+	// image
+	designer string
+
 	// set by ldflags
 	version string = "local"
 )
 
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&drawMarginLines, "draw-margin-lines", "", false, `Draw bleed and "safe area" lines`)
+	rootCmd.PersistentFlags().BoolVarP(&makeBack, "make-back", "", false, `Also create a file for a card back. Uses "${frame}-back" as frame name.`)
 	rootCmd.PersistentFlags().StringVarP(&outputDir, "output", "o", "output", `Output directory name`)
 
 	rootCmd.PersistentFlags().StringVarP(&flavorText, "flavor", "", "", `Flavor text to add to the generated card`)
@@ -107,6 +111,8 @@ If set to "faction", it will use the faction color regardless of the base color`
 	netspaceCmd.Flags().StringVarP(&gridColor4, "grid-color-4", "", "",
 		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-4, will be randomly desaturated by algorithm`)
 	netspaceCmd.PersistentFlags().Float64VarP(&gridPercent, "grid-percent", "", -1, `Percentage of total walkers that will run on a grid`)
+
+	imageCmd.Flags().StringVarP(&designer, "designer", "", "", `Name of the designer for the card back attribution`)
 
 	rootCmd.AddCommand(netspaceCmd)
 	rootCmd.AddCommand(emptyCmd)

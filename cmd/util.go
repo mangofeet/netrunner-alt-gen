@@ -14,29 +14,35 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
-func getFramer(card *nrdb.Printing) (art.Drawer, error) {
+func getFramer(card *nrdb.Printing, algorithm, designer string) (art.Drawer, error) {
+
+	if textBoxFactor > 1 {
+		textBoxFactor /= 100.0
+	}
+
+	frm := basic.FrameBasic{
+		Version:   version,
+		Algorithm: algorithm,
+		Designer:  designer,
+
+		TextBoxHeightFactor: &textBoxFactor,
+
+		ColorBG:               parseColor(frameColorBackground),
+		ColorBorder:           parseColor(frameColorBorder),
+		ColorText:             parseColor(frameColorText),
+		ColorInfluenceBG:      parseColorInstruction(frameColorInfluenceBG, card),
+		ColorStrengthBG:       parseColorInstruction(frameColorStrengthBG, card),
+		ColorFactionBG:        parseColor(frameColorFactionBG),
+		ColorInfluenceLimitBG: parseColor(frameColorInfluenceLimitBG),
+		ColorMinDeckBG:        parseColorInstruction(frameColorMinDeckBG, card),
+	}
 
 	switch frame {
+	case "basic-back":
+		return frm.Back(), nil
 	case "basic":
 		var framer art.Drawer
 		log.Println("card type:", card.Attributes.CardTypeID)
-
-		if textBoxFactor > 1 {
-			textBoxFactor /= 100.0
-		}
-
-		frm := basic.FrameBasic{
-			TextBoxHeightFactor: &textBoxFactor,
-
-			ColorBG:               parseColor(frameColorBackground),
-			ColorBorder:           parseColor(frameColorBorder),
-			ColorText:             parseColor(frameColorText),
-			ColorInfluenceBG:      parseColorInstruction(frameColorInfluenceBG, card),
-			ColorStrengthBG:       parseColorInstruction(frameColorStrengthBG, card),
-			ColorFactionBG:        parseColor(frameColorFactionBG),
-			ColorInfluenceLimitBG: parseColor(frameColorInfluenceLimitBG),
-			ColorMinDeckBG:        parseColorInstruction(frameColorMinDeckBG, card),
-		}
 
 		if flavorText != "" {
 			frm.Flavor = "<em>" + flavorText + "</em>"
@@ -178,7 +184,12 @@ func getFileName(card *nrdb.Printing) string {
 
 	set := fileNameRegexp.ReplaceAllString(card.Attributes.CardSetID, "-")
 
-	return fmt.Sprintf("%s-%s-%s-%s", cardID, set, pos, title)
+	back := ""
+	if strings.Contains(frame, "back") {
+		back = "-back"
+	}
+
+	return fmt.Sprintf("%s-%s-%s-%s%s", cardID, set, pos, title, back)
 
 }
 

@@ -9,10 +9,9 @@ import (
 )
 
 type FrameBasic struct {
-	Flavor, FlavorAttribution string
-	TextBoxHeightFactor       *float64
-	Version                   string
-	Designer                  string
+	Flavor, FlavorAttribution    string
+	TextBoxHeightFactor          *float64
+	Designer, Version, Algorithm string
 
 	ColorBG, ColorBorder, ColorText,
 	ColorInfluenceLimitBG, ColorMinDeckBG,

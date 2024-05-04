@@ -38,7 +38,7 @@ func generateCardImage(filename, cardName string) error {
 	drawer := imageDrawer{
 		filename: filename,
 	}
-	return generateCard(drawer, printing)
+	return generateCard(drawer, printing, "", designer)
 }
 
 type imageDrawer struct {

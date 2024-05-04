@@ -31,7 +31,7 @@ func generateCardEmpty(cardName string) error {
 	log.Printf("generating %s", printing.Attributes.StrippedTitle)
 
 	drawer := emptyDrawer{}
-	return generateCard(drawer, printing)
+	return generateCard(drawer, printing, "", "")
 }
 
 type emptyDrawer struct {
