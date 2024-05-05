@@ -103,7 +103,7 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		nGrid = math.Max(float64(numWalkers)*0.01, float64(rngGlobal.Next(int64(float64(numWalkers)*0.02))))
 	}
 	if drawer.GridPercent != nil {
-		nGrid = *drawer.GridPercent
+		nGrid = float64(numWalkers) * *drawer.GridPercent
 	}
 
 	dirChangeStep := 30.0
