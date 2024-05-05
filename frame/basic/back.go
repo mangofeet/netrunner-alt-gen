@@ -27,13 +27,13 @@ func (fb FrameBasic) Back() art.Drawer {
 		attributionFontSize := attributionBoxHeight * 0.6
 		attributionTextMaxWidth := (attributionBoxRight - attributionBoxLeft) * 0.9
 
-		attributionString := fmt.Sprintf("Generated using \"%s\" by %s<BR>netrunner-alt-gen %s", fb.Algorithm, fb.Designer, fb.Version)
+		attributionString := fmt.Sprintf("%s<BR>Generated using \"%s\" by %s<BR>netrunner-alt-gen %s", card.Attributes.Title, fb.Algorithm, fb.Designer, fb.Version)
 
 		if fb.Algorithm == "" && fb.Designer == "" {
-			attributionString = fmt.Sprintf("Layout by netrunner-alt-gen %s", fb.Version)
+			attributionString = fmt.Sprintf("%s<BR>Layout by netrunner-alt-gen %s", card.Attributes.Title, fb.Version)
 		}
 		if fb.Algorithm == "" && fb.Designer != "" {
-			attributionString = fmt.Sprintf("Design by %s<BR>Layout by netrunner-alt-gen %s", fb.Designer, fb.Version)
+			attributionString = fmt.Sprintf("%s<BR>Design by %s<BR>Layout by netrunner-alt-gen %s", card.Attributes.Title, fb.Designer, fb.Version)
 		}
 
 		attributionText := fb.getFittedText(ctx, attributionString, attributionFontSize, attributionTextMaxWidth, 0, canvas.Center)
