@@ -148,38 +148,51 @@ func (wlk *Walker) maybeChangeDirection() {
 	}
 	switch wlk.RNG.Sample(int64(wlk.stepCount), wlk.DirectionVariance) {
 	case 1:
-		switch wlk.Direction {
-		case "up":
-			wlk.Direction = "right"
-		case "right":
-			wlk.Direction = "down"
-		case "down":
-			wlk.Direction = "left"
-		case "left":
-			wlk.Direction = "up"
-		}
+		wlk.shiftRight()
 	case 2:
-		switch wlk.Direction {
-		case "up":
-			wlk.Direction = "left"
-		case "right":
-			wlk.Direction = "up"
-		case "down":
-			wlk.Direction = "right"
-		case "left":
-			wlk.Direction = "down"
-		}
+		wlk.shiftLeft()
 	case 3:
-		switch wlk.Direction {
-		case "up":
-			wlk.Direction = "down"
-		case "right":
-			wlk.Direction = "left"
-		case "down":
-			wlk.Direction = "up"
-		case "left":
-			wlk.Direction = "right"
-		}
+		wlk.reverse()
+	}
+
+}
+
+func (wlk *Walker) shiftLeft() {
+	switch wlk.Direction {
+	case "up":
+		wlk.Direction = "left"
+	case "right":
+		wlk.Direction = "up"
+	case "down":
+		wlk.Direction = "right"
+	case "left":
+		wlk.Direction = "down"
+	}
+}
+
+func (wlk *Walker) shiftRight() {
+	switch wlk.Direction {
+	case "up":
+		wlk.Direction = "right"
+	case "right":
+		wlk.Direction = "down"
+	case "down":
+		wlk.Direction = "left"
+	case "left":
+		wlk.Direction = "up"
+	}
+}
+
+func (wlk *Walker) reverse() {
+	switch wlk.Direction {
+	case "up":
+		wlk.Direction = "down"
+	case "right":
+		wlk.Direction = "left"
+	case "down":
+		wlk.Direction = "up"
+	case "left":
+		wlk.Direction = "right"
 	}
 
 }
