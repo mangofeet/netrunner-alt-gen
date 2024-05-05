@@ -23,7 +23,7 @@ type Netspace struct {
 
 func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
-	seed := card.Attributes.Title + card.Attributes.Text + card.Attributes.CardTypeID + card.Attributes.FactionID
+	seed := card.Attributes.Title + card.Attributes.Text + card.Attributes.CardTypeID + card.Attributes.FactionID + card.Attributes.Flavor
 
 	canvasWidth, canvasHeight := ctx.Size()
 
