@@ -23,6 +23,7 @@ type Walker struct {
 	DirectionVariance   int64
 	X, Y, Vx, Vy        float64
 	Color               color.RGBA
+	originalColor       *color.RGBA
 	Noise               opensimplex.Noise
 	Obstacles           []*canvas.Path
 	Grid                bool
@@ -128,19 +129,54 @@ func (wlk *Walker) updateVelocity(factor float64, hasChangedDirection bool) {
 			} else {
 				newVy *= -1
 			}
-		} else {
-			wlk.updateVelocity(factor*10, true)
-			return
 		}
+		// if wlk.isInsideObs(newVx, newVy) {
+		// 	wlk.updateVelocity(factor*10, true)
+		// 	return
+		// }
+	}
 
+	if wlk.isInsideObs(newVx, newVy) {
+		wlk.originalColor = &wlk.Color
+		wlk.Color = canvas.Transparent
+	} else if wlk.originalColor != nil {
+		wlk.Color = *wlk.originalColor
 	}
 
 	wlk.Vx = newVx
 	wlk.Vy = newVy
 }
 
+func (wlk Walker) isInsideObs(vx, vy float64) bool {
+	path := wlk.getNewStepPath(vx, vy)
+
+	pos := path.Pos()
+
+	for _, obs := range wlk.Obstacles {
+		if obs.Contains(pos.X, pos.Y) {
+			return true
+		}
+	}
+
+	return false
+
+}
+
 func (wlk Walker) willCollide(vx, vy float64) bool {
 
+	path := wlk.getNewStepPath(vx, vy)
+
+	for _, obs := range wlk.Obstacles {
+		if path.Intersects(obs) {
+			return true
+		}
+	}
+
+	return false
+
+}
+
+func (wlk Walker) getNewStepPath(vx, vy float64) *canvas.Path {
 	path := &canvas.Path{}
 
 	x, y := wlk.X, wlk.Y
@@ -170,14 +206,7 @@ func (wlk Walker) willCollide(vx, vy float64) bool {
 
 	path.LineTo(newX, newY)
 
-	for _, obs := range wlk.Obstacles {
-		if path.Intersects(obs) || obs.Contains(newX, newY) {
-			return true
-		}
-	}
-
-	return false
-
+	return path
 }
 
 func (wlk *Walker) maybeChangeDirection() {

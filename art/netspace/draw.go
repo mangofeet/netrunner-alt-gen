@@ -168,7 +168,12 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		}
 	}
 
-	obstacle := canvas.Circle(canvasWidth * 0.1).Transform(canvas.Identity.Translate(float64(startX)*0.8, float64(startY)*1.2))
+	obsRadiusFactor := math.Max(0.1, (float64(rngGlobal.Next(100))/100)-0.8)
+	obsX := rngGlobal.Next(int64(canvasWidth/2)) + int64(canvasWidth/4)
+	obsY := rngGlobal.Next(int64(canvasHeight/6)) + (int64(canvasHeight/8) * 5)
+
+	obstacle := canvas.Circle(canvasWidth * obsRadiusFactor).
+		Transform(canvas.Identity.Translate(float64(obsX), float64(obsY)))
 
 	for i := 0; i < numWalkers; i++ {
 
@@ -256,15 +261,15 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		}
 	}
 
-	// ctx.Push()
-	// ctx.SetFillColor(color.RGBA{
-	// 	R: 0,
-	// 	G: 0,
-	// 	B: 0,
-	// 	A: 0x77,
-	// })
-	// ctx.DrawPath(0, 0, obstacle)
-	// ctx.Pop()
+	ctx.Push()
+	ctx.SetFillColor(color.RGBA{
+		R: 0,
+		G: 0,
+		B: 0,
+		A: 0x33,
+	})
+	ctx.DrawPath(0, 0, obstacle)
+	ctx.Pop()
 
 	log.Printf("finished %d walkers", len(walkers))
 
