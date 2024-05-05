@@ -22,13 +22,15 @@ type Walker struct {
 	Direction           string
 	DirectionVariance   int64
 	X, Y, Vx, Vy        float64
-	Color               color.Color
+	Color               color.RGBA
 	Noise               opensimplex.Noise
+	Obstacles           []*canvas.Path
 	Grid                bool
 	StrokeWidth         float64
 	stepCount           int
 	DirectionChangeStep float64
 	prev                *point
+	nextGridDirection   string
 }
 
 func (wlk Walker) String() string {
@@ -46,59 +48,30 @@ func (wlk *Walker) Draw(ctx *canvas.Context) {
 		wlk.prev = &point{wlk.X, wlk.Y}
 	}
 
-	wlk.drawLine(ctx, wlk.X, wlk.Y, wlk.prev.x, wlk.prev.y)
+	ctx.MoveTo(wlk.X, wlk.Y)
+	ctx.LineTo(wlk.prev.x, wlk.prev.y)
+	ctx.Stroke()
 
 	wlk.prev = &point{wlk.X, wlk.Y}
 }
 
-func (wlk Walker) drawPoint(ctx *canvas.Context, x, y float64) {
-	ctx.MoveTo(x, y)
-	ctx.LineTo(x, y)
-	ctx.Stroke()
-}
-
 func (wlk Walker) drawLine(ctx *canvas.Context, x1, y1, x2, y2 float64) {
-	ctx.MoveTo(x1, y1)
-	ctx.LineTo(x2, y2)
-	ctx.Stroke()
-}
-
-func (wlk *Walker) Velocity() {
-	deltaX := wlk.Noise.Eval2(wlk.X*noiseStepFactor, wlk.Y*noiseStepFactor)
-	deltaY := wlk.Noise.Eval2(wlk.Y*noiseStepFactor, wlk.X*noiseStepFactor)
-
-	switch strings.ToLower(wlk.Direction) {
-	case "down":
-		wlk.Vx += deltaX
-		wlk.Vy += -1 * math.Abs(deltaY)
-	case "up":
-		wlk.Vx += deltaX
-		wlk.Vy += math.Abs(deltaY)
-	case "left":
-		wlk.Vx += -1 * math.Abs(deltaX)
-		wlk.Vy += deltaY
-	case "right":
-		wlk.Vx += math.Abs(deltaX)
-		wlk.Vy += deltaY
-	default:
-		wlk.Vx += deltaX
-		wlk.Vy += deltaY
-	}
-
 }
 
 func (wlk *Walker) Move() {
+	wlk.updateVelocity(noiseStepFactor, false)
+
 	wlk.stepCount++
 
 	if wlk.Grid {
-		switch wlk.RNG.Next(4) {
-		case 1:
+		switch wlk.nextGridDirection {
+		case "right":
 			wlk.X += wlk.Vx
-		case 2:
+		case "up":
 			wlk.Y += wlk.Vy
-		case 3:
+		case "down":
 			wlk.Y -= wlk.Vy
-		case 4:
+		case "left":
 			wlk.X -= wlk.Vx
 		}
 	} else {
@@ -107,6 +80,104 @@ func (wlk *Walker) Move() {
 	}
 
 	wlk.maybeChangeDirection()
+}
+
+func (wlk *Walker) updateVelocity(factor float64, hasChangedDirection bool) {
+	deltaX := wlk.Noise.Eval2(wlk.X*factor, wlk.Y*factor)
+	deltaY := wlk.Noise.Eval2(wlk.Y*factor, wlk.X*factor)
+
+	var newVx, newVy float64
+
+	switch strings.ToLower(wlk.Direction) {
+	case "down":
+		newVx = wlk.Vx + deltaX
+		newVy = wlk.Vy + -1*math.Abs(deltaY)
+	case "up":
+		newVx = wlk.Vx + deltaX
+		newVy = wlk.Vy + math.Abs(deltaY)
+	case "left":
+		newVx = wlk.Vx + -1*math.Abs(deltaX)
+		newVy = wlk.Vy + deltaY
+	case "right":
+		newVx = wlk.Vx + math.Abs(deltaX)
+		newVy = wlk.Vy + deltaY
+	default:
+		newVx = wlk.Vx + deltaX
+		newVy = wlk.Vy + deltaY
+	}
+
+	if wlk.Grid {
+		switch wlk.RNG.Next(4) {
+		case 1:
+			wlk.nextGridDirection = "right"
+		case 2:
+			wlk.nextGridDirection = "up"
+		case 3:
+			wlk.nextGridDirection = "down"
+		case 4:
+			wlk.nextGridDirection = "left"
+
+		}
+	}
+
+	if wlk.willCollide(newVx, newVy) {
+		if !hasChangedDirection {
+			wlk.reverse()
+			if math.Abs(newVx) > math.Abs(newVy) {
+				newVx *= -1
+			} else {
+				newVy *= -1
+			}
+		} else {
+			wlk.updateVelocity(factor*10, true)
+			return
+		}
+
+	}
+
+	wlk.Vx = newVx
+	wlk.Vy = newVy
+}
+
+func (wlk Walker) willCollide(vx, vy float64) bool {
+
+	path := &canvas.Path{}
+
+	x, y := wlk.X, wlk.Y
+
+	var newX, newY float64
+	path.MoveTo(x, y)
+
+	if wlk.Grid {
+		switch wlk.nextGridDirection {
+		case "right":
+			newX = x + vx
+			newY = y
+		case "up":
+			newX = x
+			newY = y + vy
+		case "down":
+			newX = x
+			newY = y - vy
+		case "left":
+			newX = x - vx
+			newY = y
+		}
+	} else {
+		newX = x + vx
+		newY = y + vy
+	}
+
+	path.LineTo(newX, newY)
+
+	for _, obs := range wlk.Obstacles {
+		if path.Intersects(obs) || obs.Contains(newX, newY) {
+			return true
+		}
+	}
+
+	return false
+
 }
 
 func (wlk *Walker) maybeChangeDirection() {
@@ -119,33 +190,28 @@ func (wlk *Walker) maybeChangeDirection() {
 		return
 	}
 
+	// see if the diructon change step was set
 	if wlk.DirectionChangeStep == 0 {
 		wlk.DirectionChangeStep = 30
 	}
 
+	// if we are not at a potential direction change, just return
 	if wlk.stepCount%int(wlk.DirectionChangeStep) != 0 {
 		return
 	}
 
+	// up the number for the next direction change
 	wlk.DirectionChangeStep *= 3
 
-	// 	switch wlk.Direction {
-	// 	case "up":
-	// 		wlk.Direction = "right"
-	// 	case "right":
-	// 		wlk.Direction = "down"
-	// 	case "down":
-	// 		wlk.Direction = "left"
-	// 	case "left":
-	// 		wlk.Direction = "up"
-	// 	}
-
+	// normalize variance
 	if wlk.DirectionVariance > 4 {
 		wlk.DirectionVariance = 4
 	}
 	if wlk.DirectionVariance <= 0 {
 		wlk.DirectionVariance = 1
 	}
+
+	// check for direction change
 	switch wlk.RNG.Sample(int64(wlk.stepCount), wlk.DirectionVariance) {
 	case 1:
 		wlk.shiftRight()

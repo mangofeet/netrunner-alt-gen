@@ -168,6 +168,8 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		}
 	}
 
+	obstacle := canvas.Circle(canvasWidth * 0.1).Transform(canvas.Identity.Translate(float64(startX)*0.8, float64(startY)*1.2))
+
 	for i := 0; i < numWalkers; i++ {
 
 		colorFactor := rngGlobal.Next(128) - 64
@@ -228,6 +230,7 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			Direction:           direction,
 			DirectionVariance:   rngGlobal.Next(4),
 			DirectionChangeStep: dirChangeStep,
+			Obstacles:           []*canvas.Path{obstacle},
 			X:                   float64(startX),
 			Y:                   float64(startY),
 			Vx:                  (float64(rngGlobal.Next(100)) / 100) - 0.5,
@@ -248,11 +251,21 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	for _, wlk := range walkers {
 		wlk.Draw(ctx)
 		for wlk.InBounds(ctx) {
-			wlk.Velocity()
 			wlk.Move()
 			wlk.Draw(ctx)
 		}
 	}
+
+	// ctx.Push()
+	// ctx.SetFillColor(color.RGBA{
+	// 	R: 0,
+	// 	G: 0,
+	// 	B: 0,
+	// 	A: 0x77,
+	// })
+	// ctx.DrawPath(0, 0, obstacle)
+	// ctx.Pop()
+
 	log.Printf("finished %d walkers", len(walkers))
 
 	return nil
