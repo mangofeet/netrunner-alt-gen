@@ -52,7 +52,7 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.Fill()
 	ctx.Pop()
 
-	radius := math.Max(canvasHeight-centerY, centerY) * 0.05
+	radius := math.Max(canvasHeight-centerY, centerY) * 0.4
 
 	circ := TechCircleDrawer{
 		RNG:         rngGlobal,
@@ -70,28 +70,28 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		return err
 	}
 
-	// circOverlay := TechCircleDrawer{
-	// 	RNG:         rngGlobal,
-	// 	X:           centerX,
-	// 	Y:           centerY,
-	// 	Radius:      radius,
-	// 	RadiusStart: canvasHeight * 0.01,
-	// 	Color:       baseColor,
-	// 	StrokeMin:   canvasHeight * 0.01,
-	// 	StrokeMax:   canvasHeight * 0.02,
-	// 	GetColor: func(rng prng.Generator, base color.RGBA) (color.RGBA, error) {
-	// 		return color.RGBA{
-	// 			R: 0xff,
-	// 			G: 0xff,
-	// 			B: 0xff,
-	// 			A: 0x77,
-	// 		}, nil
-	// 	},
-	// }
+	circOverlay := TechCircleDrawer{
+		RNG:         rngGlobal,
+		X:           centerX,
+		Y:           centerY,
+		Radius:      radius,
+		RadiusStart: canvasHeight * 0.01,
+		Color:       baseColor,
+		StrokeMin:   canvasHeight * 0.005,
+		StrokeMax:   canvasHeight * 0.01,
+		GetColor: func(rng prng.Generator, base color.RGBA) (color.RGBA, error) {
+			return color.RGBA{
+				R: 0xff,
+				G: 0xff,
+				B: 0xff,
+				A: 0x44,
+			}, nil
+		},
+	}
 
-	// if err := circOverlay.Draw(ctx); err != nil {
-	// 	return err
-	// }
+	if err := circOverlay.Draw(ctx); err != nil {
+		return err
+	}
 
 	// ctx.Push()
 	// ctx.SetFillColor(baseColor)
@@ -117,7 +117,6 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 	radius := drawer.RadiusStart
 	for radius < drawer.Radius {
 
-		arcPos := 0.0
 		var lastPath *canvas.Path
 		x, y := drawer.X+radius, drawer.Y
 		strokeWidthRand := drawer.Radius*(float64(drawer.RNG.Next(5))/100.0) + 0.005
@@ -127,17 +126,20 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 			return err
 		}
 
-		for arcPos < 360 {
+		rot := 0.0
+		arcPos := rot
+
+		for arcPos < 360+rot {
 
 			color := getColorOrBreak(drawer.RNG, color)
 
 			path := &canvas.Path{}
 			// bufferPath := &canvas.Path{}
-			arc := math.Min(360-arcPos, float64(drawer.RNG.Next(20)+5))
-			// log.Println("rmax:", drawer.Radius, "r:", radius, "arc:", arc, "arcPos:", arcPos, "stroke:", strokeWidth)
+			arc := math.Min(360-arcPos+rot, float64(drawer.RNG.Next(20)+5))
+			log.Println("rmax:", drawer.Radius, "r:", radius, "arc:", arc, "arcPos:", arcPos, "stroke:", strokeWidth)
 
 			theta0 := arcPos
-			theta1 := math.Min(360, arcPos+arc)
+			theta1 := math.Min(360+rot, arcPos+arc)
 
 			// theta0Buffer := theta0 - 1
 			// theta1Buffer := math.Min(360, theta1+1)
@@ -156,7 +158,7 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 			// lastPath = bufferPath.Copy()
 			lastPath = path.Copy()
 
-			log.Println(path)
+			// log.Println(path)
 			ctx.Push()
 			ctx.SetStrokeColor(color)
 			ctx.SetStrokeWidth(strokeWidth)
