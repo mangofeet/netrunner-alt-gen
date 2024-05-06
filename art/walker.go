@@ -3,6 +3,7 @@ package art
 import (
 	"fmt"
 	"image/color"
+	"log"
 	"math"
 	"strings"
 
@@ -138,55 +139,93 @@ func (wlk *Walker) updateVelocity(factor float64, hasChangedDirection bool) {
 		newVx, newVy = wlk.adjustForObs(newVx, newVy)
 	}
 
-	if wlk.isInsideObs(newVx, newVy) {
-		wlk.currentColor = &canvas.Transparent
-	} else {
-		wlk.currentColor = &wlk.Color
-	}
+	// if wlk.isInsideObs(newVx, newVy) {
+	// 	wlk.currentColor = &canvas.Transparent
+	// } else {
+	// 	wlk.currentColor = &wlk.Color
+	// }
 
 	wlk.Vx = newVx
 	wlk.Vy = newVy
 }
 
 func (wlk Walker) adjustForObs(vx, vy float64) (float64, float64) {
-	return vx, vy
 	// don't allow fully vertical or horizontal
 
-	// if vx == 0 {
-	// 	vx += 0.000001
-	// }
-	// if vy == 0 {
-	// 	vy += 0.000001
-	// }
+	if vx == 0 {
+		vx += 0.000001
+	}
+	if vy == 0 {
+		vy += 0.000001
+	}
 
-	// path := wlk.getNewStepPath(vx, vy)
+	path := wlk.getNewStepPath(vx, vy)
 
-	// x, y := path.Pos().X, path.Pos().Y
+	x, y := path.Pos().X, path.Pos().Y
 
-	// var didAdjust bool
-	// for !didAdjust {
+	didAdjust := true
+	for didAdjust {
 
-	// 	pathSlope := vy / vx
-	// 	// reset here
-	// 	didAdjust = false
+		pathSlope := vy / vx
+		// reset here
+		didAdjust = false
 
-	// 	for _, o := range wlk.Obstacles {
+		for _, o := range wlk.Obstacles {
 
-	// 		pathToObs := &canvas.Path{}
-	// 		pathToObs.MoveTo(x, y)
-	// 		pathToObs.LineTo(o.Center.X, o.Center.Y)
+			pathToObs := &canvas.Path{}
+			pathToObs.MoveTo(x, y)
+			pathToObs.LineTo(o.Center.X, o.Center.Y)
 
-	// 		pathLen := pathToObs.Length()
-	// 		// if we are not even close, don't do anything
-	// 		if pathLen > o.Radius {
-	// 			continue
-	// 		}
+			pathLen := pathToObs.Length()
+			// if we are not even close, don't do anything
+			if pathLen > o.Radius {
+				continue
+			}
 
-	// 		slopeToObs := (o.Center.Y - y) / (o.Center.X - x)
+			slopeToObs := (o.Center.Y - y) / (o.Center.X - x)
 
-	// 	}
+			if slopeToObs < 0 && pathSlope > 0 {
+				continue
+			}
+			if slopeToObs > 0 && pathSlope < 0 {
+				continue
+			}
 
-	// }
+			max := math.Max(math.Abs(pathSlope), math.Abs(slopeToObs))
+			min := math.Min(math.Abs(pathSlope), math.Abs(slopeToObs))
+
+			ratio := max / min
+
+			if ratio < 3 {
+				log.Println("adjusting", vy)
+				isPositive := true
+				if slopeToObs < 0 {
+					isPositive = false
+				}
+
+				if isPositive {
+					if pathSlope < slopeToObs {
+						vy *= 0.5
+					} else {
+						vy *= 1.5
+					}
+				} else {
+					if pathSlope < slopeToObs {
+						vy *= 1.5
+					} else {
+						vy *= 0.5
+					}
+				}
+
+				log.Println("adjusted", vy)
+				didAdjust = true
+			}
+
+		}
+
+	}
+
+	return vx, vy
 
 }
 
