@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"log"
+	"os"
 	"strings"
 
 	"github.com/mangofeet/netrunner-alt-gen/art/netspace"
@@ -18,6 +19,7 @@ var netspaceCmd = &cobra.Command{
 
 		if err := generateCardNetspace(cardName); err != nil {
 			log.Println("error:", err)
+			os.Exit(1)
 		}
 
 	},
