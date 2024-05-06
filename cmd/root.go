@@ -117,6 +117,7 @@ If set to "faction", it will use the faction color regardless of the base color`
 	rootCmd.AddCommand(netspaceCmd)
 	rootCmd.AddCommand(emptyCmd)
 	rootCmd.AddCommand(imageCmd)
+	rootCmd.AddCommand(techcircleCmd)
 }
 
 var rootCmd = &cobra.Command{
