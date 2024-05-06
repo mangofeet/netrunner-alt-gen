@@ -52,7 +52,7 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.Fill()
 	ctx.Pop()
 
-	radius := math.Max(canvasHeight-centerY, centerY) * 0.4
+	radius := math.Max(canvasHeight-centerY, centerY) * 0.9
 
 	circ := TechCircleDrawer{
 		RNG:         rngGlobal,
@@ -113,15 +113,31 @@ type TechCircleDrawer struct {
 	GetColor            ColorGetter
 }
 
+type circleSegment struct {
+	start, end  float64
+	strokeWidth float64
+	strokeColor color.RGBA
+}
+
+type circleRing struct {
+	segments []circleSegment
+	radius   float64
+}
+
 func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 	radius := drawer.RadiusStart
+
+	var rings []circleRing
+
 	for radius < drawer.Radius {
 
-		var lastPath *canvas.Path
-		x, y := drawer.X+radius, drawer.Y
+		ring := circleRing{
+			radius: radius,
+		}
+
 		strokeWidthRand := drawer.Radius*(float64(drawer.RNG.Next(5))/100.0) + 0.005
 		strokeWidth := math.Min(drawer.StrokeMax, math.Min(math.Max(drawer.StrokeMin, strokeWidthRand), radius*0.5))
-		color, err := drawer.GetColor(drawer.RNG, drawer.Color)
+		thisColor, err := drawer.GetColor(drawer.RNG, drawer.Color)
 		if err != nil {
 			return err
 		}
@@ -131,44 +147,73 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 
 		for arcPos < 360+rot {
 
-			color := getColorOrBreak(drawer.RNG, color)
+			var isBreak bool
+			var arcStart = arcPos
 
-			path := &canvas.Path{}
-			// bufferPath := &canvas.Path{}
-			arc := math.Min(360-arcPos+rot, float64(drawer.RNG.Next(20)+5))
-			log.Println("rmax:", drawer.Radius, "r:", radius, "arc:", arc, "arcPos:", arcPos, "stroke:", strokeWidth)
+			for {
+				arc := math.Min(360-arcPos+rot, float64(drawer.RNG.Next(20)+5))
 
-			theta0 := arcPos
-			theta1 := math.Min(360+rot, arcPos+arc)
+				_, isBreak = getColorOrBreak(drawer.RNG, thisColor)
+				log.Println("rmax:", drawer.Radius, "r:", radius, "arc:", arc, "arcPos:", arcPos, "stroke:", strokeWidth)
 
-			// theta0Buffer := theta0 - 1
-			// theta1Buffer := math.Min(360, theta1+1)
+				if isBreak {
+					log.Println("breaking")
+					segment := circleSegment{
+						start:       arcStart,
+						end:         math.Min(360+rot, arcPos),
+						strokeWidth: strokeWidth,
+						strokeColor: thisColor,
+					}
+					spacer := circleSegment{
+						start:       arcPos,
+						end:         math.Min(360+rot, arcPos+arc),
+						strokeWidth: strokeWidth * 0.5,
+						strokeColor: color.RGBA{
+							R: 0xff,
+							G: 0xff,
+							B: 0xff,
+							A: 0x00,
+						},
+					}
+					ring.segments = append(ring.segments, segment, spacer)
+					arcPos += arc
+					break
+				}
 
-			// path.Arc(radius, radius, 2, arcPos-1, arcPos+arc+1)
-			path.Arc(radius, radius, 0, theta0, theta1)
-			// bufferPath.Arc(radius, radius, 2, theta0Buffer, theta1Buffer)
+				arcPos += arc
+				// bufferPath := &canvas.Path{}
 
-			arcPos += arc
-
-			if lastPath != nil {
-				x += lastPath.Pos().X
-				y += lastPath.Pos().Y
 			}
 
-			// lastPath = bufferPath.Copy()
-			lastPath = path.Copy()
-
-			// log.Println(path)
-			ctx.Push()
-			ctx.SetStrokeColor(color)
-			ctx.SetStrokeWidth(strokeWidth)
-			ctx.SetFillColor(canvas.Transparent)
-			ctx.DrawPath(x, y, path)
-			ctx.Pop()
 		}
 
 		// radius += math.Min(math.Max(float64(drawer.RNG.Next(int64(radius))), strokeWidth*2), strokeWidth)
 		radius += strokeWidth * (float64(drawer.RNG.Next(60))/100.0 + 0.7)
+
+		rings = append(rings, ring)
+	}
+
+	for _, ring := range rings {
+
+		x, y := drawer.X+ring.radius, drawer.Y
+
+		for _, seg := range ring.segments {
+			log.Printf("%#v", seg)
+			path := &canvas.Path{}
+			path.Arc(ring.radius, ring.radius, 0, seg.start, seg.end)
+
+			if seg.strokeColor.A != 0x00 {
+				ctx.Push()
+				ctx.SetStrokeColor(seg.strokeColor)
+				ctx.SetStrokeWidth(seg.strokeWidth)
+				ctx.SetFillColor(canvas.Transparent)
+				ctx.DrawPath(x, y, path)
+				ctx.Pop()
+			}
+
+			x += path.Pos().X
+			y += path.Pos().Y
+		}
 
 	}
 
@@ -176,13 +221,13 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 
 }
 
-func getColorOrBreak(rng prng.Generator, base color.RGBA) color.RGBA {
+func getColorOrBreak(rng prng.Generator, base color.RGBA) (color.RGBA, bool) {
 	switch rng.Next(3) {
 	case 1:
-		return canvas.Transparent
+		return canvas.Transparent, true
 	}
 
-	return base
+	return base, false
 }
 
 func getColor(rng prng.Generator, base color.RGBA) (color.RGBA, error) {
