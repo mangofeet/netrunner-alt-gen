@@ -24,6 +24,7 @@ var imageCmd = &cobra.Command{
 
 		if err := generateCardImage(filename, cardName); err != nil {
 			log.Println("error:", err)
+			os.Exit(1)
 		}
 	},
 }

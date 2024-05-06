@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"log"
+	"os"
 	"strings"
 
 	"github.com/mangofeet/nrdb-go"
@@ -19,6 +20,7 @@ var emptyCmd = &cobra.Command{
 
 		if err := generateCardEmpty(cardName); err != nil {
 			log.Println("error:", err)
+			os.Exit(1)
 		}
 	},
 }
