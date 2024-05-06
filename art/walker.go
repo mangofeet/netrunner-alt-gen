@@ -17,15 +17,20 @@ type point struct {
 	x, y float64
 }
 
+type WalkerObstacle struct {
+	Center canvas.Point
+	Radius float64
+}
+
 type Walker struct {
 	RNG                 prng.Generator
 	Direction           string
 	DirectionVariance   int64
 	X, Y, Vx, Vy        float64
 	Color               color.RGBA
-	originalColor       *color.RGBA
+	currentColor        *color.RGBA
 	Noise               opensimplex.Noise
-	Obstacles           []*canvas.Path
+	Obstacles           []*WalkerObstacle
 	Grid                bool
 	StrokeWidth         float64
 	stepCount           int
@@ -42,7 +47,13 @@ func (wlk *Walker) Draw(ctx *canvas.Context) {
 
 	ctx.Push()
 	defer ctx.Pop()
-	ctx.SetStrokeColor(wlk.Color)
+
+	color := wlk.Color
+	if wlk.currentColor != nil {
+		color = *wlk.currentColor
+	}
+
+	ctx.SetStrokeColor(color)
 	ctx.SetStrokeWidth(wlk.StrokeWidth)
 
 	if wlk.prev == nil {
@@ -64,21 +75,10 @@ func (wlk *Walker) Move() {
 
 	wlk.stepCount++
 
-	if wlk.Grid {
-		switch wlk.nextGridDirection {
-		case "right":
-			wlk.X += wlk.Vx
-		case "up":
-			wlk.Y += wlk.Vy
-		case "down":
-			wlk.Y -= wlk.Vy
-		case "left":
-			wlk.X -= wlk.Vx
-		}
-	} else {
-		wlk.X += wlk.Vx
-		wlk.Y += wlk.Vy
-	}
+	path := wlk.getNewStepPath(wlk.Vx, wlk.Vy)
+
+	wlk.X = path.Pos().X
+	wlk.Y = path.Pos().Y
 
 	wlk.maybeChangeDirection()
 }
@@ -119,32 +119,75 @@ func (wlk *Walker) updateVelocity(factor float64, hasChangedDirection bool) {
 			wlk.nextGridDirection = "left"
 
 		}
-	}
-
-	if wlk.willCollide(newVx, newVy) {
-		if !hasChangedDirection {
-			wlk.reverse()
-			if math.Abs(newVx) > math.Abs(newVy) {
-				newVx *= -1
-			} else {
-				newVy *= -1
+		if wlk.willCollide(newVx, newVy) {
+			if !hasChangedDirection {
+				wlk.reverse()
+				if math.Abs(newVx) > math.Abs(newVy) {
+					newVx *= -1
+				} else {
+					newVy *= -1
+				}
 			}
+			// if wlk.isInsideObs(newVx, newVy) {
+			// 	wlk.updateVelocity(factor*10, true)
+			// 	return
+			// }
 		}
-		// if wlk.isInsideObs(newVx, newVy) {
-		// 	wlk.updateVelocity(factor*10, true)
-		// 	return
-		// }
+
+	} else {
+		newVx, newVy = wlk.adjustForObs(newVx, newVy)
 	}
 
 	if wlk.isInsideObs(newVx, newVy) {
-		wlk.originalColor = &wlk.Color
-		wlk.Color = canvas.Transparent
-	} else if wlk.originalColor != nil {
-		wlk.Color = *wlk.originalColor
+		wlk.currentColor = &canvas.Transparent
+	} else {
+		wlk.currentColor = &wlk.Color
 	}
 
 	wlk.Vx = newVx
 	wlk.Vy = newVy
+}
+
+func (wlk Walker) adjustForObs(vx, vy float64) (float64, float64) {
+	return vx, vy
+	// don't allow fully vertical or horizontal
+
+	// if vx == 0 {
+	// 	vx += 0.000001
+	// }
+	// if vy == 0 {
+	// 	vy += 0.000001
+	// }
+
+	// path := wlk.getNewStepPath(vx, vy)
+
+	// x, y := path.Pos().X, path.Pos().Y
+
+	// var didAdjust bool
+	// for !didAdjust {
+
+	// 	pathSlope := vy / vx
+	// 	// reset here
+	// 	didAdjust = false
+
+	// 	for _, o := range wlk.Obstacles {
+
+	// 		pathToObs := &canvas.Path{}
+	// 		pathToObs.MoveTo(x, y)
+	// 		pathToObs.LineTo(o.Center.X, o.Center.Y)
+
+	// 		pathLen := pathToObs.Length()
+	// 		// if we are not even close, don't do anything
+	// 		if pathLen > o.Radius {
+	// 			continue
+	// 		}
+
+	// 		slopeToObs := (o.Center.Y - y) / (o.Center.X - x)
+
+	// 	}
+
+	// }
+
 }
 
 func (wlk Walker) isInsideObs(vx, vy float64) bool {
@@ -152,7 +195,8 @@ func (wlk Walker) isInsideObs(vx, vy float64) bool {
 
 	pos := path.Pos()
 
-	for _, obs := range wlk.Obstacles {
+	for _, o := range wlk.Obstacles {
+		obs := canvas.Circle(o.Radius).Translate(o.Center.X, o.Center.Y)
 		if obs.Contains(pos.X, pos.Y) {
 			return true
 		}
@@ -166,7 +210,8 @@ func (wlk Walker) willCollide(vx, vy float64) bool {
 
 	path := wlk.getNewStepPath(vx, vy)
 
-	for _, obs := range wlk.Obstacles {
+	for _, o := range wlk.Obstacles {
+		obs := canvas.Circle(o.Radius).Translate(o.Center.X, o.Center.Y)
 		if path.Intersects(obs) {
 			return true
 		}
