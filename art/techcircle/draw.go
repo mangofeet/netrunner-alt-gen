@@ -52,6 +52,7 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.Pop()
 
 	radius := math.Max(canvasHeight-centerY, centerY) * 1.2
+	angle := 45.0
 
 	circ := TechCircleDrawer{
 		RNG:         rngGlobal,
@@ -63,6 +64,7 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		StrokeMin:   canvasHeight * 0.03,
 		StrokeMax:   canvasHeight * 0.05,
 		GetColor:    getColor,
+		Angle:       angle,
 	}
 
 	if err := circ.Draw(ctx); err != nil {
@@ -86,6 +88,7 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 				A: 0x44,
 			}, nil
 		},
+		Angle: angle,
 	}
 
 	if err := circOverlay.Draw(ctx); err != nil {
