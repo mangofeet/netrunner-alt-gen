@@ -146,13 +146,15 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 		rot := float64(drawer.RNG.Next(90) - 45)
 		arcPos := rot
 
-		for arcPos < 360+rot {
+		maxArc := 360 + rot
+
+		for arcPos < maxArc {
 
 			var isBreak bool
 			var arcStart = arcPos
 
 			for {
-				arc := math.Min(360-arcPos+rot, float64(drawer.RNG.Next(20)+5))
+				arc := math.Min(maxArc-arcPos, float64(drawer.RNG.Next(20)+5))
 
 				_, isBreak = getColorOrBreak(drawer.RNG, thisColor)
 				// log.Println("r:", radius, "arc:", arc, "arcPos:", arcPos, "stroke:", strokeWidth, "break", isBreak)
@@ -161,7 +163,7 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 					if arcStart != arcPos {
 						segment := circleSegment{
 							start:       arcStart,
-							end:         math.Min(360, arcPos),
+							end:         math.Min(maxArc, arcPos),
 							strokeWidth: strokeWidth,
 							// strokeWidth: 10,
 							strokeColor: thisColor,
@@ -171,7 +173,7 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 					}
 					spacer := circleSegment{
 						start:       arcPos,
-						end:         math.Min(360+rot, arcPos+arc),
+						end:         math.Min(maxArc, arcPos+arc),
 						strokeWidth: strokeWidth * 0.5,
 						isBlank:     true,
 						strokeColor: color.RGBA{
