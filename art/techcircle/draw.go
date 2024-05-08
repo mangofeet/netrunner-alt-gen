@@ -51,7 +51,7 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.Fill()
 	ctx.Pop()
 
-	radius := math.Max(canvasHeight-centerY, centerY) * 0.9
+	radius := math.Max(canvasHeight-centerY, centerY) * 1.2
 
 	circ := TechCircleDrawer{
 		RNG:         rngGlobal,
@@ -122,6 +122,7 @@ type circleSegment struct {
 type circleRing struct {
 	segments []circleSegment
 	radius   float64
+	rotation float64
 }
 
 func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
@@ -142,7 +143,7 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 			return err
 		}
 
-		rot := 45.0
+		rot := float64(drawer.RNG.Next(90) - 45)
 		arcPos := rot
 
 		for arcPos < 360+rot {
@@ -195,12 +196,18 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 		// radius += math.Min(math.Max(float64(drawer.RNG.Next(int64(radius))), strokeWidth*2), strokeWidth)
 		radius += strokeWidth * (float64(drawer.RNG.Next(60))/100.0 + 0.7)
 
+		ring.rotation = rot
 		rings = append(rings, ring)
 	}
 
 	for _, ring := range rings {
 
+		rotPath := &canvas.Path{}
+		rotPath.Arc(ring.radius, ring.radius, 0, 0, ring.rotation)
+
 		x, y := drawer.X+ring.radius, drawer.Y
+		x += rotPath.Pos().X
+		y += rotPath.Pos().Y
 
 		for _, seg := range ring.segments {
 			// log.Printf("%#v", seg)
