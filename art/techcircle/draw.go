@@ -105,6 +105,7 @@ type ColorGetter func(rng prng.Generator, base color.RGBA) (color.RGBA, error)
 type TechCircleDrawer struct {
 	RNG                 prng.Generator
 	Color               color.RGBA
+	Angle               float64
 	X, Y                float64
 	Radius, RadiusStart float64
 	StrokeMin           float64
@@ -144,6 +145,10 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 		}
 
 		rot := float64(drawer.RNG.Next(90) - 45)
+		if drawer.Angle != 0 {
+			rot = drawer.Angle
+		}
+
 		arcPos := rot
 
 		maxArc := 360 + rot
@@ -202,14 +207,16 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 		rings = append(rings, ring)
 	}
 
-	for _, ring := range rings {
-
-		rotPath := &canvas.Path{}
-		rotPath.Arc(ring.radius, ring.radius, 0, 0, ring.rotation)
+	for _, ring := range reverse(rings) {
 
 		x, y := drawer.X+ring.radius, drawer.Y
-		x += rotPath.Pos().X
-		y += rotPath.Pos().Y
+
+		if drawer.Angle == 0 {
+			rotPath := &canvas.Path{}
+			rotPath.Arc(ring.radius, ring.radius, 0, 0, ring.rotation)
+			x += rotPath.Pos().X
+			y += rotPath.Pos().Y
+		}
 
 		for _, seg := range ring.segments {
 			// log.Printf("%#v", seg)
@@ -233,6 +240,15 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 
 	return nil
 
+}
+
+func reverse[T any](slc []T) []T {
+	reversed := make([]T, len(slc))
+	for i := range len(slc) {
+		ri := len(slc) - 1 - i
+		reversed[ri] = slc[i]
+	}
+	return reversed
 }
 
 func getColorOrBreak(rng prng.Generator, base color.RGBA) (color.RGBA, bool) {
