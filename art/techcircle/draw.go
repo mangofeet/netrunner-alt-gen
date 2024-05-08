@@ -117,6 +117,7 @@ type circleSegment struct {
 	start, end  float64
 	strokeWidth float64
 	strokeColor color.RGBA
+	isBlank     bool
 }
 
 type circleRing struct {
@@ -154,28 +155,33 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 				arc := math.Min(360-arcPos+rot, float64(drawer.RNG.Next(20)+5))
 
 				_, isBreak = getColorOrBreak(drawer.RNG, thisColor)
-				log.Println("rmax:", drawer.Radius, "r:", radius, "arc:", arc, "arcPos:", arcPos, "stroke:", strokeWidth)
+				// log.Println("r:", radius, "arc:", arc, "arcPos:", arcPos, "stroke:", strokeWidth, "break", isBreak)
 
 				if isBreak {
-					log.Println("breaking")
-					segment := circleSegment{
-						start:       arcStart,
-						end:         math.Min(360+rot, arcPos),
-						strokeWidth: strokeWidth,
-						strokeColor: thisColor,
+					if arcStart != arcPos {
+						segment := circleSegment{
+							start:       arcStart,
+							end:         math.Min(360, arcPos),
+							strokeWidth: strokeWidth,
+							// strokeWidth: 10,
+							strokeColor: thisColor,
+						}
+						ring.segments = append(ring.segments, segment)
+						// log.Printf("segment: %#v", segment)
 					}
 					spacer := circleSegment{
 						start:       arcPos,
 						end:         math.Min(360+rot, arcPos+arc),
 						strokeWidth: strokeWidth * 0.5,
+						isBlank:     true,
 						strokeColor: color.RGBA{
 							R: 0xff,
 							G: 0xff,
 							B: 0xff,
-							A: 0x00,
+							A: 0x44,
 						},
 					}
-					ring.segments = append(ring.segments, segment, spacer)
+					ring.segments = append(ring.segments, spacer)
 					arcPos += arc
 					break
 				}
@@ -198,11 +204,11 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 		x, y := drawer.X+ring.radius, drawer.Y
 
 		for _, seg := range ring.segments {
-			log.Printf("%#v", seg)
+			// log.Printf("%#v", seg)
 			path := &canvas.Path{}
 			path.Arc(ring.radius, ring.radius, 0, seg.start, seg.end)
 
-			if seg.strokeColor.A != 0x00 {
+			if !seg.isBlank {
 				ctx.Push()
 				ctx.SetStrokeColor(seg.strokeColor)
 				ctx.SetStrokeWidth(seg.strokeWidth)
