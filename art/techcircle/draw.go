@@ -142,7 +142,7 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 			return err
 		}
 
-		rot := 0.0
+		rot := 45.0
 		arcPos := rot
 
 		for arcPos < 360+rot {
