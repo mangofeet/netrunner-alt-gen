@@ -2,7 +2,6 @@ package techcircle
 
 import (
 	"image/color"
-	"log"
 	"math"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
