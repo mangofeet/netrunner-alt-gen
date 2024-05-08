@@ -213,7 +213,7 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 
 		if drawer.Angle == 0 {
 			rotPath := &canvas.Path{}
-			rotPath.Arc(ring.radius, ring.radius, 0, 0, ring.rotation)
+			rotPath.Arc(ring.radius, ring.radius, 0.1, 0, ring.rotation)
 			x += rotPath.Pos().X
 			y += rotPath.Pos().Y
 		}
@@ -221,7 +221,7 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 		for _, seg := range ring.segments {
 			// log.Printf("%#v", seg)
 			path := &canvas.Path{}
-			path.Arc(ring.radius, ring.radius, 0, seg.start, seg.end)
+			path.Arc(ring.radius, ring.radius, 0.1, seg.start, seg.end)
 
 			if !seg.isBlank {
 				ctx.Push()
