@@ -330,36 +330,36 @@ func (drawer TechCircle) getColor(rng prng.Generator, base color.RGBA) (color.RG
 		// 	A: 0x77,
 		// }
 	case 2:
-		if drawer.AltColor1 != nil {
-			return *drawer.AltColor1, nil
-		}
 		newColor, _, err = art.Analogous(base, float64(rng.Next(80)-40))
 		if err != nil {
 			return base, err
 		}
-	case 3:
-		if drawer.AltColor2 != nil {
-			return *drawer.AltColor2, nil
+		if drawer.AltColor1 != nil {
+			return *drawer.AltColor1, nil
 		}
+	case 3:
 		newColor, _, err = art.Analogous(base, float64(rng.Next(100)-50))
 		if err != nil {
 			return base, err
 		}
-	case 4:
-		if drawer.AltColor3 != nil {
-			return *drawer.AltColor3, nil
+		if drawer.AltColor2 != nil {
+			return *drawer.AltColor2, nil
 		}
+	case 4:
 		newColor, _, err = art.Analogous(base, float64(rng.Next(120)-60))
 		if err != nil {
 			return base, err
 		}
-	case 5:
-		if drawer.AltColor4 != nil {
-			return *drawer.AltColor4, nil
+		if drawer.AltColor3 != nil {
+			return *drawer.AltColor3, nil
 		}
+	case 5:
 		newColor, _, err = art.Analogous(base, float64(rng.Next(140)-70))
 		if err != nil {
 			return base, err
+		}
+		if drawer.AltColor4 != nil {
+			return *drawer.AltColor4, nil
 		}
 	case 6:
 		// color = canvas.Transparent
