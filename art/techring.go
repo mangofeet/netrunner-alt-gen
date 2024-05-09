@@ -21,6 +21,7 @@ type TechRing struct {
 	StrokeMax                                  float64
 	Color                                      color.RGBA
 	AltColor1, AltColor2, AltColor3, AltColor4 *color.RGBA
+	OverlayColor                               *color.RGBA
 }
 
 func (drawer TechRing) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
@@ -45,6 +46,16 @@ func (drawer TechRing) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		return err
 	}
 
+	overlayColor := color.RGBA{
+		R: 0xff,
+		G: 0xff,
+		B: 0xff,
+		A: 0x44,
+	}
+	if drawer.OverlayColor != nil {
+		overlayColor = *drawer.OverlayColor
+	}
+
 	circOverlay := techCircleDrawer{
 		RNG:         drawer.RNG,
 		X:           drawer.X,
@@ -54,12 +65,7 @@ func (drawer TechRing) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		StrokeMin:   drawer.StrokeMin * 0.16666667,
 		StrokeMax:   drawer.StrokeMax * 0.3,
 		GetColor: func(rng prng.Generator) (color.Color, error) {
-			return color.RGBA{
-				R: 0xff,
-				G: 0xff,
-				B: 0xff,
-				A: 0x44,
-			}, nil
+			return overlayColor, nil
 		},
 		Angle:         drawer.Angle,
 		SegmentArcMin: 8,
