@@ -51,18 +51,20 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.Fill()
 	ctx.Pop()
 
-	radius := math.Max(canvasHeight-centerY, centerY) * 1.2
-	angle := 45.0
+	radius := math.Max(canvasHeight-centerY, centerY) * 1.5
+	angle := 0.0
+
+	radiusStart := canvasHeight * 0.03
 
 	circ := TechCircleDrawer{
 		RNG:         rngGlobal,
 		X:           centerX,
 		Y:           centerY,
 		Radius:      radius,
-		RadiusStart: canvasHeight * 0.01,
+		RadiusStart: radiusStart,
 		Color:       baseColor,
-		StrokeMin:   canvasHeight * 0.03,
-		StrokeMax:   canvasHeight * 0.05,
+		StrokeMin:   canvasHeight * 0.06,
+		StrokeMax:   canvasHeight * 0.1,
 		GetColor:    getColor,
 		Angle:       angle,
 	}
@@ -76,10 +78,10 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		X:           centerX,
 		Y:           centerY,
 		Radius:      radius,
-		RadiusStart: canvasHeight * 0.01,
+		RadiusStart: radiusStart,
 		Color:       baseColor,
-		StrokeMin:   canvasHeight * 0.005,
-		StrokeMax:   canvasHeight * 0.01,
+		StrokeMin:   canvasHeight * 0.01,
+		StrokeMax:   canvasHeight * 0.03,
 		GetColor: func(rng prng.Generator, base color.RGBA) (color.RGBA, error) {
 			return color.RGBA{
 				R: 0xff,
@@ -88,10 +90,33 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 				A: 0x44,
 			}, nil
 		},
-		Angle: angle,
+		Angle:         angle,
+		SegmentArcMin: 8,
+		SegmentArcMax: 15,
 	}
 
 	if err := circOverlay.Draw(ctx); err != nil {
+		return err
+	}
+
+	circBlanker := TechCircleDrawer{
+		RNG:         rngGlobal,
+		X:           centerX,
+		Y:           centerY,
+		Radius:      radius,
+		RadiusStart: radiusStart,
+		Color:       baseColor,
+		StrokeMin:   canvasHeight * 0.01,
+		StrokeMax:   canvasHeight * 0.03,
+		GetColor: func(rng prng.Generator, base color.RGBA) (color.RGBA, error) {
+			return cardBGColor, nil
+		},
+		Angle:         angle,
+		SegmentArcMin: 2,
+		SegmentArcMax: 5,
+	}
+
+	if err := circBlanker.Draw(ctx); err != nil {
 		return err
 	}
 
@@ -114,6 +139,9 @@ type TechCircleDrawer struct {
 	StrokeMin           float64
 	StrokeMax           float64
 	GetColor            ColorGetter
+
+	SegmentArcMin, SegmentArcMax float64
+	BreakArcMin, BreakArcMax     float64
 }
 
 type circleSegment struct {
@@ -133,6 +161,24 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 	radius := drawer.RadiusStart
 
 	var rings []circleRing
+
+	segArcMin := drawer.SegmentArcMin
+	if segArcMin == 0 {
+		segArcMin = 5
+	}
+	segArcMax := drawer.SegmentArcMax
+	if segArcMax == 0 {
+		segArcMax = 25
+	}
+
+	breakArcMin := drawer.BreakArcMin
+	if breakArcMin == 0 {
+		breakArcMin = 5
+	}
+	breakArcMax := drawer.BreakArcMax
+	if breakArcMax == 0 {
+		breakArcMax = 25
+	}
 
 	for radius < drawer.Radius {
 
@@ -162,9 +208,15 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 			var arcStart = arcPos
 
 			for {
-				arc := math.Min(maxArc-arcPos, float64(drawer.RNG.Next(20)+5))
 
 				_, isBreak = getColorOrBreak(drawer.RNG, thisColor)
+
+				var arc float64
+				if isBreak {
+					arc = math.Min(maxArc-arcPos, float64(drawer.RNG.Next(int64(breakArcMax)-int64(breakArcMin))+int64(breakArcMin)))
+				} else {
+					arc = math.Min(maxArc-arcPos, float64(drawer.RNG.Next(int64(segArcMax)-int64(segArcMin))+int64(segArcMin)))
+				}
 				// log.Println("r:", radius, "arc:", arc, "arcPos:", arcPos, "stroke:", strokeWidth, "break", isBreak)
 
 				if isBreak {
@@ -188,7 +240,7 @@ func (drawer TechCircleDrawer) Draw(ctx *canvas.Context) error {
 							R: 0xff,
 							G: 0xff,
 							B: 0xff,
-							A: 0x44,
+							A: 0x33,
 						},
 					}
 					ring.segments = append(ring.segments, spacer)
