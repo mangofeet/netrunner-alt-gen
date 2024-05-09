@@ -33,8 +33,12 @@ func generateCardTechcircle(cardName string) error {
 	log.Printf("generating %s", printing.Attributes.StrippedTitle)
 
 	ns := techcircle.TechCircle{
-		Color:   parseColor(baseColor),
-		ColorBG: parseColor(netspaceColorBG),
+		Color:     parseColor(baseColor),
+		ColorBG:   parseColor(netspaceColorBG),
+		AltColor1: parseColor(altColor1),
+		AltColor2: parseColor(altColor2),
+		AltColor3: parseColor(altColor3),
+		AltColor4: parseColor(altColor4),
 	}
 
 	return generateCard(ns, printing, "TechCircle", "mangofeet")

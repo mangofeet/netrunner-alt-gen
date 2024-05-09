@@ -11,7 +11,8 @@ import (
 )
 
 type TechCircle struct {
-	Color, ColorBG *color.RGBA
+	Color, ColorBG                             *color.RGBA
+	AltColor1, AltColor2, AltColor3, AltColor4 *color.RGBA
 }
 
 func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
@@ -65,7 +66,7 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		Color:       baseColor,
 		StrokeMin:   canvasHeight * 0.06,
 		StrokeMax:   canvasHeight * 0.1,
-		GetColor:    getColor,
+		GetColor:    drawer.getColor,
 		Angle:       angle,
 	}
 
@@ -315,7 +316,7 @@ func getColorOrBreak(rng prng.Generator, base color.RGBA) (color.RGBA, bool) {
 	return base, false
 }
 
-func getColor(rng prng.Generator, base color.RGBA) (color.RGBA, error) {
+func (drawer TechCircle) getColor(rng prng.Generator, base color.RGBA) (color.RGBA, error) {
 
 	var err error
 	newColor := base
@@ -329,21 +330,33 @@ func getColor(rng prng.Generator, base color.RGBA) (color.RGBA, error) {
 		// 	A: 0x77,
 		// }
 	case 2:
+		if drawer.AltColor1 != nil {
+			return *drawer.AltColor1, nil
+		}
 		newColor, _, err = art.Analogous(base, float64(rng.Next(80)-40))
 		if err != nil {
 			return base, err
 		}
 	case 3:
+		if drawer.AltColor2 != nil {
+			return *drawer.AltColor2, nil
+		}
 		newColor, _, err = art.Analogous(base, float64(rng.Next(100)-50))
 		if err != nil {
 			return base, err
 		}
 	case 4:
+		if drawer.AltColor3 != nil {
+			return *drawer.AltColor3, nil
+		}
 		newColor, _, err = art.Analogous(base, float64(rng.Next(120)-60))
 		if err != nil {
 			return base, err
 		}
 	case 5:
+		if drawer.AltColor4 != nil {
+			return *drawer.AltColor4, nil
+		}
 		newColor, _, err = art.Analogous(base, float64(rng.Next(140)-70))
 		if err != nil {
 			return base, err

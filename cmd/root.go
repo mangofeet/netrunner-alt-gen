@@ -40,12 +40,12 @@ const safeHeight = 3924.0
 // const cardHeight = 88.0
 
 var (
-	drawMarginLines, makeBack                                         bool
-	outputDir                                                         string
-	baseColor, walkerColor1, walkerColor2, walkerColor3, walkerColor4 string
-	skipFlavor                                                        bool
-	flavorText, flavorAttribution                                     string
-	textBoxFactor                                                     float64
+	drawMarginLines, makeBack                             bool
+	outputDir                                             string
+	baseColor, altColor1, altColor2, altColor3, altColor4 string
+	skipFlavor                                            bool
+	flavorText, flavorAttribution                         string
+	textBoxFactor                                         float64
 
 	frame, frameColorBackground, frameColorBorder, frameColorText,
 	frameColorInfluenceBG, frameColorStrengthBG, frameColorFactionBG,
@@ -98,10 +98,10 @@ If set to "faction", it will use the faction color regardless of the base color`
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMin, "min-walkers", "m", 3000, `Minimum amount of walkers`)
 	netspaceCmd.Flags().IntVarP(&netspaceWalkersMax, "max-walkers", "M", 10000, `Maximum amount of walkers`)
 	netspaceCmd.Flags().StringVarP(&netspaceColorBG, "color-bg", "", "", `Background color for the generated art, defaults to --base-color value`)
-	netspaceCmd.Flags().StringVarP(&walkerColor1, "walker-color-1", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue +10 - +30`)
-	netspaceCmd.Flags().StringVarP(&walkerColor2, "walker-color-2", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue -10 - -30`)
-	netspaceCmd.Flags().StringVarP(&walkerColor3, "walker-color-3", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue +30 - +50`)
-	netspaceCmd.Flags().StringVarP(&walkerColor3, "walker-color-4", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue -30 - -50`)
+	netspaceCmd.Flags().StringVarP(&altColor1, "walker-color-1", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue +10 - +30`)
+	netspaceCmd.Flags().StringVarP(&altColor2, "walker-color-2", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue -10 - -30`)
+	netspaceCmd.Flags().StringVarP(&altColor3, "walker-color-3", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue +30 - +50`)
+	netspaceCmd.Flags().StringVarP(&altColor4, "walker-color-4", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue -30 - -50`)
 	netspaceCmd.Flags().StringVarP(&gridColor1, "grid-color-1", "", "",
 		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-1, will be randomly desaturated by algorithm`)
 	netspaceCmd.Flags().StringVarP(&gridColor2, "grid-color-2", "", "",
@@ -113,6 +113,11 @@ If set to "faction", it will use the faction color regardless of the base color`
 	netspaceCmd.PersistentFlags().Float64VarP(&gridPercent, "grid-percent", "", -1, `Percentage of total walkers that will run on a grid`)
 
 	imageCmd.Flags().StringVarP(&designer, "designer", "", "", `Name of the designer for the card back attribution`)
+
+	techcircleCmd.Flags().StringVarP(&altColor1, "ring-color-1", "", "", `Alternate ring color for the card, defaults to pre-defined faction color analogue +-40`)
+	techcircleCmd.Flags().StringVarP(&altColor2, "ring-color-2", "", "", `Alternate ring color for the card, defaults to pre-defined faction color analogue +-50`)
+	techcircleCmd.Flags().StringVarP(&altColor3, "ring-color-3", "", "", `Alternate ring color for the card, defaults to pre-defined faction color analogue +-60`)
+	techcircleCmd.Flags().StringVarP(&altColor4, "ring-color-4", "", "", `Alternate ring color for the card, defaults to pre-defined faction color analogue +-70`)
 
 	rootCmd.AddCommand(netspaceCmd)
 	rootCmd.AddCommand(emptyCmd)
