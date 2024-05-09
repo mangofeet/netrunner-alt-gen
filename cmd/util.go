@@ -68,7 +68,9 @@ func getFramer(card *nrdb.Printing, algorithm, designer string) (art.Drawer, err
 						continue
 					}
 					part = strings.Replace(part, "—", "- ", 1)
+					part = strings.Replace(part, "–", "- ", 1)
 					if part[0] == '-' {
+						log.Println("detected flavor text attribution")
 						frm.FlavorAttribution = "<em>" + part + "</em>"
 					} else {
 						finalFlavor += "<BR>" + part
