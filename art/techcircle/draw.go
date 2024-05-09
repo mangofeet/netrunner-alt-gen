@@ -1,13 +1,16 @@
 package techcircle
 
 import (
+	"image"
 	"image/color"
+	"image/draw"
 	"math"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/netrunner-alt-gen/internal/prng"
 	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
+	"github.com/tdewolff/canvas/renderers/rasterizer"
 )
 
 type TechCircle struct {
@@ -25,8 +28,6 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	centerX := float64(rngGlobal.Next(int64(canvasWidth/2))) + (canvasWidth / 4)
 	centerY := float64(rngGlobal.Next(int64(canvasHeight/6))) + ((canvasHeight / 8) * 5)
-	// radius := float64(rngGlobal.Next(int64(canvasHeight/8))) + (canvasHeight / 12)
-
 	if card.Attributes.CardTypeID == "ice" {
 		centerY = float64(rngGlobal.Next(int64(canvasHeight/4))) + (canvasHeight / 6)
 	}
@@ -57,6 +58,9 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	radiusStart := canvasHeight * 0.03
 
+	ringCnv := canvas.New(canvasWidth, canvasHeight)
+	ringCtx := canvas.NewContext(ringCnv)
+
 	circ := TechCircleDrawer{
 		RNG:         rngGlobal,
 		X:           centerX,
@@ -70,7 +74,7 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		Angle:       angle,
 	}
 
-	if err := circ.Draw(ctx); err != nil {
+	if err := circ.Draw(ringCtx); err != nil {
 		return err
 	}
 
@@ -83,7 +87,7 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		Color:       baseColor,
 		StrokeMin:   canvasHeight * 0.01,
 		StrokeMax:   canvasHeight * 0.03,
-		GetColor: func(rng prng.Generator, base color.RGBA) (color.RGBA, error) {
+		GetColor: func(rng prng.Generator, base color.RGBA) (color.Color, error) {
 			return color.RGBA{
 				R: 0xff,
 				G: 0xff,
@@ -96,9 +100,14 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		SegmentArcMax: 15,
 	}
 
-	if err := circOverlay.Draw(ctx); err != nil {
+	if err := circOverlay.Draw(ringCtx); err != nil {
 		return err
 	}
+
+	ringImg := rasterizer.Draw(ringCnv, canvas.DPMM(1), canvas.DefaultColorSpace)
+
+	maskCnv := canvas.New(canvasWidth, canvasHeight)
+	maskCtx := canvas.NewContext(maskCnv)
 
 	circBlanker := TechCircleDrawer{
 		RNG:         rngGlobal,
@@ -109,27 +118,38 @@ func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		Color:       baseColor,
 		StrokeMin:   canvasHeight * 0.01,
 		StrokeMax:   canvasHeight * 0.03,
-		GetColor: func(rng prng.Generator, base color.RGBA) (color.RGBA, error) {
-			return cardBGColor, nil
+		GetColor: func(rng prng.Generator, base color.RGBA) (color.Color, error) {
+			return canvas.Black, nil
 		},
 		Angle:         angle,
 		SegmentArcMin: 2,
 		SegmentArcMax: 5,
 	}
 
-	if err := circBlanker.Draw(ctx); err != nil {
+	if err := circBlanker.Draw(maskCtx); err != nil {
 		return err
 	}
 
-	// ctx.Push()
-	// ctx.SetFillColor(baseColor)
-	// ctx.DrawPath(centerX, centerY, canvas.Circle(radius*0.1))
-	// ctx.Pop()
+	maskImg := rasterizer.Draw(maskCnv, canvas.DPMM(1), canvas.DefaultColorSpace)
+
+	// invert the mask image
+	for i, pxl := range maskImg.Pix {
+		if pxl == 0 {
+			maskImg.Pix[i] = 255
+		} else {
+			maskImg.Pix[i] = 0
+		}
+	}
+
+	ringsFinal := image.NewRGBA(image.Rect(0, 0, int(canvasWidth), int(canvasHeight)))
+	draw.DrawMask(ringsFinal, ringsFinal.Bounds(), ringImg, image.Point{}, maskImg, image.Point{}, draw.Over)
+
+	ctx.RenderImage(ringsFinal, canvas.Identity)
 
 	return nil
 }
 
-type ColorGetter func(rng prng.Generator, base color.RGBA) (color.RGBA, error)
+type ColorGetter func(rng prng.Generator, base color.RGBA) (color.Color, error)
 
 type TechCircleDrawer struct {
 	RNG                 prng.Generator
@@ -148,7 +168,7 @@ type TechCircleDrawer struct {
 type circleSegment struct {
 	start, end  float64
 	strokeWidth float64
-	strokeColor color.RGBA
+	strokeColor color.Color
 	isBlank     bool
 }
 
@@ -307,7 +327,7 @@ func reverse[T any](slc []T) []T {
 	return reversed
 }
 
-func getColorOrBreak(rng prng.Generator, base color.RGBA) (color.RGBA, bool) {
+func getColorOrBreak(rng prng.Generator, base color.Color) (color.Color, bool) {
 	switch rng.Next(3) {
 	case 1:
 		return canvas.Transparent, true
@@ -316,7 +336,7 @@ func getColorOrBreak(rng prng.Generator, base color.RGBA) (color.RGBA, bool) {
 	return base, false
 }
 
-func (drawer TechCircle) getColor(rng prng.Generator, base color.RGBA) (color.RGBA, error) {
+func (drawer TechCircle) getColor(rng prng.Generator, base color.RGBA) (color.Color, error) {
 
 	var err error
 	newColor := base
