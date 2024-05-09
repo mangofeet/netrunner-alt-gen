@@ -245,6 +245,24 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		walkers = append(walkers, &wlk)
 	}
 
+	ringColor := color.RGBA{R: 0xff, G: 0xff, B: 0xff, A: 0x22}
+
+	(art.TechRing{
+		RNG:          rngGlobal,
+		X:            float64(startX),
+		Y:            float64(startY),
+		Radius:       canvasWidth * 0.5,
+		RadiusStart:  canvasWidth * 0.1,
+		StrokeMin:    canvasWidth * 0.1,
+		StrokeMax:    canvasWidth * 0.2,
+		Color:        ringColor,
+		AltColor1:    &ringColor,
+		AltColor2:    &ringColor,
+		AltColor3:    &ringColor,
+		AltColor4:    &ringColor,
+		OverlayColor: &ringColor,
+	}).Draw(ctx, card)
+
 	for _, wlk := range walkers {
 		wlk.Draw(ctx)
 		for wlk.InBounds(ctx) {
@@ -253,24 +271,6 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			wlk.Draw(ctx)
 		}
 	}
-
-	// ringColor := color.RGBA{R: 0xff, G: 0xff, B: 0xff, A: 0x22}
-
-	// (art.TechRing{
-	// 	RNG:          rngGlobal,
-	// 	X:            float64(startX),
-	// 	Y:            float64(startY),
-	// 	Radius:       canvasWidth * 0.5,
-	// 	RadiusStart:  canvasWidth * 0.1,
-	// 	StrokeMin:    canvasWidth * 0.1,
-	// 	StrokeMax:    canvasWidth * 0.2,
-	// 	Color:        ringColor,
-	// 	AltColor1:    &ringColor,
-	// 	AltColor2:    &ringColor,
-	// 	AltColor3:    &ringColor,
-	// 	AltColor4:    &ringColor,
-	// 	OverlayColor: &ringColor,
-	// }).Draw(ctx, card)
 
 	log.Printf("finished %d walkers", len(walkers))
 
