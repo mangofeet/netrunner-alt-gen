@@ -53,5 +53,5 @@ func generateCardNetspace(cardName string) error {
 		GridColor4:   parseColor(gridColor4),
 	}
 
-	return generateCard(ns, printing, "Netwalker", "mangofeet")
+	return generateCard(ns, printing, "netwalker", "mangofeet")
 }

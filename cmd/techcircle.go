@@ -41,5 +41,5 @@ func generateCardTechcircle(cardName string) error {
 		AltColor4: parseColor(altColor4),
 	}
 
-	return generateCard(ns, printing, "Netringer", "mangofeet")
+	return generateCard(ns, printing, "netringer", "mangofeet")
 }
