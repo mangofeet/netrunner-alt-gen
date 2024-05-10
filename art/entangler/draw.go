@@ -110,7 +110,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	}
 
 	ringRadius := canvasWidth * 1.4
-	ringRadiusStart := canvasWidth * 0.08
+	ringRadiusStart := canvasWidth * 0.01
 	ringStrokeMin := canvasWidth * 0.1
 	ringStrokeMax := canvasWidth * 0.21
 
@@ -299,6 +299,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		walkers = append(walkers, &wlk)
 	}
 
+	// rings under the walkers
 	sequence++
 	(art.TechRing{
 		RNG:          prng.NewGenerator(seed, &sequence),
@@ -332,6 +333,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		AltColor4:    ringColor2,
 		OverlayColor: &canvas.Transparent,
 	}).Draw(ctx, card)
+
 	for _, wlk := range walkers {
 		wlk.Draw(ctx)
 		for wlk.InBounds(ctx) {
@@ -341,6 +343,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		}
 	}
 
+	// rings over the walkers
 	sequence++
 	(art.TechRing{
 		RNG:          prng.NewGenerator(seed, &sequence),
