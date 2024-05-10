@@ -5,19 +5,19 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mangofeet/netrunner-alt-gen/art/netspace"
+	"github.com/mangofeet/netrunner-alt-gen/art/entangler"
 	"github.com/spf13/cobra"
 )
 
-var netspaceCmd = &cobra.Command{
-	Use:   "netspace [card name or printing ID]",
+var entanglerCmd = &cobra.Command{
+	Use:   "entangler [card name or printing ID]",
 	Args:  cobra.MinimumNArgs(1),
-	Short: `Generate a card using the "netspace" algorithm`,
+	Short: `Generate a card using the "entangler" algorithm`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		cardName := strings.Join(args, " ")
 
-		if err := generateCardNetspace(cardName); err != nil {
+		if err := generateCardEntangler(cardName); err != nil {
 			log.Println("error:", err)
 			os.Exit(1)
 		}
@@ -25,7 +25,7 @@ var netspaceCmd = &cobra.Command{
 	},
 }
 
-func generateCardNetspace(cardName string) error {
+func generateCardEntangler(cardName string) error {
 	printing, err := getCardData(cardName)
 	if err != nil {
 		return err
@@ -37,7 +37,7 @@ func generateCardNetspace(cardName string) error {
 		nGridP = &gridPercent
 	}
 
-	ns := netspace.Netspace{
+	ns := entangler.Entangler{
 		MinWalkers:   netspaceWalkersMin,
 		MaxWalkers:   netspaceWalkersMax,
 		GridPercent:  nGridP,
@@ -51,7 +51,11 @@ func generateCardNetspace(cardName string) error {
 		GridColor2:   parseColor(gridColor2),
 		GridColor3:   parseColor(gridColor3),
 		GridColor4:   parseColor(gridColor4),
+		RingColor1:   parseColor(altColor1),
+		RingColor2:   parseColor(altColor2),
+		RingColor3:   parseColor(altColor3),
+		RingColor4:   parseColor(altColor4),
 	}
 
-	return generateCard(ns, printing, "netwalker", "mangofeet")
+	return generateCard(ns, printing, "entangler", "mangofeet")
 }

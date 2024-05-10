@@ -52,10 +52,11 @@ var (
 	frameColorInfluenceLimitBG, frameColorMinDeckBG string
 
 	// netspace
-	netspaceWalkersMin, netspaceWalkersMax         int
-	netspaceColorBG                                string
-	gridColor1, gridColor2, gridColor3, gridColor4 string
-	gridPercent                                    float64
+	netspaceWalkersMin, netspaceWalkersMax                 int
+	netspaceColorBG                                        string
+	walkerColor1, walkerColor2, walkerColor3, walkerColor4 string
+	gridColor1, gridColor2, gridColor3, gridColor4         string
+	gridPercent                                            float64
 
 	// image
 	designer string
@@ -95,22 +96,7 @@ If set to "faction", it will use the faction color regardless of the base color`
 Defaults to pre-defined faction colors or specified base color
 If set to "faction", it will use the faction color regardless of the base color`)
 
-	netspaceCmd.Flags().IntVarP(&netspaceWalkersMin, "min-walkers", "m", 3000, `Minimum amount of walkers`)
-	netspaceCmd.Flags().IntVarP(&netspaceWalkersMax, "max-walkers", "M", 10000, `Maximum amount of walkers`)
-	netspaceCmd.Flags().StringVarP(&netspaceColorBG, "color-bg", "", "", `Background color for the generated art, defaults to --base-color value`)
-	netspaceCmd.Flags().StringVarP(&altColor1, "walker-color-1", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue +10 - +30`)
-	netspaceCmd.Flags().StringVarP(&altColor2, "walker-color-2", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue -10 - -30`)
-	netspaceCmd.Flags().StringVarP(&altColor3, "walker-color-3", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue +30 - +50`)
-	netspaceCmd.Flags().StringVarP(&altColor4, "walker-color-4", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue -30 - -50`)
-	netspaceCmd.Flags().StringVarP(&gridColor1, "grid-color-1", "", "",
-		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-1, will be randomly desaturated by algorithm`)
-	netspaceCmd.Flags().StringVarP(&gridColor2, "grid-color-2", "", "",
-		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-2, will be randomly desaturated by algorithm`)
-	netspaceCmd.Flags().StringVarP(&gridColor3, "grid-color-3", "", "",
-		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-3, will be randomly desaturated by algorithm`)
-	netspaceCmd.Flags().StringVarP(&gridColor4, "grid-color-4", "", "",
-		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-4, will be randomly desaturated by algorithm`)
-	netspaceCmd.PersistentFlags().Float64VarP(&gridPercent, "grid-percent", "", -1, `Percentage of total walkers that will run on a grid`)
+	commonNetspaceFlags(netspaceCmd)
 
 	imageCmd.Flags().StringVarP(&designer, "designer", "", "", `Name of the designer for the card back attribution`)
 
@@ -119,10 +105,36 @@ If set to "faction", it will use the faction color regardless of the base color`
 	techcircleCmd.Flags().StringVarP(&altColor3, "ring-color-3", "", "", `Alternate ring color for the card, defaults to pre-defined faction color analogue +-60`)
 	techcircleCmd.Flags().StringVarP(&altColor4, "ring-color-4", "", "", `Alternate ring color for the card, defaults to pre-defined faction color analogue +-70`)
 
+	commonNetspaceFlags(entanglerCmd)
+	entanglerCmd.Flags().StringVarP(&altColor1, "ring-color-1", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
+	entanglerCmd.Flags().StringVarP(&altColor2, "ring-color-2", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
+	entanglerCmd.Flags().StringVarP(&altColor3, "ring-color-3", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
+	entanglerCmd.Flags().StringVarP(&altColor4, "ring-color-4", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
+
 	rootCmd.AddCommand(netspaceCmd)
 	rootCmd.AddCommand(emptyCmd)
 	rootCmd.AddCommand(imageCmd)
 	rootCmd.AddCommand(techcircleCmd)
+	rootCmd.AddCommand(entanglerCmd)
+}
+
+func commonNetspaceFlags(cmd *cobra.Command) {
+	cmd.Flags().IntVarP(&netspaceWalkersMin, "min-walkers", "m", 3000, `Minimum amount of walkers`)
+	cmd.Flags().IntVarP(&netspaceWalkersMax, "max-walkers", "M", 10000, `Maximum amount of walkers`)
+	cmd.Flags().StringVarP(&netspaceColorBG, "color-bg", "", "", `Background color for the generated art, defaults to --base-color value`)
+	cmd.Flags().StringVarP(&walkerColor1, "walker-color-1", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue +10 - +30`)
+	cmd.Flags().StringVarP(&walkerColor2, "walker-color-2", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue -10 - -30`)
+	cmd.Flags().StringVarP(&walkerColor3, "walker-color-3", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue +30 - +50`)
+	cmd.Flags().StringVarP(&walkerColor4, "walker-color-4", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue -30 - -50`)
+	cmd.Flags().StringVarP(&gridColor1, "grid-color-1", "", "",
+		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-1, will be randomly desaturated by algorithm`)
+	cmd.Flags().StringVarP(&gridColor2, "grid-color-2", "", "",
+		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-2, will be randomly desaturated by algorithm`)
+	cmd.Flags().StringVarP(&gridColor3, "grid-color-3", "", "",
+		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-3, will be randomly desaturated by algorithm`)
+	cmd.Flags().StringVarP(&gridColor4, "grid-color-4", "", "",
+		`Alternate grid color for the grid pattern on the card, defaults to --alt-color-4, will be randomly desaturated by algorithm`)
+	cmd.PersistentFlags().Float64VarP(&gridPercent, "grid-percent", "", -1, `Percentage of total walkers that will run on a grid`)
 }
 
 var rootCmd = &cobra.Command{

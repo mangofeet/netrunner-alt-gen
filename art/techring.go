@@ -208,7 +208,6 @@ func (drawer techCircleDrawer) Draw(ctx *canvas.Context) error {
 				} else {
 					arc = math.Min(maxArc-arcPos, float64(drawer.RNG.Next(int64(segArcMax)-int64(segArcMin))+int64(segArcMin)))
 				}
-				// log.Println("r:", radius, "arc:", arc, "arcPos:", arcPos, "stroke:", strokeWidth, "break", isBreak)
 
 				if isBreak {
 					if arcStart != arcPos {
@@ -220,7 +219,6 @@ func (drawer techCircleDrawer) Draw(ctx *canvas.Context) error {
 							strokeColor: thisColor,
 						}
 						ring.segments = append(ring.segments, segment)
-						// log.Printf("segment: %#v", segment)
 					}
 					spacer := circleSegment{
 						start:       arcPos,
@@ -265,7 +263,6 @@ func (drawer techCircleDrawer) Draw(ctx *canvas.Context) error {
 		}
 
 		for _, seg := range ring.segments {
-			// log.Printf("%#v", seg)
 			path := &canvas.Path{}
 			path.Arc(ring.radius, ring.radius, 0.1, seg.start, seg.end)
 
@@ -313,15 +310,8 @@ func (drawer TechRing) getColor(base color.RGBA) colorGetter {
 		var err error
 		newColor := base
 
-		switch rng.Next(5) {
+		switch rng.Next(4) {
 		case 1:
-			// newColor = color.RGBA{
-			// 	R: 0xff,
-			// 	G: 0xff,
-			// 	B: 0xff,
-			// 	A: 0x77,
-			// }
-		case 2:
 			newColor, _, err = Analogous(base, float64(rng.Next(80)-40))
 			if err != nil {
 				return base, err
@@ -329,7 +319,7 @@ func (drawer TechRing) getColor(base color.RGBA) colorGetter {
 			if drawer.AltColor1 != nil {
 				return *drawer.AltColor1, nil
 			}
-		case 3:
+		case 2:
 			newColor, _, err = Analogous(base, float64(rng.Next(100)-50))
 			if err != nil {
 				return base, err
@@ -337,7 +327,7 @@ func (drawer TechRing) getColor(base color.RGBA) colorGetter {
 			if drawer.AltColor2 != nil {
 				return *drawer.AltColor2, nil
 			}
-		case 4:
+		case 3:
 			newColor, _, err = Analogous(base, float64(rng.Next(120)-60))
 			if err != nil {
 				return base, err
@@ -345,7 +335,7 @@ func (drawer TechRing) getColor(base color.RGBA) colorGetter {
 			if drawer.AltColor3 != nil {
 				return *drawer.AltColor3, nil
 			}
-		case 5:
+		case 4:
 			newColor, _, err = Analogous(base, float64(rng.Next(140)-70))
 			if err != nil {
 				return base, err
@@ -353,8 +343,6 @@ func (drawer TechRing) getColor(base color.RGBA) colorGetter {
 			if drawer.AltColor4 != nil {
 				return *drawer.AltColor4, nil
 			}
-		case 6:
-			// color = canvas.Transparent
 		}
 
 		return newColor, nil

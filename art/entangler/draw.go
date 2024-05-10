@@ -1,4 +1,4 @@
-package netspace
+package entangler
 
 import (
 	"fmt"
@@ -13,15 +13,16 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
-type Netspace struct {
+type Entangler struct {
 	MinWalkers, MaxWalkers                                 int
 	GridPercent                                            *float64
 	Color, ColorBG                                         *color.RGBA
 	WalkerColor1, WalkerColor2, WalkerColor3, WalkerColor4 *color.RGBA
 	GridColor1, GridColor2, GridColor3, GridColor4         *color.RGBA
+	RingColor1, RingColor2, RingColor3, RingColor4         *color.RGBA
 }
 
-func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
+func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	seed := card.Attributes.Title + card.Attributes.Text + card.Attributes.CardTypeID + card.Attributes.FactionID + card.Attributes.Flavor
 
@@ -83,6 +84,36 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		cardBGColor = *drawer.ColorBG
 	}
 
+	ringColor := color.RGBA{
+		R: baseColor.R,
+		G: baseColor.G,
+		B: baseColor.B,
+		A: 0x11,
+	}
+	overlayRingColor := color.RGBA{R: 0xff, G: 0xff, B: 0xff, A: 0x22}
+
+	var ringColor1 *color.RGBA
+	if drawer.RingColor1 != nil {
+		ringColor1 = drawer.RingColor1
+	}
+	var ringColor2 *color.RGBA
+	if drawer.RingColor2 != nil {
+		ringColor2 = drawer.RingColor2
+	}
+	var ringColor3 *color.RGBA
+	if drawer.RingColor3 != nil {
+		ringColor3 = drawer.RingColor3
+	}
+	var ringColor4 *color.RGBA
+	if drawer.RingColor4 != nil {
+		ringColor4 = drawer.RingColor4
+	}
+
+	ringRadius := canvasWidth * 1.3
+	ringRadiusStart := canvasWidth * 0.08
+	ringStrokeMin := canvasWidth * 0.09
+	ringStrokeMax := canvasWidth * 0.21
+
 	// fill background
 	ctx.Push()
 	ctx.SetFillColor(cardBGColor)
@@ -106,7 +137,9 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		nGrid = float64(numWalkers) * *drawer.GridPercent
 	}
 
-	dirChangeStep := 30.0
+	// dirChangeStep := 30.0
+	// dirChangeStep := float64(rngGlobal.Next(15) + 40)
+	dirChangeStep := 60.0
 
 	// do manual seeds for these with high numbers so they didn't
 	// affect the walkers
@@ -245,7 +278,60 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		walkers = append(walkers, &wlk)
 	}
 
-	for _, wlk := range walkers {
+	(art.TechRing{
+		RNG:          rngGlobal,
+		X:            float64(startX),
+		Y:            float64(startY),
+		Radius:       ringRadius,
+		RadiusStart:  ringRadiusStart,
+		StrokeMin:    ringStrokeMin,
+		StrokeMax:    ringStrokeMax,
+		Color:        ringColor,
+		AltColor1:    ringColor1,
+		AltColor2:    &canvas.Transparent,
+		AltColor3:    &canvas.Transparent,
+		AltColor4:    &canvas.Transparent,
+		OverlayColor: &canvas.Transparent,
+	}).Draw(ctx, card)
+
+	for i, wlk := range walkers {
+
+		if i == (len(walkers) / 4) {
+			(art.TechRing{
+				RNG:          rngGlobal,
+				X:            float64(startX),
+				Y:            float64(startY),
+				Radius:       ringRadius,
+				RadiusStart:  ringRadiusStart,
+				StrokeMin:    ringStrokeMin,
+				StrokeMax:    ringStrokeMax,
+				Color:        ringColor,
+				AltColor1:    &canvas.Transparent,
+				AltColor2:    ringColor2,
+				AltColor3:    &canvas.Transparent,
+				AltColor4:    &canvas.Transparent,
+				OverlayColor: &canvas.Transparent,
+			}).Draw(ctx, card)
+		}
+
+		if i == (len(walkers)/4)*3 {
+			(art.TechRing{
+				RNG:          rngGlobal,
+				X:            float64(startX),
+				Y:            float64(startY),
+				Radius:       ringRadius,
+				RadiusStart:  ringRadiusStart,
+				StrokeMin:    ringStrokeMin,
+				StrokeMax:    ringStrokeMax,
+				Color:        ringColor,
+				AltColor1:    &canvas.Transparent,
+				AltColor2:    &canvas.Transparent,
+				AltColor3:    ringColor3,
+				AltColor4:    &canvas.Transparent,
+				OverlayColor: &canvas.Transparent,
+			}).Draw(ctx, card)
+		}
+
 		wlk.Draw(ctx)
 		for wlk.InBounds(ctx) {
 			wlk.Velocity()
@@ -253,6 +339,39 @@ func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			wlk.Draw(ctx)
 		}
 	}
+
+	(art.TechRing{
+		RNG:          rngGlobal,
+		X:            float64(startX),
+		Y:            float64(startY),
+		Radius:       ringRadius,
+		RadiusStart:  ringRadiusStart,
+		StrokeMin:    ringStrokeMin,
+		StrokeMax:    ringStrokeMax,
+		Color:        ringColor,
+		AltColor1:    &canvas.Transparent,
+		AltColor2:    &canvas.Transparent,
+		AltColor3:    &canvas.Transparent,
+		AltColor4:    ringColor4,
+		OverlayColor: &canvas.Transparent,
+	}).Draw(ctx, card)
+
+	(art.TechRing{
+		RNG:          rngGlobal,
+		X:            float64(startX),
+		Y:            float64(startY),
+		Radius:       canvasWidth * 0.5,
+		RadiusStart:  canvasWidth * 0.1,
+		StrokeMin:    canvasWidth * 0.1,
+		StrokeMax:    canvasWidth * 0.2,
+		Color:        overlayRingColor,
+		AltColor1:    &overlayRingColor,
+		AltColor2:    &overlayRingColor,
+		AltColor3:    &overlayRingColor,
+		AltColor4:    &overlayRingColor,
+		OverlayColor: &overlayRingColor,
+	}).Draw(ctx, card)
+
 	log.Printf("finished %d walkers", len(walkers))
 
 	return nil
