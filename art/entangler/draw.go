@@ -279,9 +279,9 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		wlk := art.Walker{
 			RNG:                         prng.NewGenerator(seed, &sequence),
 			Direction:                   direction,
-			DirectionVariance:           1,
+			DirectionVariance:           2,
 			DirectionChangeStep:         dirChangeStep,
-			DirectionChangeStepModifier: 1,
+			DirectionChangeStepModifier: 1.5,
 			X:                           float64(thisStartX),
 			Y:                           float64(thisStartY),
 			Vx:                          (float64(rngGlobal.Next(100)) / 100) - 0.5,
