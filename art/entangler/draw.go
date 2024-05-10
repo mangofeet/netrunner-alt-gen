@@ -137,7 +137,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		nGrid = float64(numWalkers) * *drawer.GridPercent
 	}
 
-	dirChangeStep := 38.0
+	dirChangeStep := 60.0
 	// dirChangeStep := float64(rngGlobal.Next(15) + 40)
 
 	// do manual seeds for these with high numbers so they didn't
@@ -249,6 +249,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 				direction = "right"
 				// thisStartX -= int64(ringRadiusStart)
 			}
+
 			switch direction {
 			case altColorDirection1:
 				thisColor = walkerColor1
@@ -259,19 +260,32 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			case altColorDirection4:
 				thisColor = walkerColor4
 			}
+
+			switch rngGlobal.Next(8) {
+			case 1:
+				thisColor = walkerColor1
+			case 2:
+				thisColor = walkerColor2
+			case 3:
+				thisColor = walkerColor3
+			case 4:
+				thisColor = walkerColor4
+			}
+
 		}
 
 		sequence = int64(i)
 
 		wlk := art.Walker{
-			RNG:                 prng.NewGenerator(seed, &sequence),
-			Direction:           direction,
-			DirectionVariance:   2,
-			DirectionChangeStep: dirChangeStep,
-			X:                   float64(thisStartX),
-			Y:                   float64(thisStartY),
-			Vx:                  (float64(rngGlobal.Next(100)) / 100) - 0.5,
-			Vy:                  (float64(rngGlobal.Next(100)) / 100) - 0.5,
+			RNG:                         prng.NewGenerator(seed, &sequence),
+			Direction:                   direction,
+			DirectionVariance:           1,
+			DirectionChangeStep:         dirChangeStep,
+			DirectionChangeStepModifier: 1,
+			X:                           float64(thisStartX),
+			Y:                           float64(thisStartY),
+			Vx:                          (float64(rngGlobal.Next(100)) / 100) - 0.5,
+			Vy:                          (float64(rngGlobal.Next(100)) / 100) - 0.5,
 			Color: color.RGBA{
 				R: uint8(math.Max(0, math.Min(float64(int64(thisColor.R)+colorFactor), 255))),
 				G: uint8(math.Max(0, math.Min(float64(int64(thisColor.G)+colorFactor), 255))),
@@ -319,13 +333,6 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		OverlayColor: &canvas.Transparent,
 	}).Draw(ctx, card)
 	for _, wlk := range walkers {
-
-		// if i == (len(walkers) / 4) {
-		// }
-
-		// if i == (len(walkers)/8)*7 {
-		// }
-
 		wlk.Draw(ctx)
 		for wlk.InBounds(ctx) {
 			wlk.Velocity()

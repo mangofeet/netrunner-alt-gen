@@ -18,17 +18,18 @@ type point struct {
 }
 
 type Walker struct {
-	RNG                 prng.Generator
-	Direction           string
-	DirectionVariance   int64
-	X, Y, Vx, Vy        float64
-	Color               color.Color
-	Noise               opensimplex.Noise
-	Grid                bool
-	StrokeWidth         float64
-	stepCount           int
-	DirectionChangeStep float64
-	prev                *point
+	RNG                         prng.Generator
+	Direction                   string
+	DirectionVariance           int64
+	X, Y, Vx, Vy                float64
+	Color                       color.Color
+	Noise                       opensimplex.Noise
+	Grid                        bool
+	StrokeWidth                 float64
+	stepCount                   int
+	DirectionChangeStep         float64
+	DirectionChangeStepModifier float64
+	prev                        *point
 }
 
 func (wlk Walker) String() string {
@@ -122,23 +123,18 @@ func (wlk *Walker) maybeChangeDirection() {
 	if wlk.DirectionChangeStep == 0 {
 		wlk.DirectionChangeStep = 30
 	}
+	if wlk.DirectionChangeStepModifier == 0 {
+		wlk.DirectionChangeStepModifier = 3
+	}
 
 	if wlk.stepCount%int(wlk.DirectionChangeStep) != 0 {
 		return
 	}
 
-	wlk.DirectionChangeStep *= 3
-
-	// 	switch wlk.Direction {
-	// 	case "up":
-	// 		wlk.Direction = "right"
-	// 	case "right":
-	// 		wlk.Direction = "down"
-	// 	case "down":
-	// 		wlk.Direction = "left"
-	// 	case "left":
-	// 		wlk.Direction = "up"
-	// 	}
+	wlk.DirectionChangeStep *= wlk.DirectionChangeStepModifier
+	if wlk.DirectionChangeStep < 1 {
+		wlk.DirectionChangeStep = 1
+	}
 
 	if wlk.DirectionVariance > 4 {
 		wlk.DirectionVariance = 4
