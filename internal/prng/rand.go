@@ -9,6 +9,7 @@ import (
 type Generator interface {
 	Next(max int64) int64
 	Sample(sample, max int64) int64
+	Sequence() int64
 }
 
 func NewGenerator(seed string, sequence *int64) Generator {
@@ -32,6 +33,13 @@ func (gen *generator) Next(max int64) int64 {
 
 func (gen *generator) Sample(sample, max int64) int64 {
 	return prng(gen.seed, gen.getSalt(sample), max)
+}
+
+func (gen generator) Sequence() int64 {
+	if gen.sequence == nil {
+		return 0
+	}
+	return *gen.sequence
 }
 
 func (gen *generator) getSalt(sample int64) string {
