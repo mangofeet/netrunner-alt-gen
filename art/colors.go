@@ -20,15 +20,15 @@ func Lighten(baseColor color.RGBA, factor float64) color.RGBA {
 	}
 }
 
-func Darken(baseColor color.RGBA, factor float64) color.RGBA {
-	r, g, b, a := baseColor.R, baseColor.G, baseColor.B, baseColor.A
+func Darken(baseColor color.Color, factor float64) color.RGBA {
+	r, g, b, a := baseColor.RGBA()
 
 	factorInt := 255 - int64(255.0*factor)
 
 	return color.RGBA{
-		R: uint8(math.Max(0, math.Min(float64(int64(r)-factorInt), 255))),
-		G: uint8(math.Max(0, math.Min(float64(int64(g)-factorInt), 255))),
-		B: uint8(math.Max(0, math.Min(float64(int64(b)-factorInt), 255))),
+		R: uint8(math.Max(0, math.Min(float64(int64(r/257)-factorInt), 255))),
+		G: uint8(math.Max(0, math.Min(float64(int64(g/257)-factorInt), 255))),
+		B: uint8(math.Max(0, math.Min(float64(int64(b/257)-factorInt), 255))),
 		A: uint8(a),
 	}
 }
@@ -74,14 +74,28 @@ func Analogous(baseColor color.RGBA, degShift float64) (color.RGBA, color.RGBA, 
 
 }
 
-func Desaturate(baseColor color.RGBA, amount float64) (color.RGBA, error) {
+func Desaturate(baseColor color.Color, amount float64) (color.RGBA, error) {
 	h, s, l := colorconv.ColorToHSL(baseColor)
 
 	r, g, b, err := colorconv.HSLToRGB(h, math.Min(s*amount, 1), l)
 	if err != nil {
 		return color.RGBA{}, err
 	}
-	c1 := color.RGBA{r, g, b, baseColor.A}
+	_, _, _, baseA := baseColor.RGBA()
+	c1 := color.RGBA{r, g, b, uint8(baseA / 257)}
+
+	return c1, nil
+}
+
+func AdjustLevel(baseColor color.Color, amount float64) (color.RGBA, error) {
+	h, s, l := colorconv.ColorToHSL(baseColor)
+
+	r, g, b, err := colorconv.HSLToRGB(h, s, math.Min(l*amount, 1))
+	if err != nil {
+		return color.RGBA{}, err
+	}
+	_, _, _, baseA := baseColor.RGBA()
+	c1 := color.RGBA{r, g, b, uint8(baseA / 257)}
 
 	return c1, nil
 }
