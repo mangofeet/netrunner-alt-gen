@@ -137,10 +137,8 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		nGrid = float64(numWalkers) * *drawer.GridPercent
 	}
 
-	// dirChangeStep := 30.0
+	dirChangeStep := 38.0
 	// dirChangeStep := float64(rngGlobal.Next(15) + 40)
-	// dirChangeStep := 60.0
-	dirChangeStep := 90.0
 
 	// do manual seeds for these with high numbers so they didn't
 	// affect the walkers
@@ -268,7 +266,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		wlk := art.Walker{
 			RNG:                 prng.NewGenerator(seed, &sequence),
 			Direction:           direction,
-			DirectionVariance:   rngGlobal.Next(4),
+			DirectionVariance:   2,
 			DirectionChangeStep: dirChangeStep,
 			X:                   float64(thisStartX),
 			Y:                   float64(thisStartY),
