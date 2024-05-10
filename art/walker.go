@@ -65,8 +65,8 @@ func (wlk Walker) drawLine(ctx *canvas.Context, x1, y1, x2, y2 float64) {
 }
 
 func (wlk *Walker) Velocity() {
-	deltaX := wlk.Noise.Eval2(wlk.X*noiseStepFactor, wlk.Y*noiseStepFactor)
-	deltaY := wlk.Noise.Eval2(wlk.Y*noiseStepFactor, wlk.X*noiseStepFactor)
+	deltaX := wlk.Noise.Eval3(wlk.X*noiseStepFactor, wlk.Y*noiseStepFactor, float64(wlk.stepCount*int(wlk.RNG.Sequence()+1)))
+	deltaY := wlk.Noise.Eval3(wlk.Y*noiseStepFactor, wlk.X*noiseStepFactor, float64(wlk.stepCount*int(wlk.RNG.Sequence()+1)))
 
 	switch strings.ToLower(wlk.Direction) {
 	case "down":
