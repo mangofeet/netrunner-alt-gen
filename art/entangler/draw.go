@@ -88,7 +88,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		R: baseColor.R,
 		G: baseColor.G,
 		B: baseColor.B,
-		A: 0x11,
+		A: 0xdd,
 	}
 	overlayRingColor := color.RGBA{R: 0xff, G: 0xff, B: 0xff, A: 0x22}
 
@@ -109,9 +109,9 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		ringColor4 = drawer.RingColor4
 	}
 
-	ringRadius := canvasWidth * 1.3
+	ringRadius := canvasWidth * 1.4
 	ringRadiusStart := canvasWidth * 0.08
-	ringStrokeMin := canvasWidth * 0.09
+	ringStrokeMin := canvasWidth * 0.1
 	ringStrokeMax := canvasWidth * 0.21
 
 	// fill background
@@ -139,7 +139,8 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	// dirChangeStep := 30.0
 	// dirChangeStep := float64(rngGlobal.Next(15) + 40)
-	dirChangeStep := 60.0
+	// dirChangeStep := 60.0
+	dirChangeStep := 90.0
 
 	// do manual seeds for these with high numbers so they didn't
 	// affect the walkers
@@ -212,6 +213,9 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 		thisColor := baseColor
 
+		thisStartX := startX
+		thisStartY := startY
+
 		if float64(i) < nGrid {
 			colorFactor = -2 * int64(math.Abs(float64(colorFactor)))
 			grid = true
@@ -236,12 +240,16 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 			if dirSeed <= 1 {
 				direction = "up"
+				// thisStartY -= int64(ringRadiusStart)
 			} else if dirSeed <= 2 {
 				direction = "down"
+				// thisStartY += int64(ringRadiusStart)
 			} else if dirSeed <= 3 {
 				direction = "left"
+				// thisStartX += int64(ringRadiusStart)
 			} else if dirSeed <= 4 {
 				direction = "right"
+				// thisStartX -= int64(ringRadiusStart)
 			}
 			switch direction {
 			case altColorDirection1:
@@ -262,8 +270,8 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			Direction:           direction,
 			DirectionVariance:   rngGlobal.Next(4),
 			DirectionChangeStep: dirChangeStep,
-			X:                   float64(startX),
-			Y:                   float64(startY),
+			X:                   float64(thisStartX),
+			Y:                   float64(thisStartY),
 			Vx:                  (float64(rngGlobal.Next(100)) / 100) - 0.5,
 			Vy:                  (float64(rngGlobal.Next(100)) / 100) - 0.5,
 			Color: color.RGBA{
@@ -291,7 +299,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		Color:        ringColor,
 		AltColor1:    ringColor1,
 		AltColor2:    &canvas.Transparent,
-		AltColor3:    &canvas.Transparent,
+		AltColor3:    ringColor1,
 		AltColor4:    &canvas.Transparent,
 		OverlayColor: &canvas.Transparent,
 	}).Draw(ctx, card)
@@ -309,7 +317,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		AltColor1:    &canvas.Transparent,
 		AltColor2:    ringColor2,
 		AltColor3:    &canvas.Transparent,
-		AltColor4:    &canvas.Transparent,
+		AltColor4:    ringColor2,
 		OverlayColor: &canvas.Transparent,
 	}).Draw(ctx, card)
 	for _, wlk := range walkers {
@@ -338,7 +346,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		StrokeMin:    ringStrokeMin,
 		StrokeMax:    ringStrokeMax,
 		Color:        ringColor,
-		AltColor1:    &canvas.Transparent,
+		AltColor1:    ringColor3,
 		AltColor2:    &canvas.Transparent,
 		AltColor3:    ringColor3,
 		AltColor4:    &canvas.Transparent,
@@ -356,7 +364,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		StrokeMax:    ringStrokeMax,
 		Color:        ringColor,
 		AltColor1:    &canvas.Transparent,
-		AltColor2:    &canvas.Transparent,
+		AltColor2:    ringColor4,
 		AltColor3:    &canvas.Transparent,
 		AltColor4:    ringColor4,
 		OverlayColor: &canvas.Transparent,
