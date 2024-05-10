@@ -201,6 +201,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		}
 	}
 
+	var sequence int64
 	for i := 0; i < numWalkers; i++ {
 
 		colorFactor := rngGlobal.Next(128) - 64
@@ -254,7 +255,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			}
 		}
 
-		sequence := int64(i)
+		sequence = int64(i)
 
 		wlk := art.Walker{
 			RNG:                 prng.NewGenerator(seed, &sequence),
@@ -278,8 +279,9 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		walkers = append(walkers, &wlk)
 	}
 
+	sequence++
 	(art.TechRing{
-		RNG:          rngGlobal,
+		RNG:          prng.NewGenerator(seed, &sequence),
 		X:            float64(startX),
 		Y:            float64(startY),
 		Radius:       ringRadius,
@@ -294,43 +296,29 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		OverlayColor: &canvas.Transparent,
 	}).Draw(ctx, card)
 
-	for i, wlk := range walkers {
+	sequence++
+	(art.TechRing{
+		RNG:          prng.NewGenerator(seed, &sequence),
+		X:            float64(startX),
+		Y:            float64(startY),
+		Radius:       ringRadius,
+		RadiusStart:  ringRadiusStart,
+		StrokeMin:    ringStrokeMin,
+		StrokeMax:    ringStrokeMax,
+		Color:        ringColor,
+		AltColor1:    &canvas.Transparent,
+		AltColor2:    ringColor2,
+		AltColor3:    &canvas.Transparent,
+		AltColor4:    &canvas.Transparent,
+		OverlayColor: &canvas.Transparent,
+	}).Draw(ctx, card)
+	for _, wlk := range walkers {
 
-		if i == (len(walkers) / 4) {
-			(art.TechRing{
-				RNG:          rngGlobal,
-				X:            float64(startX),
-				Y:            float64(startY),
-				Radius:       ringRadius,
-				RadiusStart:  ringRadiusStart,
-				StrokeMin:    ringStrokeMin,
-				StrokeMax:    ringStrokeMax,
-				Color:        ringColor,
-				AltColor1:    &canvas.Transparent,
-				AltColor2:    ringColor2,
-				AltColor3:    &canvas.Transparent,
-				AltColor4:    &canvas.Transparent,
-				OverlayColor: &canvas.Transparent,
-			}).Draw(ctx, card)
-		}
+		// if i == (len(walkers) / 4) {
+		// }
 
-		if i == (len(walkers)/4)*3 {
-			(art.TechRing{
-				RNG:          rngGlobal,
-				X:            float64(startX),
-				Y:            float64(startY),
-				Radius:       ringRadius,
-				RadiusStart:  ringRadiusStart,
-				StrokeMin:    ringStrokeMin,
-				StrokeMax:    ringStrokeMax,
-				Color:        ringColor,
-				AltColor1:    &canvas.Transparent,
-				AltColor2:    &canvas.Transparent,
-				AltColor3:    ringColor3,
-				AltColor4:    &canvas.Transparent,
-				OverlayColor: &canvas.Transparent,
-			}).Draw(ctx, card)
-		}
+		// if i == (len(walkers)/8)*7 {
+		// }
 
 		wlk.Draw(ctx)
 		for wlk.InBounds(ctx) {
@@ -340,8 +328,26 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		}
 	}
 
+	sequence++
 	(art.TechRing{
-		RNG:          rngGlobal,
+		RNG:          prng.NewGenerator(seed, &sequence),
+		X:            float64(startX),
+		Y:            float64(startY),
+		Radius:       ringRadius,
+		RadiusStart:  ringRadiusStart,
+		StrokeMin:    ringStrokeMin,
+		StrokeMax:    ringStrokeMax,
+		Color:        ringColor,
+		AltColor1:    &canvas.Transparent,
+		AltColor2:    &canvas.Transparent,
+		AltColor3:    ringColor3,
+		AltColor4:    &canvas.Transparent,
+		OverlayColor: &canvas.Transparent,
+	}).Draw(ctx, card)
+
+	sequence++
+	(art.TechRing{
+		RNG:          prng.NewGenerator(seed, &sequence),
 		X:            float64(startX),
 		Y:            float64(startY),
 		Radius:       ringRadius,
@@ -356,8 +362,9 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		OverlayColor: &canvas.Transparent,
 	}).Draw(ctx, card)
 
+	sequence++
 	(art.TechRing{
-		RNG:          rngGlobal,
+		RNG:          prng.NewGenerator(seed, &sequence),
 		X:            float64(startX),
 		Y:            float64(startY),
 		Radius:       canvasWidth * 0.5,
