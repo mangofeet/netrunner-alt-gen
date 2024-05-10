@@ -186,8 +186,8 @@ func (drawer techCircleDrawer) Draw(ctx *canvas.Context) error {
 
 		// darkFactor := drawer.Radius / (drawer.Radius - radius) * 0.7
 		// thisColor, _ = Desaturate(thisColor, darkFactor)
-		darkFactor := drawer.Radius / (drawer.Radius - radius) * 0.5
-		thisColor, _ = AdjustLevel(thisColor, darkFactor)
+		// darkFactor := drawer.Radius / (drawer.Radius - radius) * 0.5
+		// thisColor, _ = AdjustLevel(thisColor, darkFactor)
 
 		rot := float64(drawer.RNG.Next(90) - 45)
 		if drawer.Angle != 0 {
