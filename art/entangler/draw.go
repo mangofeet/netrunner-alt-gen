@@ -137,7 +137,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		nGrid = float64(numWalkers) * *drawer.GridPercent
 	}
 
-	dirChangeStep := 60.0
+	dirChangeStep := 45.0
 	// dirChangeStep := float64(rngGlobal.Next(15) + 40)
 
 	// do manual seeds for these with high numbers so they didn't
@@ -302,40 +302,50 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	// rings under the walkers
 	sequence++
 	(art.TechRing{
-		RNG:          prng.NewGenerator(seed, &sequence),
-		X:            float64(startX),
-		Y:            float64(startY),
-		Radius:       ringRadius,
-		RadiusStart:  ringRadiusStart,
-		StrokeMin:    ringStrokeMin,
-		StrokeMax:    ringStrokeMax,
-		Color:        ringColor,
-		AltColor1:    ringColor1,
-		AltColor2:    &canvas.Transparent,
-		AltColor3:    ringColor1,
-		AltColor4:    &canvas.Transparent,
+		RNG:         prng.NewGenerator(seed, &sequence),
+		X:           float64(startX),
+		Y:           float64(startY),
+		Radius:      ringRadius,
+		RadiusStart: ringRadiusStart,
+		StrokeMin:   ringStrokeMin,
+		StrokeMax:   ringStrokeMax,
+		Color:       ringColor,
+		AltColor1:   ringColor1,
+		AltColor2:   ringColor2,
+		AltColor3:   ringColor3,
+		AltColor4:   ringColor4,
+		// AltColor1:    &canvas.Red,
+		// AltColor2:    &canvas.Red,
+		// AltColor3:    &canvas.Red,
+		// AltColor4:    &canvas.Red,
 		OverlayColor: &canvas.Transparent,
 	}).Draw(ctx, card)
 
-	sequence++
-	(art.TechRing{
-		RNG:          prng.NewGenerator(seed, &sequence),
-		X:            float64(startX),
-		Y:            float64(startY),
-		Radius:       ringRadius,
-		RadiusStart:  ringRadiusStart,
-		StrokeMin:    ringStrokeMin,
-		StrokeMax:    ringStrokeMax,
-		Color:        ringColor,
-		AltColor1:    &canvas.Transparent,
-		AltColor2:    ringColor2,
-		AltColor3:    &canvas.Transparent,
-		AltColor4:    ringColor2,
-		OverlayColor: &canvas.Transparent,
-	}).Draw(ctx, card)
-
-	for _, wlk := range walkers {
+	for i, wlk := range walkers {
 		wlk.Draw(ctx)
+		if i == (len(walkers)/4)*3 {
+			sequence++
+			(art.TechRing{
+				RNG:         prng.NewGenerator(seed, &sequence),
+				X:           float64(startX),
+				Y:           float64(startY),
+				Radius:      ringRadius,
+				RadiusStart: ringRadiusStart * 10,
+				StrokeMin:   ringStrokeMin,
+				StrokeMax:   ringStrokeMax,
+				Color:       ringColor,
+				AltColor1:   ringColor1,
+				AltColor2:   ringColor2,
+				AltColor3:   ringColor3,
+				AltColor4:   ringColor4,
+				// AltColor1:    &canvas.Green,
+				// AltColor2:    &canvas.Green,
+				// AltColor3:    &canvas.Green,
+				// AltColor4:    &canvas.Green,
+				OverlayColor: &canvas.Transparent,
+			}).Draw(ctx, card)
+
+		}
 		for wlk.InBounds(ctx) {
 			wlk.Velocity()
 			wlk.Move()
@@ -346,35 +356,22 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	// rings over the walkers
 	sequence++
 	(art.TechRing{
-		RNG:          prng.NewGenerator(seed, &sequence),
-		X:            float64(startX),
-		Y:            float64(startY),
-		Radius:       ringRadius,
-		RadiusStart:  ringRadiusStart,
-		StrokeMin:    ringStrokeMin,
-		StrokeMax:    ringStrokeMax,
-		Color:        ringColor,
-		AltColor1:    ringColor3,
-		AltColor2:    &canvas.Transparent,
-		AltColor3:    ringColor3,
-		AltColor4:    &canvas.Transparent,
-		OverlayColor: &canvas.Transparent,
-	}).Draw(ctx, card)
-
-	sequence++
-	(art.TechRing{
-		RNG:          prng.NewGenerator(seed, &sequence),
-		X:            float64(startX),
-		Y:            float64(startY),
-		Radius:       ringRadius,
-		RadiusStart:  ringRadiusStart,
-		StrokeMin:    ringStrokeMin,
-		StrokeMax:    ringStrokeMax,
-		Color:        ringColor,
-		AltColor1:    &canvas.Transparent,
-		AltColor2:    ringColor4,
-		AltColor3:    &canvas.Transparent,
-		AltColor4:    ringColor4,
+		RNG:         prng.NewGenerator(seed, &sequence),
+		X:           float64(startX),
+		Y:           float64(startY),
+		Radius:      ringRadius,
+		RadiusStart: ringRadiusStart * 20,
+		StrokeMin:   ringStrokeMin,
+		StrokeMax:   ringStrokeMax,
+		Color:       ringColor,
+		AltColor1:   ringColor1,
+		AltColor2:   ringColor2,
+		AltColor3:   ringColor3,
+		AltColor4:   ringColor4,
+		// AltColor1:    &canvas.Blue,
+		// AltColor2:    &canvas.Blue,
+		// AltColor3:    &canvas.Blue,
+		// AltColor4:    &canvas.Blue,
 		OverlayColor: &canvas.Transparent,
 	}).Draw(ctx, card)
 
