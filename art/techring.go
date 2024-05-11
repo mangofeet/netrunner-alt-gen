@@ -350,6 +350,9 @@ func (drawer TechRing) getColor(base color.RGBA) colorGetter {
 			}
 		}
 
+		newColor, _ = Desaturate(newColor, 0.7)
+		newColor, _ = AdjustLevel(newColor, 0.5)
+
 		return newColor, nil
 	}
 }
