@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 
-./netrunner-alt-gen netspace hedge fund
+./netrunner-alt-gen netwalker hedge fund
                     
 flavor_sure_gamble='"I would suggest variable text box size.<BR>Wasted space on stuff like Sure Gambles is something that'"'"'s always bothered me for alt arts."'
 
-./netrunner-alt-gen netspace sure gamble \
+./netrunner-alt-gen netwalker sure gamble \
                     --make-back \
                     --text-box-height 26 \
                     --flavor "${flavor_sure_gamble}" \
@@ -22,7 +22,7 @@ flavor_sure_gamble='"I would suggest variable text box size.<BR>Wasted space on 
 
 
 # skip flavor on FFG cards as a courtesy
-./netrunner-alt-gen netspace diversion of funds \
+./netrunner-alt-gen netwalker diversion of funds \
                     --skip-flavor
 
 # get a cropped preview
