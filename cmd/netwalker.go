@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mangofeet/netrunner-alt-gen/art/netspace"
+	"github.com/mangofeet/netrunner-alt-gen/art/netwalker"
 	"github.com/spf13/cobra"
 )
 
@@ -37,7 +37,7 @@ func generateCardNetwalker(cardName string) error {
 		nGridP = &gridPercent
 	}
 
-	ns := netspace.Netspace{
+	ns := netwalker.NetWalker{
 		MinWalkers:   walkersMin,
 		MaxWalkers:   walkersMax,
 		GridPercent:  nGridP,

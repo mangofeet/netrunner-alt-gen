@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mangofeet/netrunner-alt-gen/art/techcircle"
+	"github.com/mangofeet/netrunner-alt-gen/art/netringer"
 	"github.com/spf13/cobra"
 )
 
@@ -32,7 +32,7 @@ func generateCardNetringer(cardName string) error {
 	}
 	log.Printf("generating %s", printing.Attributes.StrippedTitle)
 
-	ns := techcircle.TechCircle{
+	ns := netringer.NetRinger{
 		Color:     parseColor(baseColor),
 		ColorBG:   parseColor(colorBG),
 		AltColor1: parseColor(altColor1),

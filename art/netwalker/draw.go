@@ -1,4 +1,4 @@
-package netspace
+package netwalker
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
-type Netspace struct {
+type NetWalker struct {
 	MinWalkers, MaxWalkers                                 int
 	GridPercent                                            *float64
 	Color, ColorBG                                         *color.RGBA
@@ -21,7 +21,7 @@ type Netspace struct {
 	GridColor1, GridColor2, GridColor3, GridColor4         *color.RGBA
 }
 
-func (drawer Netspace) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
+func (drawer NetWalker) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	seed := card.Attributes.Title + card.Attributes.Text + card.Attributes.CardTypeID + card.Attributes.FactionID + card.Attributes.Flavor
 

@@ -1,4 +1,4 @@
-package techcircle
+package netringer
 
 import (
 	"image/color"
@@ -10,12 +10,12 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
-type TechCircle struct {
+type NetRinger struct {
 	Color, ColorBG                             *color.RGBA
 	AltColor1, AltColor2, AltColor3, AltColor4 *color.RGBA
 }
 
-func (drawer TechCircle) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
+func (drawer NetRinger) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	seed := card.Attributes.Title + card.Attributes.Text + card.Attributes.CardTypeID + card.Attributes.FactionID + card.Attributes.Flavor
 
