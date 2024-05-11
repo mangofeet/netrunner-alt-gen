@@ -22,12 +22,12 @@ source <(netrunner-alt-gen completion zsh)
 
 ## Commands
 
-### `netspace`
+### `netwalker`, `netringer`, `phungus`
 
-Generate a card by running:
+Generate a card and art by running:
 
 ```
-netrunner-alt-gen netspace [card name or printing ID] [flags]
+netrunner-alt-gen [netwalker|netringer|phungus] [card name or printing ID] [flags]
 ```
 
 ### `empty`

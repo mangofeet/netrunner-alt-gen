@@ -52,8 +52,8 @@ var (
 	frameColorInfluenceLimitBG, frameColorMinDeckBG string
 
 	// netspace
-	netspaceWalkersMin, netspaceWalkersMax                 int
-	netspaceColorBG                                        string
+	walkersMin, walkersMax                                 int
+	colorBG                                                string
 	walkerColor1, walkerColor2, walkerColor3, walkerColor4 string
 	gridColor1, gridColor2, gridColor3, gridColor4         string
 	gridPercent                                            float64
@@ -96,32 +96,32 @@ If set to "faction", it will use the faction color regardless of the base color`
 Defaults to pre-defined faction colors or specified base color
 If set to "faction", it will use the faction color regardless of the base color`)
 
-	commonNetspaceFlags(netspaceCmd)
+	commonNetspaceFlags(netwalkerCmd)
 
 	imageCmd.Flags().StringVarP(&designer, "designer", "", "", `Name of the designer for the card back attribution`)
 
-	techcircleCmd.Flags().StringVarP(&altColor1, "ring-color-1", "", "", `Alternate ring color for the card, defaults to pre-defined faction color analogue +-40`)
-	techcircleCmd.Flags().StringVarP(&altColor2, "ring-color-2", "", "", `Alternate ring color for the card, defaults to pre-defined faction color analogue +-50`)
-	techcircleCmd.Flags().StringVarP(&altColor3, "ring-color-3", "", "", `Alternate ring color for the card, defaults to pre-defined faction color analogue +-60`)
-	techcircleCmd.Flags().StringVarP(&altColor4, "ring-color-4", "", "", `Alternate ring color for the card, defaults to pre-defined faction color analogue +-70`)
+	netringerCmd.Flags().StringVarP(&altColor1, "ring-color-1", "", "", `Alternate ring color for the card, defaults to pre-defined faction color analogue +-40`)
+	netringerCmd.Flags().StringVarP(&altColor2, "ring-color-2", "", "", `Alternate ring color for the card, defaults to pre-defined faction color analogue +-50`)
+	netringerCmd.Flags().StringVarP(&altColor3, "ring-color-3", "", "", `Alternate ring color for the card, defaults to pre-defined faction color analogue +-60`)
+	netringerCmd.Flags().StringVarP(&altColor4, "ring-color-4", "", "", `Alternate ring color for the card, defaults to pre-defined faction color analogue +-70`)
 
-	commonNetspaceFlags(entanglerCmd)
-	entanglerCmd.Flags().StringVarP(&altColor1, "ring-color-1", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
-	entanglerCmd.Flags().StringVarP(&altColor2, "ring-color-2", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
-	entanglerCmd.Flags().StringVarP(&altColor3, "ring-color-3", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
-	entanglerCmd.Flags().StringVarP(&altColor4, "ring-color-4", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
+	commonNetspaceFlags(phungusCmd)
+	phungusCmd.Flags().StringVarP(&altColor1, "ring-color-1", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
+	phungusCmd.Flags().StringVarP(&altColor2, "ring-color-2", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
+	phungusCmd.Flags().StringVarP(&altColor3, "ring-color-3", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
+	phungusCmd.Flags().StringVarP(&altColor4, "ring-color-4", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
 
-	rootCmd.AddCommand(netspaceCmd)
+	rootCmd.AddCommand(netwalkerCmd)
 	rootCmd.AddCommand(emptyCmd)
 	rootCmd.AddCommand(imageCmd)
-	rootCmd.AddCommand(techcircleCmd)
-	rootCmd.AddCommand(entanglerCmd)
+	rootCmd.AddCommand(netringerCmd)
+	rootCmd.AddCommand(phungusCmd)
 }
 
 func commonNetspaceFlags(cmd *cobra.Command) {
-	cmd.Flags().IntVarP(&netspaceWalkersMin, "min-walkers", "m", 3000, `Minimum amount of walkers`)
-	cmd.Flags().IntVarP(&netspaceWalkersMax, "max-walkers", "M", 10000, `Maximum amount of walkers`)
-	cmd.Flags().StringVarP(&netspaceColorBG, "color-bg", "", "", `Background color for the generated art, defaults to --base-color value`)
+	cmd.Flags().IntVarP(&walkersMin, "min-walkers", "m", 3000, `Minimum amount of walkers`)
+	cmd.Flags().IntVarP(&walkersMax, "max-walkers", "M", 10000, `Maximum amount of walkers`)
+	cmd.Flags().StringVarP(&colorBG, "color-bg", "", "", `Background color for the generated art, defaults to --base-color value`)
 	cmd.Flags().StringVarP(&walkerColor1, "walker-color-1", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue +10 - +30`)
 	cmd.Flags().StringVarP(&walkerColor2, "walker-color-2", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue -10 - -30`)
 	cmd.Flags().StringVarP(&walkerColor3, "walker-color-3", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue +30 - +50`)
