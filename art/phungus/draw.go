@@ -1,4 +1,4 @@
-package entangler
+package phungus
 
 import (
 	"fmt"
@@ -109,10 +109,10 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		ringColor4 = drawer.RingColor4
 	}
 
-	ringRadius := canvasWidth * 1.4
+	ringRadius := canvasWidth * 1.5
 	ringRadiusStart := canvasWidth * 0.01
-	ringStrokeMin := canvasWidth * 0.1
-	ringStrokeMax := canvasWidth * 0.21
+	ringStrokeMin := canvasWidth * 0.08
+	ringStrokeMax := canvasWidth * 0.18
 
 	// fill background
 	ctx.Push()
@@ -330,7 +330,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 				X:           float64(startX),
 				Y:           float64(startY),
 				Radius:      ringRadius,
-				RadiusStart: ringRadiusStart * 10,
+				RadiusStart: ringRadiusStart * 2,
 				StrokeMin:   ringStrokeMin,
 				StrokeMax:   ringStrokeMax,
 				Color:       ringColor,
@@ -360,7 +360,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		X:           float64(startX),
 		Y:           float64(startY),
 		Radius:      ringRadius,
-		RadiusStart: ringRadiusStart * 20,
+		RadiusStart: ringRadiusStart * 5,
 		StrokeMin:   ringStrokeMin,
 		StrokeMax:   ringStrokeMax,
 		Color:       ringColor,

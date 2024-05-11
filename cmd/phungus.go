@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mangofeet/netrunner-alt-gen/art/entangler"
+	"github.com/mangofeet/netrunner-alt-gen/art/phungus"
 	"github.com/spf13/cobra"
 )
 
@@ -37,7 +37,7 @@ func generateCardPhungus(cardName string) error {
 		nGridP = &gridPercent
 	}
 
-	ns := entangler.Entangler{
+	ns := phungus.Entangler{
 		MinWalkers:   walkersMin,
 		MaxWalkers:   walkersMax,
 		GridPercent:  nGridP,
