@@ -27,8 +27,8 @@ type TechRing struct {
 func (drawer TechRing) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	canvasWidth, canvasHeight := ctx.Size()
 
-	ringCnv := canvas.New(canvasWidth, canvasHeight)
-	ringCtx := canvas.NewContext(ringCnv)
+	ringBaseCnv := canvas.New(canvasWidth, canvasHeight)
+	ringBaseCtx := canvas.NewContext(ringBaseCnv)
 
 	circ := techCircleDrawer{
 		RNG:         drawer.RNG,
@@ -42,9 +42,13 @@ func (drawer TechRing) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		Angle:       drawer.Angle,
 	}
 
-	if err := circ.Draw(ringCtx); err != nil {
+	if err := circ.Draw(ringBaseCtx); err != nil {
 		return err
 	}
+	ringBaseImg := rasterizer.Draw(ringBaseCnv, canvas.DPMM(1), canvas.DefaultColorSpace)
+
+	overlayCnv := canvas.New(canvasWidth, canvasHeight)
+	overlayCtx := canvas.NewContext(ringBaseCnv)
 
 	overlayColor := color.RGBA{
 		R: 0xff,
@@ -72,10 +76,16 @@ func (drawer TechRing) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		SegmentArcMax: 15,
 	}
 
-	if err := circOverlay.Draw(ringCtx); err != nil {
+	if err := circOverlay.Draw(overlayCtx); err != nil {
 		return err
 	}
 
+	ringOverlayImg := rasterizer.Draw(overlayCnv, canvas.DPMM(1), canvas.DefaultColorSpace)
+
+	ringCnv := canvas.New(canvasWidth, canvasHeight)
+	ringCtx := canvas.NewContext(ringCnv)
+	ringCtx.RenderImage(ringBaseImg, canvas.Identity)
+	ringCtx.RenderImage(ringOverlayImg, canvas.Identity)
 	ringImg := rasterizer.Draw(ringCnv, canvas.DPMM(1), canvas.DefaultColorSpace)
 
 	maskCnv := canvas.New(canvasWidth, canvasHeight)
@@ -140,6 +150,19 @@ type circleSegment struct {
 	strokeWidth float64
 	strokeColor color.Color
 	isBlank     bool
+}
+
+func (seg circleSegment) shouldRender() bool {
+	if seg.isBlank {
+		return false
+	}
+
+	_, _, _, a := seg.strokeColor.RGBA()
+	if a == 0 { // transparent
+		return false
+	}
+
+	return true
 }
 
 type circleRing struct {
@@ -271,7 +294,7 @@ func (drawer techCircleDrawer) Draw(ctx *canvas.Context) error {
 			path := &canvas.Path{}
 			path.Arc(ring.radius, ring.radius, 0.1, seg.start, seg.end)
 
-			if !seg.isBlank {
+			if seg.shouldRender() {
 				ctx.Push()
 				ctx.SetStrokeColor(seg.strokeColor)
 				ctx.SetStrokeWidth(seg.strokeWidth)
