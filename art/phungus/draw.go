@@ -299,10 +299,11 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		walkers = append(walkers, &wlk)
 	}
 
+	ringSequence := int64(9999)
 	// rings under the walkers
-	sequence++
+	ringSequence++
 	(art.TechRing{
-		RNG:         prng.NewGenerator(seed, &sequence),
+		RNG:         prng.NewGenerator(seed, &ringSequence),
 		X:           float64(startX),
 		Y:           float64(startY),
 		Radius:      ringRadius,
@@ -324,9 +325,9 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	for i, wlk := range walkers {
 		wlk.Draw(ctx)
 		if i == (len(walkers)/4)*3 {
-			sequence++
+			ringSequence++
 			(art.TechRing{
-				RNG:         prng.NewGenerator(seed, &sequence),
+				RNG:         prng.NewGenerator(seed, &ringSequence),
 				X:           float64(startX),
 				Y:           float64(startY),
 				Radius:      ringRadius,
@@ -354,9 +355,9 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	}
 
 	// rings over the walkers
-	sequence++
+	ringSequence++
 	(art.TechRing{
-		RNG:         prng.NewGenerator(seed, &sequence),
+		RNG:         prng.NewGenerator(seed, &ringSequence),
 		X:           float64(startX),
 		Y:           float64(startY),
 		Radius:      ringRadius,
@@ -376,9 +377,9 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		OverlayColor: &canvas.Transparent,
 	}).Draw(ctx, card)
 
-	sequence++
+	ringSequence++
 	(art.TechRing{
-		RNG:          prng.NewGenerator(seed, &sequence),
+		RNG:          prng.NewGenerator(seed, &ringSequence),
 		X:            float64(startX),
 		Y:            float64(startY),
 		Radius:       canvasWidth * 0.5,
