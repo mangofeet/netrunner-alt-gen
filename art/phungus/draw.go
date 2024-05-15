@@ -210,6 +210,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		var strokeWidth = 0.3
 
 		thisColor := baseColor
+		noiseStepFactor := 0.008
 
 		thisStartX := startX
 		thisStartY := startY
@@ -218,6 +219,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			colorFactor = -2 * int64(math.Abs(float64(colorFactor)))
 			grid = true
 			strokeWidth = 1.5
+			noiseStepFactor = 0.005
 			switch rngGlobal.Next(4) {
 			case 1:
 				thisColor = gridColor1
@@ -292,9 +294,10 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 				B: uint8(math.Max(0, math.Min(float64(int64(thisColor.B)+colorFactor), 255))),
 				A: 0xff,
 			},
-			Noise:       noise,
-			Grid:        grid,
-			StrokeWidth: strokeWidth,
+			Noise:           noise,
+			NoiseStepFactor: noiseStepFactor,
+			Grid:            grid,
+			StrokeWidth:     strokeWidth,
 		}
 		walkers = append(walkers, &wlk)
 	}
