@@ -11,7 +11,7 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
-const noiseStepFactor = 0.005
+const defaultNoiseStepFactor = 0.005
 
 type point struct {
 	x, y float64
@@ -24,6 +24,7 @@ type Walker struct {
 	X, Y, Vx, Vy                float64
 	Color                       color.Color
 	Noise                       opensimplex.Noise
+	NoiseStepFactor             float64
 	Grid                        bool
 	StrokeWidth                 float64
 	stepCount                   int
@@ -65,8 +66,13 @@ func (wlk Walker) drawLine(ctx *canvas.Context, x1, y1, x2, y2 float64) {
 }
 
 func (wlk *Walker) Velocity() {
-	deltaX := wlk.Noise.Eval3(wlk.X*noiseStepFactor, wlk.Y*noiseStepFactor, float64(wlk.stepCount*int(wlk.RNG.Sequence()+1)))
-	deltaY := wlk.Noise.Eval3(wlk.Y*noiseStepFactor, wlk.X*noiseStepFactor, float64(wlk.stepCount*int(wlk.RNG.Sequence()+1)))
+
+	if wlk.NoiseStepFactor == 0 {
+		wlk.NoiseStepFactor = defaultNoiseStepFactor
+	}
+
+	deltaX := wlk.Noise.Eval3(wlk.X*wlk.NoiseStepFactor, wlk.Y*wlk.NoiseStepFactor, float64(wlk.stepCount*int(wlk.RNG.Sequence()+1)))
+	deltaY := wlk.Noise.Eval3(wlk.Y*wlk.NoiseStepFactor, wlk.X*wlk.NoiseStepFactor, float64(wlk.stepCount*int(wlk.RNG.Sequence()+1)))
 
 	switch strings.ToLower(wlk.Direction) {
 	case "down":
