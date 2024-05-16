@@ -106,7 +106,8 @@ func (drawer NetWalker) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		nGrid = float64(numWalkers) * *drawer.GridPercent
 	}
 
-	dirChangeStep := 30.0
+	dirChangeStep := 45.0
+	dirChangeStepMod := 3.0
 
 	// do manual seeds for these with high numbers so they didn't
 	// affect the walkers
@@ -177,6 +178,8 @@ func (drawer NetWalker) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		var strokeWidth = 0.3
 
 		thisColor := baseColor
+		vxBase := float64(rngGlobal.Next(3)) - 1.5
+		vyBase := float64(rngGlobal.Next(3)) - 1.5
 
 		if float64(i) < nGrid {
 			colorFactor = -2 * int64(math.Abs(float64(colorFactor)))
@@ -199,15 +202,24 @@ func (drawer NetWalker) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		} else {
 
 			dirSeed := rngGlobal.Next(4)
+			oppositeVBaseFactor := 2.0
 
 			if dirSeed <= 1 {
 				direction = "up"
+				vyBase = math.Abs(vyBase)
+				vxBase *= oppositeVBaseFactor
 			} else if dirSeed <= 2 {
 				direction = "down"
+				vyBase = math.Abs(vyBase) * -1
+				vxBase *= oppositeVBaseFactor
 			} else if dirSeed <= 3 {
 				direction = "left"
+				vxBase = math.Abs(vxBase) * -1
+				vyBase *= oppositeVBaseFactor
 			} else if dirSeed <= 4 {
 				direction = "right"
+				vxBase = math.Abs(vxBase)
+				vyBase *= oppositeVBaseFactor
 			}
 			switch direction {
 			case altColorDirection1:
@@ -219,28 +231,41 @@ func (drawer NetWalker) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			case altColorDirection4:
 				thisColor = walkerColor4
 			}
+
+			switch rngGlobal.Next(8) {
+			case 1:
+				thisColor = walkerColor1
+			case 2:
+				thisColor = walkerColor2
+			case 3:
+				thisColor = walkerColor3
+			case 4:
+				thisColor = walkerColor4
+			}
 		}
 
 		sequence := int64(i)
 
 		wlk := art.Walker{
-			RNG:                 prng.NewGenerator(seed, &sequence),
-			Direction:           direction,
-			DirectionVariance:   rngGlobal.Next(4),
-			DirectionChangeStep: dirChangeStep,
-			X:                   float64(startX),
-			Y:                   float64(startY),
-			Vx:                  (float64(rngGlobal.Next(100)) / 100) - 0.5,
-			Vy:                  (float64(rngGlobal.Next(100)) / 100) - 0.5,
+			RNG:                         prng.NewGenerator(seed, &sequence),
+			Direction:                   direction,
+			DirectionVariance:           2,
+			DirectionChangeStep:         dirChangeStep,
+			DirectionChangeStepModifier: dirChangeStepMod,
+			X:                           float64(startX),
+			Y:                           float64(startY),
+			Vx:                          vxBase + (float64(rngGlobal.Next(20)) / 100) - 0.1,
+			Vy:                          vyBase + (float64(rngGlobal.Next(20)) / 100) - 0.1,
 			Color: color.RGBA{
 				R: uint8(math.Max(0, math.Min(float64(int64(thisColor.R)+colorFactor), 255))),
 				G: uint8(math.Max(0, math.Min(float64(int64(thisColor.G)+colorFactor), 255))),
 				B: uint8(math.Max(0, math.Min(float64(int64(thisColor.B)+colorFactor), 255))),
 				A: 0xff,
 			},
-			Noise:       noise,
-			Grid:        grid,
-			StrokeWidth: strokeWidth,
+			Noise:           noise,
+			NoiseStepFactor: 0.005,
+			Grid:            grid,
+			StrokeWidth:     strokeWidth,
 		}
 		walkers = append(walkers, &wlk)
 	}
