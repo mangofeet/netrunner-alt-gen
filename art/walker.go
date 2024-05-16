@@ -71,8 +71,11 @@ func (wlk *Walker) Velocity() {
 		wlk.NoiseStepFactor = defaultNoiseStepFactor
 	}
 
-	deltaX := wlk.Noise.Eval3(wlk.X*wlk.NoiseStepFactor, wlk.Y*wlk.NoiseStepFactor, float64(wlk.stepCount*int(wlk.RNG.Sequence()+1)))
-	deltaY := wlk.Noise.Eval3(wlk.Y*wlk.NoiseStepFactor, wlk.X*wlk.NoiseStepFactor, float64(wlk.stepCount*int(wlk.RNG.Sequence()+1)))
+	// deltaX := wlk.Noise.Eval3(wlk.X*wlk.NoiseStepFactor, wlk.Y*wlk.NoiseStepFactor, float64(wlk.stepCount*int(wlk.RNG.Sequence()+1)))
+	// deltaY := wlk.Noise.Eval3(wlk.Y*wlk.NoiseStepFactor, wlk.X*wlk.NoiseStepFactor, float64(wlk.stepCount*int(wlk.RNG.Sequence()+1)))
+
+	deltaX := wlk.Noise.Eval2(wlk.X*wlk.NoiseStepFactor, wlk.Y*wlk.NoiseStepFactor)
+	deltaY := wlk.Noise.Eval2(wlk.Y*wlk.NoiseStepFactor, wlk.X*wlk.NoiseStepFactor)
 
 	switch strings.ToLower(wlk.Direction) {
 	case "down":
