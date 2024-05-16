@@ -64,7 +64,7 @@ func (fb FrameBasic) Agenda() art.Drawer {
 		// pixel/mm setup I'm using, but these work
 		fontSizeTitle := titleBoxHeight * 2
 		fontSizeCost := titleBoxHeight * 3
-		fontSizeCard := titleBoxHeight * 1.2
+		fontSizeCard := titleBoxHeight * 1.5
 
 		fb.drawAgendaPoints(ctx, card, fontSizeCost)
 

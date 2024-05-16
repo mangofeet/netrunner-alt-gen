@@ -57,7 +57,7 @@ func (fb FrameBasic) Upgrade() art.Drawer {
 		// not sure how these sizes actually correlate to the weird
 		// pixel/mm setup I'm using, but these work
 		fontSizeTitle := titleBoxHeight * 2
-		fontSizeCard := titleBoxHeight * 1.2
+		fontSizeCard := titleBoxHeight * 1.5
 
 		titleTextX := titleBoxLeftIn
 		if card.Attributes.IsUnique { // unique diamon fits better in the angled end here

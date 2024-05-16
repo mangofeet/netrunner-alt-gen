@@ -128,7 +128,7 @@ func (fb FrameBasic) Ice() art.Drawer {
 
 		fontSizeTitle := titleBoxHeight * 2
 		fontSizeStr := titleBoxHeight * 4
-		fontSizeCard := titleBoxHeight * 1.2
+		fontSizeCard := titleBoxHeight * 1.5
 
 		titleTextX := titleBoxLeft + titleBoxHeight*0.3
 		titleTextY := titleBoxTop - titleBoxHeight*0.1

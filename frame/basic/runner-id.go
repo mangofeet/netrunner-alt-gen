@@ -86,7 +86,7 @@ func (fb FrameBasic) RunnerID() art.Drawer {
 		// pixel/mm setup I'm using, but these work
 		fontSizeTitle := titleBoxHeight * 2
 		fontSizeSubtitle := fontSizeTitle * subtitleFactor
-		fontSizeCard := titleBoxHeight * 1.2
+		fontSizeCard := titleBoxHeight * 1.5
 
 		factionBubbleWidth := (titleBoxHeight + subtitleBoxHeight)
 		factionBubbleX := canvasWidth * 0.85
