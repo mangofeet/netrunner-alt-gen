@@ -311,6 +311,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 			},
 			Noise:           noise,
 			NoiseStepFactor: noiseStepFactor,
+			NoiseDimensions: 3,
 			Grid:            grid,
 			StrokeWidth:     strokeWidth,
 		}
