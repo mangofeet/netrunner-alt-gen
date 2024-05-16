@@ -209,7 +209,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 		var direction string
 		var grid = false
-		var strokeWidth = 0.8
+		var strokeWidth = 0.2
 
 		thisColor := baseColor
 		noiseStepFactor := 0.008
