@@ -157,8 +157,7 @@ func (seg circleSegment) shouldRender() bool {
 		return false
 	}
 
-	_, _, _, a := seg.strokeColor.RGBA()
-	if a == 0 { // transparent
+	if _, _, _, a := seg.strokeColor.RGBA(); a == 0 {
 		return false
 	}
 
