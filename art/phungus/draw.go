@@ -32,8 +32,8 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	numWalkers := int(math.Max(float64(drawer.MinWalkers), float64(rngGlobal.Next(int64(drawer.MaxWalkers)))))
 
-	startX := rngGlobal.Next(int64(canvasWidth/2)) + int64(canvasWidth/4)
-	startY := rngGlobal.Next(int64(canvasHeight/6)) + (int64(canvasHeight/8) * 5)
+	startX := rngGlobal.Next(int64(canvasWidth/4)) + int64(canvasWidth/8)*3
+	startY := rngGlobal.Next(int64(canvasHeight/6)) + (int64(canvasHeight / 2))
 
 	if card.Attributes.CardTypeID == "ice" {
 		startY = rngGlobal.Next(int64(canvasHeight/4)) + (int64(canvasHeight / 6))
@@ -207,7 +207,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 		var direction string
 		var grid = false
-		var strokeWidth = 0.3
+		var strokeWidth = 0.4
 
 		thisColor := baseColor
 		noiseStepFactor := 0.008
@@ -278,16 +278,21 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 		sequence = int64(i)
 
+		vxBase := float64(rngGlobal.Next(10)) - 5
+		vyBase := float64(rngGlobal.Next(10)) - 5
+
 		wlk := art.Walker{
 			RNG:                         prng.NewGenerator(seed, &sequence),
 			Direction:                   direction,
-			DirectionVariance:           2,
+			DirectionVariance:           4,
 			DirectionChangeStep:         dirChangeStep,
 			DirectionChangeStepModifier: 1.5,
 			X:                           float64(thisStartX),
 			Y:                           float64(thisStartY),
-			Vx:                          (float64(rngGlobal.Next(100)) / 100) - 0.5,
-			Vy:                          (float64(rngGlobal.Next(100)) / 100) - 0.5,
+			Vx:                          vxBase + (float64(rngGlobal.Next(20)) / 100) - 0.1,
+			Vy:                          vyBase + (float64(rngGlobal.Next(20)) / 100) - 0.1,
+			// Vx:                          (float64(rngGlobal.Next(100)) / 100) - 0.5,
+			// Vy:                          (float64(rngGlobal.Next(100)) / 100) - 0.5,
 			Color: color.RGBA{
 				R: uint8(math.Max(0, math.Min(float64(int64(thisColor.R)+colorFactor), 255))),
 				G: uint8(math.Max(0, math.Min(float64(int64(thisColor.G)+colorFactor), 255))),
