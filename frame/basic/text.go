@@ -353,7 +353,7 @@ func (fb FrameBasic) drawTypeText(ctx *canvas.Context, card *nrdb.Printing, font
 	h := box.height
 	box.top = box.bottom + box.height
 
-	typeText := fb.getTypeText(card, fontSize, w, h, box.align)
+	typeText := fb.getTypeText(ctx, card, fontSize, w, h, box.align)
 
 	x := box.left + paddingLR
 	y := box.top - (box.height-(typeText.Bounds().H))*0.5
@@ -362,14 +362,14 @@ func (fb FrameBasic) drawTypeText(ctx *canvas.Context, card *nrdb.Printing, font
 
 }
 
-func (fb FrameBasic) getTypeText(card *nrdb.Printing, fontSize, w, h float64, align canvas.TextAlign) *canvas.Text {
+func (fb FrameBasic) getTypeText(ctx *canvas.Context, card *nrdb.Printing, fontSize, w, h float64, align canvas.TextAlign) *canvas.Text {
 	var tText *canvas.Text
 	typeName := getTypeName(card.Attributes.CardTypeID)
 
 	if card.Attributes.DisplaySubtypes != nil {
-		tText = fb.getCardText(fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSize, w, h, align)
+		tText = fb.getFittedText(ctx, fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSize, w, h, align)
 	} else {
-		tText = fb.getCardText(fmt.Sprintf("<strong>%s</strong>", typeName), fontSize, w, h, align)
+		tText = fb.getFittedText(ctx, fmt.Sprintf("<strong>%s</strong>", typeName), fontSize, w, h, align)
 	}
 
 	return tText

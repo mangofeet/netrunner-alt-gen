@@ -161,7 +161,7 @@ func (fb FrameBasic) Ice() art.Drawer {
 		ctx.Push()
 		ctx.Rotate(90)
 
-		typeText := fb.getTypeText(card, fontSizeCard, typeBoxTop-typeBoxWidth*0.3, typeBoxWidth, canvas.Right)
+		typeText := fb.getTypeText(ctx, card, fontSizeCard, typeBoxTop-typeBoxWidth*0.3, typeBoxWidth, canvas.Right)
 		ctx.DrawText(typeBoxLeft+typeBoxWidth*0.16, 0, typeText)
 
 		ctx.Pop()
