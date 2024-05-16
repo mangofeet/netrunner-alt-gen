@@ -139,7 +139,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	// dirChangeStep := 10.0
 	// dirChangeStepMod := 2.0
-	dirChangeStep := 45.0
+	dirChangeStep := 10.0
 	dirChangeStepMod := 1.5
 
 	// do manual seeds for these with high numbers so they didn't

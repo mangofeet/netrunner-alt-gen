@@ -148,7 +148,7 @@ func (wlk *Walker) maybeChangeDirection() {
 	if wlk.DirectionVariance <= 0 {
 		wlk.DirectionVariance = 1
 	}
-	switch wlk.RNG.Sample(int64(wlk.stepCount), wlk.DirectionVariance) {
+	switch wlk.RNG.Next(wlk.DirectionVariance) {
 	case 1:
 		wlk.shiftRight()
 	case 2:
