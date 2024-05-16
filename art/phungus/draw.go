@@ -137,8 +137,10 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		nGrid = float64(numWalkers) * *drawer.GridPercent
 	}
 
+	// dirChangeStep := 10.0
+	// dirChangeStepMod := 2.0
 	dirChangeStep := 45.0
-	// dirChangeStep := float64(rngGlobal.Next(15) + 40)
+	dirChangeStepMod := 1.5
 
 	// do manual seeds for these with high numbers so they didn't
 	// affect the walkers
@@ -207,13 +209,15 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 		var direction string
 		var grid = false
-		var strokeWidth = 0.4
+		var strokeWidth = 0.8
 
 		thisColor := baseColor
 		noiseStepFactor := 0.008
 
 		thisStartX := startX
 		thisStartY := startY
+		vxBase := float64(rngGlobal.Next(3)) - 1.5
+		vyBase := float64(rngGlobal.Next(3)) - 1.5
 
 		if float64(i) < nGrid {
 			colorFactor = -2 * int64(math.Abs(float64(colorFactor)))
@@ -237,18 +241,27 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		} else {
 
 			dirSeed := rngGlobal.Next(4)
+			oppositeVBaseFactor := 2.0
 
 			if dirSeed <= 1 {
 				direction = "up"
+				vyBase = math.Abs(vyBase)
+				vxBase *= oppositeVBaseFactor
 				// thisStartY -= int64(ringRadiusStart)
 			} else if dirSeed <= 2 {
 				direction = "down"
+				vyBase = math.Abs(vyBase) * -1
+				vxBase *= oppositeVBaseFactor
 				// thisStartY += int64(ringRadiusStart)
 			} else if dirSeed <= 3 {
 				direction = "left"
+				vxBase = math.Abs(vxBase) * -1
+				vyBase *= oppositeVBaseFactor
 				// thisStartX += int64(ringRadiusStart)
 			} else if dirSeed <= 4 {
 				direction = "right"
+				vxBase = math.Abs(vxBase)
+				vyBase *= oppositeVBaseFactor
 				// thisStartX -= int64(ringRadiusStart)
 			}
 
@@ -278,15 +291,12 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 		sequence = int64(i)
 
-		vxBase := float64(rngGlobal.Next(10)) - 5
-		vyBase := float64(rngGlobal.Next(10)) - 5
-
 		wlk := art.Walker{
 			RNG:                         prng.NewGenerator(seed, &sequence),
 			Direction:                   direction,
-			DirectionVariance:           4,
+			DirectionVariance:           2,
 			DirectionChangeStep:         dirChangeStep,
-			DirectionChangeStepModifier: 1.5,
+			DirectionChangeStepModifier: dirChangeStepMod,
 			X:                           float64(thisStartX),
 			Y:                           float64(thisStartY),
 			Vx:                          vxBase + (float64(rngGlobal.Next(20)) / 100) - 0.1,
