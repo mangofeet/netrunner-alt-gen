@@ -16,17 +16,24 @@ func (fb FrameBasic) Back() art.Drawer {
 
 		canvasWidth, canvasHeight := ctx.Size()
 
-		attributionBoxTop := canvasHeight * 0.12
+		attributionBoxTop := canvasHeight * 0.9409
 		// attributionBoxBottom := canvasHeight * 0.032
-		attributionBoxBottom := canvasHeight * 0.0591
+		attributionBoxBottom := canvasHeight * 0.88
 		attributionBoxHeight := attributionBoxTop - attributionBoxBottom
 		attributionBoxLeft := canvasWidth * 0.25
 		attributionBoxRight := canvasWidth * 0.75
 		attributionBoxRadius := canvasWidth * 0.01
 
+		cliBoxTop := canvasHeight * 0.12
+		cliBoxBottom := canvasHeight * 0.0591
+		cliBoxHeight := cliBoxTop - cliBoxBottom
+		cliBoxLeft := canvasWidth * 0.1
+		cliBoxRight := canvasWidth * 0.9
+		cliBoxRadius := canvasWidth * 0.01
+
 		fb.drawRoundedBox(ctx, attributionBoxTop, attributionBoxBottom, attributionBoxLeft, attributionBoxRight, attributionBoxRadius)
 
-		fb.drawRoundedBox(ctx, canvasHeight, 0, canvasWidth*0.919, canvasWidth, attributionBoxRadius)
+		fb.drawRoundedBox(ctx, cliBoxTop, cliBoxBottom, cliBoxLeft, cliBoxRight, cliBoxRadius)
 
 		attributionFontSize := attributionBoxHeight * 0.6
 		attributionTextMaxWidth := (attributionBoxRight - attributionBoxLeft) * 0.9
@@ -46,19 +53,16 @@ func (fb FrameBasic) Back() art.Drawer {
 		attributionTextY := (attributionBoxTop - (attributionBoxHeight-attributionText.Bounds().H)*0.5)
 		ctx.DrawText(attributionTextX, attributionTextY, attributionText)
 
-		cliFontSize := attributionBoxHeight
-		cliTextMaxWidth := (canvasHeight * 1.0)
-		// cliString := strings.Join(os.Args, " ")
+		cliFontSize := cliBoxHeight * 0.6
+		cliTextMaxWidth := (cliBoxRight - cliBoxLeft) * 0.9
+		cliTextMaxHeight := (cliBoxTop - cliBoxBottom) * 0.9
 		cliString := getCLIText()
 
-		cliText := fb.getFittedText(ctx, cliString, cliFontSize, cliTextMaxWidth, 0, canvas.Center)
-		cliTextX := (canvasWidth * 0.937) - (cliText.Height / 2)
-		cliTextY := 0.0
+		cliText := fb.getVerticalFittedText(ctx, cliString, cliFontSize, cliTextMaxWidth, cliTextMaxHeight, canvas.Center)
 
-		ctx.Push()
-		ctx.Rotate(90)
+		cliTextX := cliBoxLeft + ((cliBoxRight - cliBoxLeft) * 0.05)
+		cliTextY := (cliBoxTop - (cliBoxHeight-cliText.Bounds().H)*0.5)
 		ctx.DrawText(cliTextX, cliTextY, cliText)
-		ctx.Pop()
 
 		return nil
 	})
