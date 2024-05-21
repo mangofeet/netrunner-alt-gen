@@ -17,18 +17,8 @@ func (fb FrameBasic) Back() art.Drawer {
 
 		canvasWidth, canvasHeight := ctx.Size()
 
-		attributionBoxTop := canvasHeight * 0.12
-		attributionBoxBottom := canvasHeight * 0.0591
-		attributionBoxHeight := attributionBoxTop - attributionBoxBottom
-		// attributionBoxLeft := canvasWidth * 0.25
-		// attributionBoxRight := canvasWidth * 0.75
-		// attributionBoxRadius := canvasWidth * 0.01
-
-		// fb.drawRoundedBox(ctx, attributionBoxTop, attributionBoxBottom, attributionBoxLeft, attributionBoxRight, attributionBoxRadius)
-
-		attributionFontSize := attributionBoxHeight * 0.8
-		// attributionTextMaxWidth := (attributionBoxRight - attributionBoxLeft) * 0.9
-		attributionTextMaxHeight := (attributionBoxTop - attributionBoxBottom) * 0.9
+		attributionFontSize := canvasHeight * 0.048
+		attributionTextMaxHeight := canvasHeight * 0.06481
 
 		attributionString := fmt.Sprintf("%s<BR>Generated using \"%s\" by %s<BR>netrunner-alt-gen %s", card.Attributes.Title, fb.Algorithm, fb.Designer, fb.Version)
 
@@ -39,11 +29,7 @@ func (fb FrameBasic) Back() art.Drawer {
 			attributionString = fmt.Sprintf("%s<BR>Design by %s<BR>Layout by netrunner-alt-gen %s", card.Attributes.Title, fb.Designer, fb.Version)
 		}
 
-		// attributionTextX := attributionBoxLeft + ((attributionBoxRight - attributionBoxLeft) * 0.05)
-		// attributionTextY := (attributionBoxTop - (attributionBoxHeight-attributionText.Bounds().H)*0.5)
-		// ctx.DrawText(attributionTextX, attributionTextY, attributionText)
-
-		cliFontSize := attributionFontSize * 0.8
+		cliFontSize := attributionFontSize * 0.9
 		cliTextMaxHeight := canvasHeight * 0.7
 		cliString := getCLIText()
 
