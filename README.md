@@ -30,6 +30,10 @@ Generate a card and art by running:
 netrunner-alt-gen [netwalker|netringer|phungus] [card name or printing ID] [flags]
 ```
 
+Note: The `phungus` generator was designed specifically for "Physarum
+Entangler", it will actually fail to generate on some other
+cards. This is an issue with the upstream 2d rendering libarary.
+
 ### `empty`
 
 Generate a card frame by running:
