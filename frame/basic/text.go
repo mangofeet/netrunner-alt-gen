@@ -63,6 +63,23 @@ func (fb FrameBasic) getFittedText(ctx *canvas.Context, title string, fontSize, 
 	return text
 }
 
+func (fb FrameBasic) getVerticalFittedText(ctx *canvas.Context, title string, fontSize, width, maxHeight float64, align canvas.TextAlign) *canvas.Text {
+
+	text := fb.getCardText(title, fontSize, width, maxHeight*2, align)
+
+	strokeWidth := getStrokeWidth(ctx)
+
+	for text.Bounds().H > maxHeight {
+		fontSize -= strokeWidth
+		text = fb.getCardText(title, fontSize, width, maxHeight*2, align)
+	}
+
+	// get it a final time to get the width correct
+	text = fb.getCardText(title, fontSize, width, maxHeight, align)
+
+	return text
+}
+
 func (fb FrameBasic) getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64, align canvas.TextAlign) *canvas.Text {
 
 	regFace := fb.getFont(fontSize, canvas.FontRegular)
