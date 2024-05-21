@@ -138,6 +138,13 @@ func getCLIText() string {
 
 		if arg[0] != '-' {
 			isFlag = false
+			if strings.Contains(arg, " ") {
+				if strings.Contains(arg, `"`) {
+					arg = "'" + arg + "'"
+				} else {
+					arg = `"` + arg + `"`
+				}
+			}
 			args = append(args, thisOpt+" "+arg)
 		} else {
 			thisOpt = arg
