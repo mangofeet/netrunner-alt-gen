@@ -2,6 +2,7 @@ package basic
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"strings"
 
@@ -16,25 +17,17 @@ func (fb FrameBasic) Back() art.Drawer {
 
 		canvasWidth, canvasHeight := ctx.Size()
 
-		attributionBoxTop := canvasHeight * 0.9409
-		// attributionBoxBottom := canvasHeight * 0.032
-		attributionBoxBottom := canvasHeight * 0.87
+		attributionBoxTop := canvasHeight * 0.12
+		attributionBoxBottom := canvasHeight * 0.0591
 		attributionBoxHeight := attributionBoxTop - attributionBoxBottom
-		attributionBoxLeft := canvasWidth * 0.25
-		attributionBoxRight := canvasWidth * 0.75
-		attributionBoxRadius := canvasWidth * 0.01
+		// attributionBoxLeft := canvasWidth * 0.25
+		// attributionBoxRight := canvasWidth * 0.75
+		// attributionBoxRadius := canvasWidth * 0.01
 
-		cliBoxTop := canvasHeight * 0.16
-		cliBoxBottom := canvasHeight * 0.0591
-		cliBoxHeight := cliBoxTop - cliBoxBottom
-		cliBoxLeft := canvasWidth * 0.1
-		cliBoxRight := canvasWidth * 0.9
-		cliBoxRadius := canvasWidth * 0.01
+		// fb.drawRoundedBox(ctx, attributionBoxTop, attributionBoxBottom, attributionBoxLeft, attributionBoxRight, attributionBoxRadius)
 
-		fb.drawRoundedBox(ctx, attributionBoxTop, attributionBoxBottom, attributionBoxLeft, attributionBoxRight, attributionBoxRadius)
-
-		attributionFontSize := attributionBoxHeight * 0.6
-		attributionTextMaxWidth := (attributionBoxRight - attributionBoxLeft) * 0.9
+		attributionFontSize := attributionBoxHeight * 0.8
+		// attributionTextMaxWidth := (attributionBoxRight - attributionBoxLeft) * 0.9
 		attributionTextMaxHeight := (attributionBoxTop - attributionBoxBottom) * 0.9
 
 		attributionString := fmt.Sprintf("%s<BR>Generated using \"%s\" by %s<BR>netrunner-alt-gen %s", card.Attributes.Title, fb.Algorithm, fb.Designer, fb.Version)
@@ -46,26 +39,43 @@ func (fb FrameBasic) Back() art.Drawer {
 			attributionString = fmt.Sprintf("%s<BR>Design by %s<BR>Layout by netrunner-alt-gen %s", card.Attributes.Title, fb.Designer, fb.Version)
 		}
 
-		attributionText := fb.getVerticalFittedText(ctx, attributionString, attributionFontSize, attributionTextMaxWidth, attributionTextMaxHeight, canvas.Center)
+		// attributionTextX := attributionBoxLeft + ((attributionBoxRight - attributionBoxLeft) * 0.05)
+		// attributionTextY := (attributionBoxTop - (attributionBoxHeight-attributionText.Bounds().H)*0.5)
+		// ctx.DrawText(attributionTextX, attributionTextY, attributionText)
 
-		attributionTextX := attributionBoxLeft + ((attributionBoxRight - attributionBoxLeft) * 0.05)
-		attributionTextY := (attributionBoxTop - (attributionBoxHeight-attributionText.Bounds().H)*0.5)
-		ctx.DrawText(attributionTextX, attributionTextY, attributionText)
-
-		cliFontSize := cliBoxHeight * 0.6
-		cliTextMaxWidth := (cliBoxRight - cliBoxLeft) * 0.9
-		cliTextMaxHeight := (cliBoxTop - cliBoxBottom) * 0.9
+		cliFontSize := attributionFontSize * 0.8
+		cliTextMaxHeight := canvasHeight * 0.7
 		cliString := getCLIText()
 
-		cliText := fb.getVerticalFittedText(ctx, cliString, cliFontSize, cliTextMaxWidth, cliTextMaxHeight, canvas.Center)
+		attributionText := fb.getVerticalFittedText(ctx, attributionString, attributionFontSize, 0, attributionTextMaxHeight, canvas.Center)
+		cliText := fb.getVerticalFittedText(ctx, cliString, cliFontSize, 0, cliTextMaxHeight, canvas.Left)
 
-		cliTextX := cliBoxLeft + ((cliBoxRight - cliBoxLeft) * 0.05)
-		cliTextY := (cliBoxTop - (cliBoxHeight-cliText.Bounds().H)*0.5)
-
-		if len(cliString) > 0 {
-			fb.drawRoundedBox(ctx, cliBoxTop, cliBoxBottom, cliBoxLeft, cliBoxRight, cliBoxRadius)
-			ctx.DrawText(cliTextX, cliTextY, cliText)
+		cliBoxWidth := math.Max(cliText.Bounds().W, attributionText.Bounds().W) * 1.1
+		cliBoxHeight := cliText.Bounds().H + (attributionText.Bounds().H)
+		cliBoxMarginTB := attributionText.Bounds().H * 0.2
+		if len(cliString) == 0 {
+			cliBoxHeight += cliBoxMarginTB * 2
+		} else {
+			cliBoxHeight += cliBoxMarginTB * 3
 		}
+
+		cliBoxBottom := canvasHeight * 0.0591
+		cliBoxTop := cliBoxBottom + cliBoxHeight
+		cliBoxRight := (canvasWidth / 2) + cliBoxWidth*0.5
+		cliBoxLeft := (canvasWidth / 2) - cliBoxWidth*0.5
+		cliBoxRadius := canvasWidth * 0.01
+		cliBoxMiddle := cliBoxLeft + cliBoxWidth*0.5
+
+		attributionTextX := cliBoxMiddle
+		attributionTextY := cliBoxTop - cliBoxMarginTB
+
+		cliTextX := cliBoxMiddle - (cliText.Bounds().W)*0.5
+		cliTextY := cliBoxBottom + cliText.Bounds().H + cliBoxMarginTB
+
+		fb.drawRoundedBox(ctx, cliBoxTop, cliBoxBottom, cliBoxLeft, cliBoxRight, cliBoxRadius)
+
+		ctx.DrawText(attributionTextX, attributionTextY, attributionText)
+		ctx.DrawText(cliTextX, cliTextY, cliText)
 
 		return nil
 	})
@@ -99,17 +109,21 @@ func getCLIText() string {
 	var args []string
 
 	var isFlag bool
+	var thisOpt string
 	for _, arg := range os.Args {
 
 		if len(arg) < 1 {
+			thisOpt = ""
 			continue
 		}
 
 		if arg == "-o" {
+			thisOpt = ""
 			continue
 		}
 
 		if arg == "--make-back" {
+			thisOpt = ""
 			continue
 		}
 
@@ -118,16 +132,18 @@ func getCLIText() string {
 		}
 
 		if !isFlag {
+			thisOpt = ""
 			continue
 		}
 
-		args = append(args, arg)
-
 		if arg[0] != '-' {
 			isFlag = false
+			args = append(args, thisOpt+" "+arg)
+		} else {
+			thisOpt = arg
 		}
 
 	}
 
-	return strings.Join(args, " ")
+	return strings.Join(args, "<BR>")
 }
