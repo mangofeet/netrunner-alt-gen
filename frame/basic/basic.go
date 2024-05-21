@@ -14,6 +14,7 @@ type FrameBasic struct {
 	Designer, Version, Algorithm string
 
 	ColorBG, ColorBorder, ColorText,
+	ColorTextStrength, ColorInfluencePips,
 	ColorInfluenceLimitBG, ColorMinDeckBG,
 	ColorInfluenceBG, ColorStrengthBG, ColorFactionBG *color.RGBA
 }
@@ -54,6 +55,20 @@ func (fb FrameBasic) getColorBorder() color.RGBA {
 	}
 
 	return colorDefaultText
+}
+
+func (fb FrameBasic) getColorTextStrength() color.RGBA {
+	if fb.ColorTextStrength != nil {
+		return *fb.ColorTextStrength
+	}
+	return fb.getColorText()
+}
+
+func (fb FrameBasic) getColorInfluencePips() color.RGBA {
+	if fb.ColorInfluencePips != nil {
+		return *fb.ColorInfluencePips
+	}
+	return fb.getColorText()
 }
 
 func (fb FrameBasic) getColorText() color.RGBA {

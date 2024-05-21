@@ -32,8 +32,10 @@ func getFramer(card *nrdb.Printing, algorithm, designer string) (art.Drawer, err
 		ColorText:             parseColor(frameColorText),
 		ColorInfluenceBG:      parseColorInstruction(frameColorInfluenceBG, card),
 		ColorStrengthBG:       parseColorInstruction(frameColorStrengthBG, card),
+		ColorTextStrength:     parseColor(frameColorTextStrength),
 		ColorFactionBG:        parseColor(frameColorFactionBG),
 		ColorInfluenceLimitBG: parseColor(frameColorInfluenceLimitBG),
+		ColorInfluencePips:    parseColor(frameColorInfluencePips),
 		ColorMinDeckBG:        parseColorInstruction(frameColorMinDeckBG, card),
 	}
 

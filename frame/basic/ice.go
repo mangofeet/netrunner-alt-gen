@@ -145,7 +145,7 @@ func (fb FrameBasic) Ice() art.Drawer {
 		ctx.Push()
 		ctx.Rotate(90)
 		ctx.DrawText(strTextX, strTextY, canvas.NewTextBox(
-			fb.getFont(fontSizeStr, canvas.FontBlack), strengthText,
+			fb.getFontWithColor(fontSizeStr, canvas.FontBlack, fb.getColorTextStrength()), strengthText,
 			canvasWidth/5, 0,
 			canvas.Center, canvas.Center, 0, 0))
 		ctx.Pop()

@@ -1,6 +1,7 @@
 package basic
 
 import (
+	"image/color"
 	"io"
 	"log"
 
@@ -59,4 +60,8 @@ func loadFont(name, backup string, style canvas.FontStyle) error {
 
 func (fb FrameBasic) getFont(size float64, style canvas.FontStyle) *canvas.FontFace {
 	return fontFamily.Face(size, fb.getColorText(), style)
+}
+
+func (fb FrameBasic) getFontWithColor(size float64, style canvas.FontStyle, clr color.Color) *canvas.FontFace {
+	return fontFamily.Face(size, clr, style)
 }

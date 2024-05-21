@@ -48,6 +48,7 @@ var (
 	textBoxFactor                                         float64
 
 	frame, frameColorBackground, frameColorBorder, frameColorText,
+	frameColorTextStrength, frameColorInfluencePips,
 	frameColorInfluenceBG, frameColorStrengthBG, frameColorFactionBG,
 	frameColorInfluenceLimitBG, frameColorMinDeckBG string
 
@@ -80,6 +81,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&frameColorBackground, "frame-color-background", "", "1c1c1c99", `Background color for frame text boxes`)
 	rootCmd.PersistentFlags().StringVarP(&frameColorBorder, "frame-color-border", "", "dcdccc", `Border color for frame text boxes`)
 	rootCmd.PersistentFlags().StringVarP(&frameColorText, "frame-color-text", "", "dcdccc", `Text color for frame text boxes`)
+	rootCmd.PersistentFlags().StringVarP(&frameColorTextStrength, "frame-color-text-strength", "", "", `Text color for frame strength text, defaults to --frame-color-text`)
+	rootCmd.PersistentFlags().StringVarP(&frameColorInfluencePips, "frame-color-influence-pips", "", "", `Text color for frame influence pips, defaults to --frame-color-text`)
 	rootCmd.PersistentFlags().StringVarP(&frameColorFactionBG, "frame-color-faction-bg", "", "1c1c1c", `Background color for the faction symbol`)
 	rootCmd.PersistentFlags().StringVarP(&frameColorInfluenceBG, "frame-color-influence-bg", "", "",
 		`Background color for the influence cost indicator

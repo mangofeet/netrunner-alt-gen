@@ -376,7 +376,7 @@ func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *
 
 			ctx.Push()
 			ctx.SetStrokeWidth(strokeWidth * 0.75)
-			ctx.SetStrokeColor(fb.getColorBorder())
+			ctx.SetStrokeColor(fb.getColorInfluencePips())
 			ctx.SetFill(transparent)
 
 			pip := canvas.Circle(pipR)
@@ -386,7 +386,7 @@ func (fb FrameBasic) drawInfluenceAndOrFactionSymbol(ctx *canvas.Context, card *
 
 			if i >= 5-float64(influenceCost) {
 				ctx.Push()
-				ctx.SetFill(fb.getColorBorder())
+				ctx.SetFill(fb.getColorInfluencePips())
 				pip := canvas.Circle(pipR * 0.5)
 				ctx.DrawPath(x, pipY, pip)
 				ctx.Pop()
