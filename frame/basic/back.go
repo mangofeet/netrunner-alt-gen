@@ -2,6 +2,8 @@ package basic
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/nrdb-go"
@@ -24,6 +26,8 @@ func (fb FrameBasic) Back() art.Drawer {
 
 		fb.drawRoundedBox(ctx, attributionBoxTop, attributionBoxBottom, attributionBoxLeft, attributionBoxRight, attributionBoxRadius)
 
+		fb.drawRoundedBox(ctx, canvasHeight, 0, canvasWidth*0.919, canvasWidth, attributionBoxRadius)
+
 		attributionFontSize := attributionBoxHeight * 0.6
 		attributionTextMaxWidth := (attributionBoxRight - attributionBoxLeft) * 0.9
 
@@ -40,8 +44,21 @@ func (fb FrameBasic) Back() art.Drawer {
 
 		attributionTextX := attributionBoxLeft + ((attributionBoxRight - attributionBoxLeft) * 0.05)
 		attributionTextY := (attributionBoxTop - (attributionBoxHeight-attributionText.Bounds().H)*0.5)
-
 		ctx.DrawText(attributionTextX, attributionTextY, attributionText)
+
+		cliFontSize := attributionBoxHeight
+		cliTextMaxWidth := (canvasHeight * 1.0)
+		// cliString := strings.Join(os.Args, " ")
+		cliString := getCLIText()
+
+		cliText := fb.getFittedText(ctx, cliString, cliFontSize, cliTextMaxWidth, 0, canvas.Center)
+		cliTextX := (canvasWidth * 0.937) - (cliText.Height / 2)
+		cliTextY := 0.0
+
+		ctx.Push()
+		ctx.Rotate(90)
+		ctx.DrawText(cliTextX, cliTextY, cliText)
+		ctx.Pop()
 
 		return nil
 	})
@@ -69,4 +86,41 @@ func (fb FrameBasic) drawRoundedBox(ctx *canvas.Context, top, bottom, left, righ
 
 	ctx.DrawPath(0, 0, path)
 	ctx.Pop()
+}
+
+func getCLIText() string {
+	var args []string
+
+	var isFlag bool
+	for _, arg := range os.Args {
+
+		if len(arg) < 1 {
+			continue
+		}
+
+		if arg == "-o" {
+			continue
+		}
+
+		if arg == "--make-back" {
+			continue
+		}
+
+		if arg[0] == '-' {
+			isFlag = true
+		}
+
+		if !isFlag {
+			continue
+		}
+
+		args = append(args, arg)
+
+		if arg[0] != '-' {
+			isFlag = false
+		}
+
+	}
+
+	return strings.Join(args, " ")
 }
