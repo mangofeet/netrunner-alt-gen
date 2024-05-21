@@ -33,8 +33,6 @@ func (fb FrameBasic) Back() art.Drawer {
 
 		fb.drawRoundedBox(ctx, attributionBoxTop, attributionBoxBottom, attributionBoxLeft, attributionBoxRight, attributionBoxRadius)
 
-		fb.drawRoundedBox(ctx, cliBoxTop, cliBoxBottom, cliBoxLeft, cliBoxRight, cliBoxRadius)
-
 		attributionFontSize := attributionBoxHeight * 0.6
 		attributionTextMaxWidth := (attributionBoxRight - attributionBoxLeft) * 0.9
 		attributionTextMaxHeight := (attributionBoxTop - attributionBoxBottom) * 0.9
@@ -63,7 +61,11 @@ func (fb FrameBasic) Back() art.Drawer {
 
 		cliTextX := cliBoxLeft + ((cliBoxRight - cliBoxLeft) * 0.05)
 		cliTextY := (cliBoxTop - (cliBoxHeight-cliText.Bounds().H)*0.5)
-		ctx.DrawText(cliTextX, cliTextY, cliText)
+
+		if len(cliString) > 0 {
+			fb.drawRoundedBox(ctx, cliBoxTop, cliBoxBottom, cliBoxLeft, cliBoxRight, cliBoxRadius)
+			ctx.DrawText(cliTextX, cliTextY, cliText)
+		}
 
 		return nil
 	})
