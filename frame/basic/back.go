@@ -24,7 +24,7 @@ func (fb FrameBasic) Back() art.Drawer {
 		attributionBoxRight := canvasWidth * 0.75
 		attributionBoxRadius := canvasWidth * 0.01
 
-		cliBoxTop := canvasHeight * 0.13
+		cliBoxTop := canvasHeight * 0.16
 		cliBoxBottom := canvasHeight * 0.0591
 		cliBoxHeight := cliBoxTop - cliBoxBottom
 		cliBoxLeft := canvasWidth * 0.1
