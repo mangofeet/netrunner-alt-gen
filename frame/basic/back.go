@@ -18,13 +18,13 @@ func (fb FrameBasic) Back() art.Drawer {
 
 		attributionBoxTop := canvasHeight * 0.9409
 		// attributionBoxBottom := canvasHeight * 0.032
-		attributionBoxBottom := canvasHeight * 0.88
+		attributionBoxBottom := canvasHeight * 0.87
 		attributionBoxHeight := attributionBoxTop - attributionBoxBottom
 		attributionBoxLeft := canvasWidth * 0.25
 		attributionBoxRight := canvasWidth * 0.75
 		attributionBoxRadius := canvasWidth * 0.01
 
-		cliBoxTop := canvasHeight * 0.12
+		cliBoxTop := canvasHeight * 0.13
 		cliBoxBottom := canvasHeight * 0.0591
 		cliBoxHeight := cliBoxTop - cliBoxBottom
 		cliBoxLeft := canvasWidth * 0.1
@@ -37,6 +37,7 @@ func (fb FrameBasic) Back() art.Drawer {
 
 		attributionFontSize := attributionBoxHeight * 0.6
 		attributionTextMaxWidth := (attributionBoxRight - attributionBoxLeft) * 0.9
+		attributionTextMaxHeight := (attributionBoxTop - attributionBoxBottom) * 0.9
 
 		attributionString := fmt.Sprintf("%s<BR>Generated using \"%s\" by %s<BR>netrunner-alt-gen %s", card.Attributes.Title, fb.Algorithm, fb.Designer, fb.Version)
 
@@ -47,7 +48,7 @@ func (fb FrameBasic) Back() art.Drawer {
 			attributionString = fmt.Sprintf("%s<BR>Design by %s<BR>Layout by netrunner-alt-gen %s", card.Attributes.Title, fb.Designer, fb.Version)
 		}
 
-		attributionText := fb.getFittedText(ctx, attributionString, attributionFontSize, attributionTextMaxWidth, 0, canvas.Center)
+		attributionText := fb.getVerticalFittedText(ctx, attributionString, attributionFontSize, attributionTextMaxWidth, attributionTextMaxHeight, canvas.Center)
 
 		attributionTextX := attributionBoxLeft + ((attributionBoxRight - attributionBoxLeft) * 0.05)
 		attributionTextY := (attributionBoxTop - (attributionBoxHeight-attributionText.Bounds().H)*0.5)
