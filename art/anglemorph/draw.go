@@ -46,8 +46,13 @@ func (drawer AngleMorph) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	// columnCount := rngGlobal.Next(60) + 60
 	// rowCount := rngGlobal.Next(120)
-	columnCount := 30
+	columnCount := 40
 	rowCount := int(float64(columnCount) * (height / width))
+	rowCount *= 2
+
+	if drawer.InterpolationSteps == nil {
+		drawer.InterpolationSteps = makePointer(10)
+	}
 
 	// fill background
 	ctx.Push()
@@ -72,8 +77,8 @@ func (drawer AngleMorph) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		Color:              art.Complementary(baseColor),
 		Gradient:           art.AngleMorphGradientHorizontal,
 		ColorShiftMax:      makePointer(90.0),
-		StrokeWidthMain:    makePointer(width * (0.03 / float64(columnCount))),
-		StrokeWidthMinor:   makePointer(width * (0.03 / float64(columnCount))),
+		StrokeWidthMain:    makePointer(width * (0.02 / float64(columnCount))),
+		StrokeWidthMinor:   makePointer(width * (0.02 / float64(columnCount))),
 	}
 
 	first.Draw(ctx)
@@ -86,6 +91,7 @@ func (drawer AngleMorph) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		Height:             height,
 		X:                  x,
 		Y:                  y,
+		MaxShiftFactorY:    makePointer(0.2),
 		ColumnCount:        int(columnCount),
 		RowCount:           int(rowCount),
 		InterpolationSteps: drawer.InterpolationSteps,
@@ -99,23 +105,23 @@ func (drawer AngleMorph) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	second.Draw(ctx)
 
-	third := &art.AngleMorph{
-		RNG:                rngGlobal,
-		Width:              canvasWidth * 1.2,
-		Height:             canvasHeight * 1.2,
-		X:                  canvasWidth * -0.1,
-		Y:                  canvasHeight * -0.1,
-		ColumnCount:        int(columnCount),
-		RowCount:           int(rowCount * 2),
-		InterpolationSteps: drawer.InterpolationSteps,
-		Color:              color.RGBA{0x1c, 0x1c, 0x1c, 0xee},
-		Gradient:           art.AngleMorphGradientHorizontal,
-		ColorShiftMax:      makePointer(90.0),
-		StrokeWidthMain:    makePointer(width * (0.03 / float64(columnCount))),
-		StrokeWidthMinor:   makePointer(width * (0.03 / float64(columnCount))),
-	}
+	// third := &art.AngleMorph{
+	// 	RNG:                rngGlobal,
+	// 	Width:              canvasWidth * 1.2,
+	// 	Height:             canvasHeight * 1.2,
+	// 	X:                  canvasWidth * -0.1,
+	// 	Y:                  canvasHeight * -0.1,
+	// 	ColumnCount:        int(columnCount),
+	// 	RowCount:           int(rowCount * 2),
+	// 	InterpolationSteps: drawer.InterpolationSteps,
+	// 	Color:              cardBGColor,
+	// 	Gradient:           art.AngleMorphGradientNone,
+	// 	ColorShiftMax:      makePointer(90.0),
+	// 	StrokeWidthMain:    makePointer(width * (0.02 / float64(columnCount))),
+	// 	StrokeWidthMinor:   makePointer(width * (0.02 / float64(columnCount))),
+	// }
 
-	third.Draw(ctx)
+	// third.Draw(ctx)
 
 	return nil
 }
