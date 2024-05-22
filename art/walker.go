@@ -13,7 +13,7 @@ import (
 
 const defaultNoiseStepFactor = 0.005
 
-type point struct {
+type Point struct {
 	x, y float64
 }
 
@@ -31,7 +31,7 @@ type Walker struct {
 	stepCount                   int
 	DirectionChangeStep         float64
 	DirectionChangeStepModifier float64
-	prev                        *point
+	prev                        *Point
 }
 
 func (wlk Walker) String() string {
@@ -46,12 +46,12 @@ func (wlk *Walker) Draw(ctx *canvas.Context) {
 	ctx.SetStrokeWidth(wlk.StrokeWidth)
 
 	if wlk.prev == nil {
-		wlk.prev = &point{wlk.X, wlk.Y}
+		wlk.prev = &Point{wlk.X, wlk.Y}
 	}
 
 	wlk.drawLine(ctx, wlk.X, wlk.Y, wlk.prev.x, wlk.prev.y)
 
-	wlk.prev = &point{wlk.X, wlk.Y}
+	wlk.prev = &Point{wlk.X, wlk.Y}
 }
 
 func (wlk Walker) drawPoint(ctx *canvas.Context, x, y float64) {
