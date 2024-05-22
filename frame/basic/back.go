@@ -17,8 +17,9 @@ func (fb FrameBasic) Back() art.Drawer {
 
 		canvasWidth, canvasHeight := ctx.Size()
 
-		attributionFontSize := canvasHeight * 0.048
-		attributionTextMaxHeight := canvasHeight * 0.06481
+		attributionFontSize := canvasHeight * 0.058
+		// attributionTextMaxHeight := canvasHeight * 0.06481
+		attributionTextMaxHeight := canvasHeight
 
 		attributionString := fmt.Sprintf("%s<BR>Generated using \"%s\" by %s<BR>netrunner-alt-gen %s", card.Attributes.Title, fb.Algorithm, fb.Designer, fb.Version)
 
