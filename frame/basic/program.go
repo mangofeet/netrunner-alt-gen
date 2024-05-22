@@ -107,7 +107,7 @@ func (fb FrameBasic) Program() art.Drawer {
 			canvasWidth/5, 0,
 			canvas.Center, canvas.Center, 0, 0))
 
-		fb.drawCardText(ctx, card, fontSizeCard, strengthPath.Bounds().H, canvasWidth*0.06, boxText, fb.getAdditionalText()...)
+		fb.drawCardText(ctx, card, fontSizeCard, strengthPath.Bounds().H, canvasWidth*0.08, boxText, fb.getAdditionalText()...)
 		fb.drawTypeText(ctx, card, fontSizeCard, boxType)
 
 		return nil
