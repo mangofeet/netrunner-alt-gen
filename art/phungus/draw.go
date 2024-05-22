@@ -339,7 +339,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		// AltColor3:    &canvas.Red,
 		// AltColor4:    &canvas.Red,
 		OverlayColor: &canvas.Transparent,
-	}).Draw(ctx, card)
+	}).Draw(ctx)
 
 	for i, wlk := range walkers {
 		wlk.Draw(ctx)
@@ -363,7 +363,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 				// AltColor3:    &canvas.Green,
 				// AltColor4:    &canvas.Green,
 				OverlayColor: &canvas.Transparent,
-			}).Draw(ctx, card)
+			}).Draw(ctx)
 
 		}
 		for wlk.InBounds(ctx) {
@@ -394,7 +394,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		// AltColor3:    &canvas.Blue,
 		// AltColor4:    &canvas.Blue,
 		OverlayColor: &canvas.Transparent,
-	}).Draw(ctx, card)
+	}).Draw(ctx)
 
 	ringSequence++
 	(art.TechRing{
@@ -411,7 +411,7 @@ func (drawer Entangler) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		AltColor3:    &overlayRingColor,
 		AltColor4:    &overlayRingColor,
 		OverlayColor: &overlayRingColor,
-	}).Draw(ctx, card)
+	}).Draw(ctx)
 
 	log.Printf("finished %d walkers", len(walkers))
 

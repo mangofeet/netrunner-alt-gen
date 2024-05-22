@@ -71,6 +71,6 @@ func (drawer NetRinger) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		AltColor4:   drawer.AltColor4,
 	}
 
-	return ringer.Draw(ctx, card)
+	return ringer.Draw(ctx)
 
 }

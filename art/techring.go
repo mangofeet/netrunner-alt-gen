@@ -7,7 +7,6 @@ import (
 	"math"
 
 	"github.com/mangofeet/netrunner-alt-gen/internal/prng"
-	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
 	"github.com/tdewolff/canvas/renderers/rasterizer"
 )
@@ -24,7 +23,7 @@ type TechRing struct {
 	OverlayColor                               *color.RGBA
 }
 
-func (drawer TechRing) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
+func (drawer TechRing) Draw(ctx *canvas.Context) error {
 	canvasWidth, canvasHeight := ctx.Size()
 
 	ringBaseCnv := canvas.New(canvasWidth, canvasHeight)
