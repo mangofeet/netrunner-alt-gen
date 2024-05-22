@@ -120,6 +120,7 @@ If set to "faction", it will use the faction color regardless of the base color`
 	rootCmd.AddCommand(netringerCmd)
 	rootCmd.AddCommand(phungusCmd)
 	rootCmd.AddCommand(anglemorphCmd)
+	rootCmd.AddCommand(reflectionCmd)
 }
 
 func commonNetspaceFlags(cmd *cobra.Command) {

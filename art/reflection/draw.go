@@ -1,15 +1,17 @@
-package anglemorph
+package reflection
 
 import (
 	"image/color"
+	"math"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/netrunner-alt-gen/internal/prng"
 	"github.com/mangofeet/nrdb-go"
+	"github.com/ojrac/opensimplex-go"
 	"github.com/tdewolff/canvas"
 )
 
-type AngleMorph struct {
+type Reflection struct {
 	ColumnCount, RowCount int
 
 	InterpolationSteps *int
@@ -17,7 +19,7 @@ type AngleMorph struct {
 	Color, ColorBG *color.RGBA
 }
 
-func (drawer AngleMorph) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
+func (drawer Reflection) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	seed := card.Attributes.Title + card.Attributes.Text + card.Attributes.CardTypeID + card.Attributes.FactionID + card.Attributes.Flavor
 
@@ -35,11 +37,8 @@ func (drawer AngleMorph) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		cardBGColor = *drawer.ColorBG
 	}
 
-	splitFactor := (float64(rngGlobal.Next(50)) / 100.0) + 0.25
-	// width := canvasWidth * 1.2
-	// height := canvasHeight * 1.2
-	// x := canvasWidth * -0.1
-	// y := canvasHeight * -0.1
+	splitFactor := (float64(rngGlobal.Next(33)) / 100.0) + 0.33
+
 	width := canvasWidth * 1.2
 	height := canvasHeight * (splitFactor + 0.1)
 	x := canvasWidth * -0.1
@@ -65,6 +64,11 @@ func (drawer AngleMorph) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	ctx.Fill()
 	ctx.Pop()
 
+	bottomColor, _, err := art.Analogous(baseColor, 45)
+	if err != nil {
+		panic(err)
+	}
+
 	first := &art.AngleMorph{
 		RNG:                rngGlobal,
 		Width:              width,
@@ -74,7 +78,7 @@ func (drawer AngleMorph) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		ColumnCount:        int(columnCount),
 		RowCount:           int(rowCount),
 		InterpolationSteps: drawer.InterpolationSteps,
-		Color:              art.Complementary(baseColor),
+		Color:              bottomColor,
 		Gradient:           art.AngleMorphGradientHorizontal,
 		ColorShiftMax:      makePointer(90.0),
 		StrokeWidthMain:    makePointer(width * (0.02 / float64(columnCount))),
@@ -105,6 +109,44 @@ func (drawer AngleMorph) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	}
 
 	second.Draw(ctx)
+
+	var walkers []*art.Walker
+
+	noise := opensimplex.New(rngGlobal.Next(math.MaxInt64))
+
+	for i := 0; i < 5000; i++ {
+		colorFactor := rngGlobal.Next(128) - 64
+
+		wlk := art.Walker{
+			RNG:             rngGlobal,
+			Direction:       "down",
+			X:               canvasWidth / 2,
+			Y:               canvasHeight - 1,
+			Vx:              (float64(rngGlobal.Next(200)) / 100) - 1.0,
+			Vy:              (float64(rngGlobal.Next(10)) / 100) * -1,
+			NoiseStepFactor: 0.01,
+			NoiseDimensions: 3,
+			Noise:           noise,
+			StrokeWidth:     width * (0.01 / float64(columnCount)),
+
+			Color: color.RGBA{
+				R: uint8(math.Max(0, math.Min(float64(int64(bottomColor.R)+colorFactor), 255))),
+				G: uint8(math.Max(0, math.Min(float64(int64(bottomColor.G)+colorFactor), 255))),
+				B: uint8(math.Max(0, math.Min(float64(int64(bottomColor.B)+colorFactor), 255))),
+				A: 0xff,
+			},
+		}
+		walkers = append(walkers, &wlk)
+	}
+
+	for _, wlk := range walkers {
+		wlk.Draw(ctx)
+		for wlk.InBounds(ctx) {
+			wlk.Velocity()
+			wlk.Move()
+			wlk.Draw(ctx)
+		}
+	}
 
 	// third := &art.AngleMorph{
 	// 	RNG:                rngGlobal,
