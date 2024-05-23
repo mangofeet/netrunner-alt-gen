@@ -117,14 +117,16 @@ func (drawer Reflection) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 	for i := 0; i < 5000; i++ {
 		colorFactor := rngGlobal.Next(128) - 64
 
+		baseVx := float64(rngGlobal.Next(10) - 5)
+
 		wlk := art.Walker{
 			RNG:             rngGlobal,
 			Direction:       "down",
 			X:               canvasWidth / 2,
 			Y:               canvasHeight - 1,
-			Vx:              (float64(rngGlobal.Next(200)) / 100) - 1.0,
-			Vy:              (float64(rngGlobal.Next(10)) / 100) * -1,
-			NoiseStepFactor: 0.01,
+			Vx:              baseVx + (float64(rngGlobal.Next(50)) / 100) - 0.2,
+			Vy:              (float64(rngGlobal.Next(50)) / 100) * -1,
+			NoiseStepFactor: 0.005,
 			NoiseDimensions: 3,
 			Noise:           noise,
 			StrokeWidth:     width * (0.01 / float64(columnCount)),
@@ -141,10 +143,32 @@ func (drawer Reflection) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 
 	for _, wlk := range walkers {
 		wlk.Draw(ctx)
+		var hasTurned bool
 		for wlk.InBounds(ctx) {
 			wlk.Velocity()
 			wlk.Move()
 			wlk.Draw(ctx)
+
+			if !hasTurned && wlk.Y < canvasHeight*splitFactor*1.75 {
+				wlk.Vy *= 0.9
+				wlk.Vx *= 0.9
+			}
+			if !hasTurned && wlk.Y < canvasHeight*splitFactor*1.5 {
+				wlk.Vy *= 0.9
+				wlk.Vx *= 0.9
+			}
+			if !hasTurned && wlk.Y < canvasHeight*splitFactor*1.25 {
+				wlk.Vy *= 0.9
+				wlk.Vx *= 0.9
+			}
+			if !hasTurned && wlk.Y < canvasHeight*splitFactor {
+				hasTurned = true
+				if wlk.Vx > 0 {
+					wlk.Direction = "right"
+				} else {
+					wlk.Direction = "left"
+				}
+			}
 		}
 	}
 
