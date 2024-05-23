@@ -2,7 +2,6 @@ package art
 
 import (
 	"image/color"
-	"log"
 
 	"github.com/mangofeet/netrunner-alt-gen/internal/prng"
 	"github.com/tdewolff/canvas"
@@ -56,14 +55,12 @@ func (drawer *AngleMorph) Draw(ctx *canvas.Context) error {
 		col := make(column, drawer.RowCount+1)
 
 		if c == 0 && len(drawer.LeftColumn) == drawer.RowCount+1 {
-			log.Println("using provided left col")
 			cols[c] = column(drawer.LeftColumn)
 			thisBottomRow = append(thisBottomRow, drawer.LeftColumn[0])
 			thisTopRow = append(thisTopRow, drawer.LeftColumn[drawer.RowCount])
 			continue
 		}
 		if c == drawer.ColumnCount && len(drawer.RightColumn) == drawer.RowCount+1 {
-			log.Println("using provided right col")
 			cols[c] = column(drawer.RightColumn)
 			thisBottomRow = append(thisBottomRow, drawer.RightColumn[0])
 			thisTopRow = append(thisTopRow, drawer.RightColumn[drawer.RowCount])
@@ -166,8 +163,6 @@ func (drawer *AngleMorph) Draw(ctx *canvas.Context) error {
 		}
 	}
 	ctx.Pop()
-
-	log.Println("done")
 
 	return nil
 
