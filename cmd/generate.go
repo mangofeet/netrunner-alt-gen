@@ -10,6 +10,7 @@ import (
 	"github.com/mangofeet/nrdb-go"
 	"github.com/tdewolff/canvas"
 	"github.com/tdewolff/canvas/renderers"
+	"github.com/tdewolff/canvas/renderers/rasterizer"
 )
 
 func generateCard(drawer art.Drawer, card *nrdb.Printing, algorithm, designer string) error {
@@ -41,13 +42,32 @@ func generateCard(drawer art.Drawer, card *nrdb.Printing, algorithm, designer st
 
 }
 
-func output(cnv *canvas.Canvas, ctx *canvas.Context, card *nrdb.Printing, algorithm, designer string) error {
+func drawFrame(cnv *canvas.Canvas, ctx *canvas.Context, card *nrdb.Printing, algorithm, designer string) error {
+	if frame == "none" {
+		return nil
+	}
 	framer, err := getFramer(card, algorithm, designer)
 	if err != nil {
 		return err
 	}
 
-	if err := framer.Draw(ctx, card); err != nil {
+	frameCnv := canvas.New(canvasWidth, canvasHeight)
+	frameCtx := canvas.NewContext(frameCnv)
+
+	if err := framer.Draw(frameCtx, card); err != nil {
+		return err
+	}
+
+	frameImg := rasterizer.Draw(frameCnv, canvas.DPMM(1), canvas.DefaultColorSpace)
+
+	ctx.RenderImage(frameImg, canvas.Identity)
+
+	return nil
+
+}
+func output(cnv *canvas.Canvas, ctx *canvas.Context, card *nrdb.Printing, algorithm, designer string) error {
+
+	if err := drawFrame(cnv, ctx, card, algorithm, designer); err != nil {
 		return err
 	}
 

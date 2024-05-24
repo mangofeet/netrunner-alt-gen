@@ -127,7 +127,7 @@ func GetFactionBaseColor(factionID string) color.RGBA {
 			A: 0xff,
 		}
 
-	case "nbn":
+	case "nbn", "tags":
 		return color.RGBA{
 			R: 0x8f,
 			G: 0x6a,
@@ -143,7 +143,7 @@ func GetFactionBaseColor(factionID string) color.RGBA {
 			A: 0xff,
 		}
 
-	case "haas_bioroid":
+	case "haas_bioroid", "core damage":
 		return color.RGBA{
 			R: 0x52,
 			G: 0x23,
@@ -151,7 +151,7 @@ func GetFactionBaseColor(factionID string) color.RGBA {
 			A: 0xff,
 		}
 
-	case "weyland_consortium":
+	case "weyland_consortium", "bad pub", "bad publicity":
 
 		return color.RGBA{
 			R: 0x3f,

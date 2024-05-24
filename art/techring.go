@@ -1,9 +1,11 @@
 package art
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
+	"log"
 	"math"
 
 	"github.com/mangofeet/netrunner-alt-gen/internal/prng"
@@ -21,6 +23,16 @@ type TechRing struct {
 	Color                                      color.RGBA
 	AltColor1, AltColor2, AltColor3, AltColor4 *color.RGBA
 	OverlayColor                               *color.RGBA
+}
+
+func (drawer TechRing) log(args ...interface{}) {
+	args = append([]interface{}{fmt.Sprintf("techring %d:", drawer.RNG.Sequence())}, args...)
+	log.Println(args...)
+}
+
+func (drawer TechRing) logf(format string, args ...interface{}) {
+	format = fmt.Sprintf("techring %d: %s", drawer.RNG.Sequence(), format)
+	log.Printf(format, args...)
 }
 
 func (drawer TechRing) Draw(ctx *canvas.Context) error {
@@ -44,6 +56,8 @@ func (drawer TechRing) Draw(ctx *canvas.Context) error {
 	if err := circ.Draw(ringBaseCtx); err != nil {
 		return err
 	}
+
+	drawer.log("rasterizing ring")
 	ringBaseImg := rasterizer.Draw(ringBaseCnv, canvas.DPMM(1), canvas.DefaultColorSpace)
 
 	overlayCnv := canvas.New(canvasWidth, canvasHeight)
@@ -79,12 +93,18 @@ func (drawer TechRing) Draw(ctx *canvas.Context) error {
 		return err
 	}
 
+	drawer.log("rasterizing overlay ring")
 	ringOverlayImg := rasterizer.Draw(overlayCnv, canvas.DPMM(1), canvas.DefaultColorSpace)
 
 	ringCnv := canvas.New(canvasWidth, canvasHeight)
 	ringCtx := canvas.NewContext(ringCnv)
+
+	drawer.log("rendering base ring")
 	ringCtx.RenderImage(ringBaseImg, canvas.Identity)
+	drawer.log("rendering overlay ring")
 	ringCtx.RenderImage(ringOverlayImg, canvas.Identity)
+
+	drawer.log("rasterizing combined ring and overlay images")
 	ringImg := rasterizer.Draw(ringCnv, canvas.DPMM(1), canvas.DefaultColorSpace)
 
 	maskCnv := canvas.New(canvasWidth, canvasHeight)
@@ -110,6 +130,7 @@ func (drawer TechRing) Draw(ctx *canvas.Context) error {
 		return err
 	}
 
+	drawer.log("rasterizing mask ring")
 	maskImg := rasterizer.Draw(maskCnv, canvas.DPMM(1), canvas.DefaultColorSpace)
 
 	// invert the mask image
@@ -124,6 +145,7 @@ func (drawer TechRing) Draw(ctx *canvas.Context) error {
 	ringsFinal := image.NewRGBA(image.Rect(0, 0, int(canvasWidth), int(canvasHeight)))
 	draw.DrawMask(ringsFinal, ringsFinal.Bounds(), ringImg, image.Point{}, maskImg, image.Point{}, draw.Over)
 
+	drawer.log("rendering final rings")
 	ctx.RenderImage(ringsFinal, canvas.Identity)
 
 	return nil

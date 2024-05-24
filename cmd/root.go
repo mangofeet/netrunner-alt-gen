@@ -114,6 +114,12 @@ If set to "faction", it will use the faction color regardless of the base color`
 	phungusCmd.Flags().StringVarP(&altColor3, "ring-color-3", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
 	phungusCmd.Flags().StringVarP(&altColor4, "ring-color-4", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
 
+	trackerCmd.Flags().StringVarP(&altColor1, "ring-color-1", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
+	trackerCmd.Flags().StringVarP(&altColor2, "ring-color-2", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
+	trackerCmd.Flags().StringVarP(&altColor3, "ring-color-3", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
+	trackerCmd.Flags().StringVarP(&altColor4, "ring-color-4", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
+	trackerCmd.Flags().StringVarP(&colorBG, "color-bg", "", "", `Background color for the generated art, defaults to a darkened --base-color value`)
+
 	rootCmd.AddCommand(netwalkerCmd)
 	rootCmd.AddCommand(emptyCmd)
 	rootCmd.AddCommand(imageCmd)
@@ -121,12 +127,13 @@ If set to "faction", it will use the faction color regardless of the base color`
 	rootCmd.AddCommand(phungusCmd)
 	rootCmd.AddCommand(anglemorphCmd)
 	rootCmd.AddCommand(reflectionCmd)
+	rootCmd.AddCommand(trackerCmd)
 }
 
 func commonNetspaceFlags(cmd *cobra.Command) {
 	cmd.Flags().IntVarP(&walkersMin, "min-walkers", "m", 3000, `Minimum amount of walkers`)
 	cmd.Flags().IntVarP(&walkersMax, "max-walkers", "M", 10000, `Maximum amount of walkers`)
-	cmd.Flags().StringVarP(&colorBG, "color-bg", "", "", `Background color for the generated art, defaults to --base-color value`)
+	cmd.Flags().StringVarP(&colorBG, "color-bg", "", "", `Background color for the generated art, defaults to a darkened --base-color value`)
 	cmd.Flags().StringVarP(&walkerColor1, "walker-color-1", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue +10 - +30`)
 	cmd.Flags().StringVarP(&walkerColor2, "walker-color-2", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue -10 - -30`)
 	cmd.Flags().StringVarP(&walkerColor3, "walker-color-3", "", "", `Alternate walker color for the card, defaults to pre-defined faction color analogue +30 - +50`)

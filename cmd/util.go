@@ -40,8 +40,10 @@ func getFramer(card *nrdb.Printing, algorithm, designer string) (art.Drawer, err
 	}
 
 	switch frame {
-	case "basic-back":
+	case "basic-back", "basic-tracker-back":
 		return frm.Back(), nil
+	case "basic-tracker":
+		return frm.Tracker(), nil
 	case "basic":
 		var framer art.Drawer
 		log.Println("card type:", card.Attributes.CardTypeID)
@@ -178,8 +180,12 @@ func getFileName(card *nrdb.Printing) string {
 	cardID := fmt.Sprint(card.ID)
 
 	if cardIDInt < 10 {
-		cardID = fmt.Sprintf("00%s", card.ID)
+		cardID = fmt.Sprintf("0000%s", card.ID)
 	} else if cardIDInt < 100 {
+		cardID = fmt.Sprintf("000%s", card.ID)
+	} else if cardIDInt < 1000 {
+		cardID = fmt.Sprintf("00%s", card.ID)
+	} else if cardIDInt < 10000 {
 		cardID = fmt.Sprintf("0%s", card.ID)
 	}
 

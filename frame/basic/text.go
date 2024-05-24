@@ -39,14 +39,35 @@ func getSubtitle(card *nrdb.Printing) string {
 }
 
 func (fb FrameBasic) getTitleText(ctx *canvas.Context, card *nrdb.Printing, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
-	return fb.getFittedText(ctx, getTitle(card), fontSize, maxWidth, height, align)
+	return fb.getHorizontalFittedText(ctx, getTitle(card), fontSize, maxWidth, height, align)
 }
 
 func (fb FrameBasic) getSubtitleText(ctx *canvas.Context, card *nrdb.Printing, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
-	return fb.getFittedText(ctx, getSubtitle(card), fontSize, maxWidth, height, align)
+	return fb.getHorizontalFittedText(ctx, getSubtitle(card), fontSize, maxWidth, height, align)
 }
 
-func (fb FrameBasic) getFittedText(ctx *canvas.Context, title string, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
+func (fb FrameBasic) getFittedText(ctx *canvas.Context, title string, fontSize, maxWidth, maxHeight float64, align canvas.TextAlign) *canvas.Text {
+	if maxWidth == 0 {
+		return fb.getVerticalFittedText(ctx, title, fontSize, maxWidth, maxHeight, align)
+	}
+	if maxHeight == 0 {
+		return fb.getHorizontalFittedText(ctx, title, fontSize, maxWidth, maxHeight, align)
+	}
+
+	text := fb.getCardText(title, fontSize, maxWidth*2, maxHeight*2, align)
+
+	strokeWidth := getStrokeWidth(ctx)
+
+	for text.Bounds().W > maxWidth || text.Bounds().H > maxHeight {
+		fontSize -= strokeWidth
+		text = fb.getCardText(title, fontSize, maxWidth*2, maxHeight*2, align)
+	}
+
+	return fb.getCardText(title, fontSize, maxWidth, maxHeight, align)
+
+}
+
+func (fb FrameBasic) getHorizontalFittedText(ctx *canvas.Context, title string, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
 
 	text := fb.getCardText(title, fontSize, maxWidth*2, height, align)
 
@@ -384,9 +405,9 @@ func (fb FrameBasic) getTypeText(ctx *canvas.Context, card *nrdb.Printing, fontS
 	typeName := getTypeName(card.Attributes.CardTypeID)
 
 	if card.Attributes.DisplaySubtypes != nil {
-		tText = fb.getFittedText(ctx, fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSize, w, h, align)
+		tText = fb.getHorizontalFittedText(ctx, fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSize, w, h, align)
 	} else {
-		tText = fb.getFittedText(ctx, fmt.Sprintf("<strong>%s</strong>", typeName), fontSize, w, h, align)
+		tText = fb.getHorizontalFittedText(ctx, fmt.Sprintf("<strong>%s</strong>", typeName), fontSize, w, h, align)
 	}
 
 	return tText
