@@ -16,7 +16,7 @@ func (fb FrameBasic) Tracker() art.Drawer {
 		textMaxHeight := canvasHeight * 0.15
 		// textMaxWidth := canvasWidth * 0.7
 
-		text := fb.getVerticalFittedText(ctx, card.Attributes.Title, fontSize, 0, textMaxHeight, canvas.Center)
+		text := fb.getVerticalFittedTextWithFont(ctx, card.Attributes.Title, fontSize, 0, textMaxHeight, canvas.Center, fb.getFont(fontSize, canvas.FontThin))
 
 		boxMarginTB := text.Bounds().H * 0.2
 

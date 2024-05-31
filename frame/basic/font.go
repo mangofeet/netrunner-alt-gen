@@ -29,6 +29,10 @@ func init() {
 		panic(err)
 	}
 
+	if err := loadFont("MonkirtaPursuit-NC.ttf", "monospace", canvas.FontThin); err != nil {
+		panic(err)
+	}
+
 	// the "extra bold" in the font family is used for unicode
 	// symbols, this font seems to be the best at rendering them
 	if err := loadFont("DejaVuSans.ttf", "monospace", canvas.FontExtraBold); err != nil {

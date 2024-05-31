@@ -47,6 +47,10 @@ func (fb FrameBasic) getSubtitleText(ctx *canvas.Context, card *nrdb.Printing, f
 }
 
 func (fb FrameBasic) getFittedText(ctx *canvas.Context, title string, fontSize, maxWidth, maxHeight float64, align canvas.TextAlign) *canvas.Text {
+	return fb.getFittedTextWithFont(ctx, title, fontSize, maxWidth, maxHeight, align, fb.getFont(fontSize, canvas.FontRegular))
+}
+
+func (fb FrameBasic) getFittedTextWithFont(ctx *canvas.Context, title string, fontSize, maxWidth, maxHeight float64, align canvas.TextAlign, font *canvas.FontFace) *canvas.Text {
 	if maxWidth == 0 {
 		return fb.getVerticalFittedText(ctx, title, fontSize, maxWidth, maxHeight, align)
 	}
@@ -68,6 +72,10 @@ func (fb FrameBasic) getFittedText(ctx *canvas.Context, title string, fontSize, 
 }
 
 func (fb FrameBasic) getHorizontalFittedText(ctx *canvas.Context, title string, fontSize, maxWidth, height float64, align canvas.TextAlign) *canvas.Text {
+	return fb.getHorizontalFittedTextWithFont(ctx, title, fontSize, maxWidth, height, align, fb.getFont(fontSize, canvas.FontRegular))
+}
+
+func (fb FrameBasic) getHorizontalFittedTextWithFont(ctx *canvas.Context, title string, fontSize, maxWidth, height float64, align canvas.TextAlign, font *canvas.FontFace) *canvas.Text {
 
 	text := fb.getCardText(title, fontSize, maxWidth*2, height, align)
 
@@ -75,16 +83,20 @@ func (fb FrameBasic) getHorizontalFittedText(ctx *canvas.Context, title string, 
 
 	for text.Bounds().W > maxWidth {
 		fontSize -= strokeWidth
-		text = fb.getCardText(title, fontSize, maxWidth*2, height, align)
+		text = fb.getCardTextWithFont(title, fontSize, maxWidth*2, height, align, font)
 	}
 
 	// get it a final time to get the width correct
-	text = fb.getCardText(title, fontSize, maxWidth, height, align)
+	text = fb.getCardTextWithFont(title, fontSize, maxWidth, height, align, font)
 
 	return text
 }
 
 func (fb FrameBasic) getVerticalFittedText(ctx *canvas.Context, title string, fontSize, width, maxHeight float64, align canvas.TextAlign) *canvas.Text {
+	return fb.getVerticalFittedTextWithFont(ctx, title, fontSize, width, maxHeight, align, fb.getFont(fontSize, canvas.FontRegular))
+}
+
+func (fb FrameBasic) getVerticalFittedTextWithFont(ctx *canvas.Context, title string, fontSize, width, maxHeight float64, align canvas.TextAlign, font *canvas.FontFace) *canvas.Text {
 
 	text := fb.getCardText(title, fontSize, width, maxHeight*2, align)
 
@@ -92,24 +104,28 @@ func (fb FrameBasic) getVerticalFittedText(ctx *canvas.Context, title string, fo
 
 	for text.Bounds().H > maxHeight {
 		fontSize -= strokeWidth
-		text = fb.getCardText(title, fontSize, width, maxHeight*2, align)
+		text = fb.getCardTextWithFont(title, fontSize, width, maxHeight*2, align, font)
 	}
 
 	// get it a final time to get the width correct
-	text = fb.getCardText(title, fontSize, width, maxHeight, align)
+	text = fb.getCardTextWithFont(title, fontSize, width, maxHeight, align, font)
 
 	return text
 }
 
 func (fb FrameBasic) getCardText(text string, fontSize, cardTextBoxW, cardTextBoxH float64, align canvas.TextAlign) *canvas.Text {
-
 	regFace := fb.getFont(fontSize, canvas.FontRegular)
+	return fb.getCardTextWithFont(text, fontSize, cardTextBoxW, cardTextBoxH, align, regFace)
+}
+
+func (fb FrameBasic) getCardTextWithFont(text string, fontSize, cardTextBoxW, cardTextBoxH float64, align canvas.TextAlign, font *canvas.FontFace) *canvas.Text {
+
 	boldFace := fb.getFont(fontSize, canvas.FontBold)
 	italicFace := fb.getFont(fontSize, canvas.FontItalic)
 	arrowFace := fb.getFont(fontSize, canvas.FontExtraBold)
 	uniqueFace := fb.getFont(fontSize, canvas.FontExtraBold)
 
-	rt := canvas.NewRichText(regFace)
+	rt := canvas.NewRichText(font)
 
 	var parts []string
 	strongParts := strings.Split(text, "<strong>")
@@ -122,19 +138,19 @@ func (fb FrameBasic) getCardText(text string, fontSize, cardTextBoxW, cardTextBo
 
 		if strings.Contains(part, "→") {
 			subParts := strings.Split(part, "→")
-			fb.writeTextPart(rt, subParts[0], regFace, boldFace, italicFace)
+			fb.writeTextPart(rt, subParts[0], font, boldFace, italicFace)
 			rt.WriteFace(arrowFace, "→")
 			part = subParts[1]
 		}
 
 		if strings.Contains(part, "♦") {
 			subParts := strings.Split(part, "♦")
-			fb.writeTextPart(rt, subParts[0], regFace, boldFace, italicFace)
+			fb.writeTextPart(rt, subParts[0], font, boldFace, italicFace)
 			rt.WriteFace(uniqueFace, "♦")
 			part = subParts[1]
 		}
 
-		fb.writeTextPart(rt, part, regFace, boldFace, italicFace)
+		fb.writeTextPart(rt, part, font, boldFace, italicFace)
 	}
 
 	return rt.ToText(
