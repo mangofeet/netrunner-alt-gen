@@ -62,6 +62,9 @@ var (
 	// image
 	designer string
 
+	// pnp
+	startRow int
+
 	// set by ldflags
 	version string = "local"
 )
@@ -120,6 +123,8 @@ If set to "faction", it will use the faction color regardless of the base color`
 	trackerCmd.Flags().StringVarP(&altColor4, "ring-color-4", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
 	trackerCmd.Flags().StringVarP(&colorBG, "color-bg", "", "", `Background color for the generated art, defaults to a darkened --base-color value`)
 
+	pnpCmd.Flags().IntVarP(&startRow, "start-row", "m", 2, `Row to start generating from, defaults to 1 (this assumes the CSV contains a header row)`)
+
 	rootCmd.AddCommand(netwalkerCmd)
 	rootCmd.AddCommand(emptyCmd)
 	rootCmd.AddCommand(imageCmd)
@@ -128,6 +133,7 @@ If set to "faction", it will use the faction color regardless of the base color`
 	rootCmd.AddCommand(anglemorphCmd)
 	rootCmd.AddCommand(reflectionCmd)
 	rootCmd.AddCommand(trackerCmd)
+	rootCmd.AddCommand(pnpCmd)
 }
 
 func commonNetspaceFlags(cmd *cobra.Command) {
