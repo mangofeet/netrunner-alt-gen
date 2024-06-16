@@ -81,7 +81,7 @@ func (fb FrameBasic) getHorizontalFittedTextWithFont(ctx *canvas.Context, title 
 
 	strokeWidth := getStrokeWidth(ctx)
 
-	for text.Bounds().W > maxWidth {
+	for text.Bounds().W > maxWidth && fontSize > 0 {
 		fontSize -= strokeWidth
 		text = fb.getCardTextWithFont(title, fontSize, maxWidth*2, height, align, font)
 	}
