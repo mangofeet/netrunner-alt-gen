@@ -62,7 +62,7 @@ func (fb FrameBasic) Program() art.Drawer {
 		// program strength
 		ctx.Push()
 
-		ctx.SetFillColor(fb.getColorStrenthBG(card))
+		ctx.SetFillColor(fb.getColorStrengthBG(card))
 		ctx.SetStrokeColor(fb.getColorBorder())
 		ctx.SetStrokeWidth(strokeWidth)
 

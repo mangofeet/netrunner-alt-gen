@@ -72,6 +72,7 @@ func generatePnPFile(csvPath string) error {
 	frameColorBackground = "ffffff"
 	frameColorFactionBG = "ffffff"
 	frameColorStrengthBG = "ffffff"
+	frameColorInfluenceBG = "ffffff"
 	frameColorInfluenceLimitBG = "ffffff"
 	frameColorMinDeckBG = "ffffff"
 	frameColorBorder = "000000"
