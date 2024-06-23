@@ -46,7 +46,7 @@ func getFramer(card *nrdb.Printing, algorithm, designer string) (art.Drawer, err
 		return frm.Tracker(), nil
 	case "basic":
 		var framer art.Drawer
-		log.Println("card type:", card.Attributes.CardTypeID)
+		log.Printf("Card: %s, type: %s", card.Attributes.Title, card.Attributes.CardTypeID)
 
 		if flavorText != "" {
 			frm.Flavor = "<em>" + flavorText + "</em>"

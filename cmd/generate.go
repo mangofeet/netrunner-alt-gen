@@ -42,6 +42,31 @@ func generateCard(drawer art.Drawer, card *nrdb.Printing, algorithm, designer st
 
 }
 
+func generateCardCanvas(drawer art.Drawer, card *nrdb.Printing, algorithm, designer string) (*canvas.Canvas, error) {
+	cnv := canvas.New(canvasWidth, canvasHeight)
+	ctx := canvas.NewContext(cnv)
+
+	if err := drawer.Draw(ctx, card); err != nil {
+		return nil, err
+	}
+
+	if err := drawFrame(cnv, ctx, card, algorithm, designer); err != nil {
+		return nil, err
+	}
+
+	if drawMarginLines {
+		marginX := (canvasWidth - cardWidth) / 2
+		marginY := (canvasHeight - cardHeight) / 2
+		safeMarginX := (canvasWidth - safeWidth) / 2
+		safeMarginY := (canvasHeight - safeHeight) / 2
+
+		drawMargin(ctx, marginX, marginY, cardWidth, cardHeight, color.White)
+		drawMargin(ctx, safeMarginX, safeMarginY, safeWidth, safeHeight, canvas.Red)
+	}
+
+	return cnv, nil
+}
+
 func drawFrame(cnv *canvas.Canvas, ctx *canvas.Context, card *nrdb.Printing, algorithm, designer string) error {
 	if frame == "none" {
 		return nil
@@ -65,6 +90,7 @@ func drawFrame(cnv *canvas.Canvas, ctx *canvas.Context, card *nrdb.Printing, alg
 	return nil
 
 }
+
 func output(cnv *canvas.Canvas, ctx *canvas.Context, card *nrdb.Printing, algorithm, designer string) error {
 
 	if err := drawFrame(cnv, ctx, card, algorithm, designer); err != nil {

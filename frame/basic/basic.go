@@ -89,7 +89,7 @@ func (fb FrameBasic) getColorInfluenceBG(card *nrdb.Printing) color.RGBA {
 	return art.GetFactionBaseColor(card.Attributes.FactionID)
 }
 
-func (fb FrameBasic) getColorStrenthBG(card *nrdb.Printing) color.RGBA {
+func (fb FrameBasic) getColorStrengthBG(card *nrdb.Printing) color.RGBA {
 
 	if fb.ColorStrengthBG != nil {
 		return *fb.ColorStrengthBG
