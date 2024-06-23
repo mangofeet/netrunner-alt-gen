@@ -10,6 +10,7 @@ import (
 	"github.com/tdewolff/canvas/renderers/rasterizer"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -155,8 +156,7 @@ func buildCard(record []string, cardID int) *nrdb.Printing {
 	} else {
 		card.Attributes.FactionID = strings.ReplaceAll(strings.ToLower(record[1]), "-", "_")
 	}
-	// card.Attributes.Title = record[3]
-	card.Attributes.Title = record[3]
+	card.Attributes.Title = strings.ReplaceAll(record[3], "\n", "")
 	card.Attributes.StrippedTitle = titleStripper.Replace(record[3])
 	card.Attributes.IsUnique = strings.Contains(summary_sections[0], "◆")
 	if record[4] == "Runner-ID" {
@@ -207,6 +207,13 @@ func buildCard(record []string, cardID int) *nrdb.Printing {
 
 	// Set text
 	card.Attributes.Text = strings.Trim(summary_sections[3], "\n")
+	card.Attributes.Text = strings.ReplaceAll(card.Attributes.Text, "{mu}", "[mu]")
+	card.Attributes.Text = strings.ReplaceAll(card.Attributes.Text, "{c}", "[credit]")
+	card.Attributes.Text = strings.ReplaceAll(card.Attributes.Text, "{recurring}", "[recurring-credit]")
+	card.Attributes.Text = strings.ReplaceAll(card.Attributes.Text, "{click}", "[click]")
+	card.Attributes.Text = strings.ReplaceAll(card.Attributes.Text, "{sub}", "[subroutine]")
+	card.Attributes.Text = strings.ReplaceAll(card.Attributes.Text, "{trash}", "[trash]")
+	card.Attributes.Text = strings.ReplaceAll(card.Attributes.Text, "{interrupt}", "[interrupt]")
 
 	return card
 }
