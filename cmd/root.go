@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/mangofeet/netrunner-alt-gen/frame/basic"
 	"github.com/spf13/cobra"
 )
 
@@ -24,12 +25,12 @@ import (
 
 // based on MPC template
 
-const canvasWidth = 3264.0
-const canvasHeight = 4450.0
-const cardWidth = 2976.0
-const cardHeight = 4152.0
-const safeWidth = 2736.0
-const safeHeight = 3924.0
+// const canvasWidth = 3264.0
+// const canvasHeight = 4450.0
+// const cardWidth = 2976.0
+// const cardHeight = 4152.0
+// const safeWidth = 2736.0
+// const safeHeight = 3924.0
 
 // real card MM, doesn't work currently, need higehr res for
 // generation
@@ -40,12 +41,14 @@ const safeHeight = 3924.0
 // const cardHeight = 88.0
 
 var (
+	canvasWidth, canvasHeight, cardWidth, cardHeight, safeWidth, safeHeight float64 = 3264.0, 4450.0, 2976.0, 4152.0, 2736.0, 3924.0
+
 	drawMarginLines, makeBack                             bool
 	outputDir                                             string
 	baseColor, altColor1, altColor2, altColor3, altColor4 string
 	skipFlavor                                            bool
 	flavorText, flavorAttribution                         string
-	textBoxFactor                                         float64
+	textBoxFactor, scaleFactor                            float64
 
 	frame, frameColorBackground, frameColorBorder, frameColorText,
 	frameColorTextStrength, frameColorInfluencePips,
@@ -79,6 +82,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&skipFlavor, "skip-flavor", "", false, `Don't render default flavor text`)
 	rootCmd.PersistentFlags().StringVarP(&baseColor, "base-color", "c", "", `Alternate base color for the card, defaults to pre-defined faction colors`)
 	rootCmd.PersistentFlags().Float64VarP(&textBoxFactor, "text-box-height", "", 33.3, `Percentage of total card height taken up by the main text box`)
+	rootCmd.PersistentFlags().Float64VarP(&scaleFactor, "scale-factor", "", 1.0, `Scaling factor of entire image, defaults to 1.0 (1.0 = 1200DPI)`)
 
 	rootCmd.PersistentFlags().StringVarP(&frame, "frame", "f", "basic", `Frame to draw, use "none" to skip drawing a frame`)
 	rootCmd.PersistentFlags().StringVarP(&frameColorBackground, "frame-color-background", "", "1c1c1c99", `Background color for frame text boxes`)
@@ -160,6 +164,15 @@ var rootCmd = &cobra.Command{
 	Short: "netrunner-alt-gen generates alt arts for Netrunner",
 	Long: `A generative art tool to create alternate art cards with tournament legal frames for Netrunner.
   Complete documentation is available at https://github.com/mangofeet/netrunner-alt-gen`,
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		canvasWidth *= scaleFactor
+		canvasHeight *= scaleFactor
+		cardWidth *= scaleFactor
+		cardHeight *= scaleFactor
+		safeWidth *= scaleFactor
+		safeHeight *= scaleFactor
+		basic.ScaleFactor = scaleFactor
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("Version:", version)
 		cmd.Usage()
