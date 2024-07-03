@@ -1,14 +1,15 @@
 package reflection
 
 import (
+	"image"
 	"image/color"
-	"math"
+	"image/draw"
 
 	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/netrunner-alt-gen/internal/prng"
 	"github.com/mangofeet/nrdb-go"
-	"github.com/ojrac/opensimplex-go"
 	"github.com/tdewolff/canvas"
+	"github.com/tdewolff/canvas/renderers/rasterizer"
 )
 
 type Reflection struct {
@@ -69,6 +70,9 @@ func (drawer Reflection) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		panic(err)
 	}
 
+	baseCnv := canvas.New(canvasWidth, canvasHeight)
+	baseCtx := canvas.NewContext(baseCnv)
+
 	first := &art.AngleMorph{
 		RNG:                rngGlobal,
 		Width:              width,
@@ -85,7 +89,7 @@ func (drawer Reflection) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		StrokeWidthMinor:   makePointer(width * (0.02 / float64(columnCount))),
 	}
 
-	first.Draw(ctx)
+	first.Draw(baseCtx)
 
 	y += height
 	height = canvasHeight - height + (canvasHeight * 0.1)
@@ -103,92 +107,114 @@ func (drawer Reflection) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		Color:              baseColor,
 		Gradient:           art.AngleMorphGradientHorizontal,
 		ColorShiftMax:      makePointer(90.0),
-		StrokeWidthMain:    makePointer(width * (0.03 / float64(columnCount))),
-		StrokeWidthMinor:   makePointer(width * (0.03 / float64(columnCount))),
+		StrokeWidthMain:    makePointer(width * (0.02 / float64(columnCount))),
+		StrokeWidthMinor:   makePointer(width * (0.02 / float64(columnCount))),
 		BottomRow:          first.TopRow,
 	}
 
-	second.Draw(ctx)
+	second.Draw(baseCtx)
 
-	var walkers []*art.Walker
+	baseImg := rasterizer.Draw(baseCnv, canvas.DPMM(1), canvas.DefaultColorSpace)
 
-	noise := opensimplex.New(rngGlobal.Next(math.MaxInt64))
+	maskCnv := canvas.New(canvasWidth, canvasHeight)
+	maskCtx := canvas.NewContext(maskCnv)
 
-	for i := 0; i < 5000; i++ {
-		colorFactor := rngGlobal.Next(128) - 64
-
-		baseVx := float64(rngGlobal.Next(10) - 5)
-
-		wlk := art.Walker{
-			RNG:             rngGlobal,
-			Direction:       "down",
-			X:               canvasWidth / 2,
-			Y:               canvasHeight - 1,
-			Vx:              baseVx + (float64(rngGlobal.Next(50)) / 100) - 0.2,
-			Vy:              (float64(rngGlobal.Next(50)) / 100) * -1,
-			NoiseStepFactor: 0.005,
-			NoiseDimensions: 3,
-			Noise:           noise,
-			StrokeWidth:     width * (0.01 / float64(columnCount)),
-
-			Color: color.RGBA{
-				R: uint8(math.Max(0, math.Min(float64(int64(bottomColor.R)+colorFactor), 255))),
-				G: uint8(math.Max(0, math.Min(float64(int64(bottomColor.G)+colorFactor), 255))),
-				B: uint8(math.Max(0, math.Min(float64(int64(bottomColor.B)+colorFactor), 255))),
-				A: 0xff,
-			},
-		}
-		walkers = append(walkers, &wlk)
+	mask := &art.AngleMorph{
+		RNG:                rngGlobal,
+		Width:              width,
+		Height:             height,
+		X:                  x,
+		Y:                  y,
+		ColumnCount:        int(columnCount),
+		RowCount:           int(rowCount * 2),
+		InterpolationSteps: drawer.InterpolationSteps,
+		Color:              canvas.Black,
+		Gradient:           art.AngleMorphGradientNone,
+		ColorShiftMax:      makePointer(0.0),
+		StrokeWidthMain:    makePointer(width * (0.02 / float64(columnCount))),
+		StrokeWidthMinor:   makePointer(width * (0.02 / float64(columnCount))),
+		BottomRow:          first.TopRow,
 	}
 
-	for _, wlk := range walkers {
-		wlk.Draw(ctx)
-		var hasTurned bool
-		for wlk.InBounds(ctx) {
-			wlk.Velocity()
-			wlk.Move()
-			wlk.Draw(ctx)
+	mask.Draw(maskCtx)
 
-			if !hasTurned && wlk.Y < canvasHeight*splitFactor*1.75 {
-				wlk.Vy *= 0.9
-				wlk.Vx *= 0.9
-			}
-			if !hasTurned && wlk.Y < canvasHeight*splitFactor*1.5 {
-				wlk.Vy *= 0.9
-				wlk.Vx *= 0.9
-			}
-			if !hasTurned && wlk.Y < canvasHeight*splitFactor*1.25 {
-				wlk.Vy *= 0.9
-				wlk.Vx *= 0.9
-			}
-			if !hasTurned && wlk.Y < canvasHeight*splitFactor {
-				hasTurned = true
-				if wlk.Vx > 0 {
-					wlk.Direction = "right"
-				} else {
-					wlk.Direction = "left"
-				}
-			}
+	maskImg := rasterizer.Draw(maskCnv, canvas.DPMM(1), canvas.DefaultColorSpace)
+
+	// invert the mask image
+	for i, pxl := range maskImg.Pix {
+		if pxl == 0 {
+			maskImg.Pix[i] = 255
+		} else {
+			maskImg.Pix[i] = 0
 		}
 	}
 
-	// third := &art.AngleMorph{
-	// 	RNG:                rngGlobal,
-	// 	Width:              canvasWidth * 1.2,
-	// 	Height:             canvasHeight * 1.2,
-	// 	X:                  canvasWidth * -0.1,
-	// 	Y:                  canvasHeight * -0.1,
-	// 	ColumnCount:        int(columnCount),
-	// 	RowCount:           int(rowCount * 2),
-	// 	InterpolationSteps: drawer.InterpolationSteps,
-	// 	Color:              cardBGColor,
-	// 	Gradient:           art.AngleMorphGradientNone,
-	// 	ColorShiftMax:      makePointer(90.0),
-	// 	StrokeWidthMain:    makePointer(width * (0.02 / float64(columnCount))),
-	// 	StrokeWidthMinor:   makePointer(width * (0.02 / float64(columnCount))),
+	final := image.NewRGBA(image.Rect(0, 0, int(canvasWidth), int(canvasHeight)))
+	draw.DrawMask(final, final.Bounds(), baseImg, image.Point{}, maskImg, image.Point{}, draw.Over)
+
+	ctx.RenderImage(final, canvas.Identity)
+
+	// var walkers []*art.Walker
+
+	// noise := opensimplex.New(rngGlobal.Next(math.MaxInt64))
+
+	// for i := 0; i < 5000; i++ {
+	// 	colorFactor := rngGlobal.Next(128) - 64
+
+	// 	baseVx := float64(rngGlobal.Next(10) - 5)
+
+	// 	wlk := art.Walker{
+	// 		RNG:             rngGlobal,
+	// 		Direction:       "down",
+	// 		X:               canvasWidth / 2,
+	// 		Y:               canvasHeight - 1,
+	// 		Vx:              baseVx + (float64(rngGlobal.Next(50)) / 100) - 0.2,
+	// 		Vy:              (float64(rngGlobal.Next(50)) / 100) * -1,
+	// 		NoiseStepFactor: 0.005,
+	// 		NoiseDimensions: 3,
+	// 		Noise:           noise,
+	// 		StrokeWidth:     width * (0.01 / float64(columnCount)),
+
+	// 		Color: color.RGBA{
+	// 			R: uint8(math.Max(0, math.Min(float64(int64(bottomColor.R)+colorFactor), 255))),
+	// 			G: uint8(math.Max(0, math.Min(float64(int64(bottomColor.G)+colorFactor), 255))),
+	// 			B: uint8(math.Max(0, math.Min(float64(int64(bottomColor.B)+colorFactor), 255))),
+	// 			A: 0xff,
+	// 		},
+	// 	}
+	// 	walkers = append(walkers, &wlk)
 	// }
 
-	// third.Draw(ctx)
+	// for _, wlk := range walkers {
+	// 	wlk.Draw(ctx)
+	// 	var hasTurned bool
+	// 	for wlk.InBounds(ctx) {
+	// 		wlk.Velocity()
+	// 		wlk.Move()
+	// 		wlk.Draw(ctx)
+
+	// 		if !hasTurned && wlk.Y < canvasHeight*splitFactor*1.75 {
+	// 			wlk.Vy *= 0.9
+	// 			wlk.Vx *= 0.9
+	// 		}
+	// 		if !hasTurned && wlk.Y < canvasHeight*splitFactor*1.5 {
+	// 			wlk.Vy *= 0.9
+	// 			wlk.Vx *= 0.9
+	// 		}
+	// 		if !hasTurned && wlk.Y < canvasHeight*splitFactor*1.25 {
+	// 			wlk.Vy *= 0.9
+	// 			wlk.Vx *= 0.9
+	// 		}
+	// 		if !hasTurned && wlk.Y < canvasHeight*splitFactor {
+	// 			hasTurned = true
+	// 			if wlk.Vx > 0 {
+	// 				wlk.Direction = "right"
+	// 			} else {
+	// 				wlk.Direction = "left"
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	return nil
 }

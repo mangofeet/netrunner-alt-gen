@@ -120,6 +120,8 @@ If set to "faction", it will use the faction color regardless of the base color`
 	trackerCmd.Flags().StringVarP(&altColor4, "ring-color-4", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
 	trackerCmd.Flags().StringVarP(&colorBG, "color-bg", "", "", `Background color for the generated art, defaults to a darkened --base-color value`)
 
+	reflectionCmd.Flags().StringVarP(&colorBG, "color-bg", "", "", `Background color for the generated art, defaults to a darkened --base-color value`)
+
 	rootCmd.AddCommand(netwalkerCmd)
 	rootCmd.AddCommand(emptyCmd)
 	rootCmd.AddCommand(imageCmd)
