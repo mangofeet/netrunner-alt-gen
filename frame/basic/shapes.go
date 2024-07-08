@@ -11,6 +11,8 @@ import (
 	"github.com/tdewolff/canvas"
 )
 
+var ScaleFactor float64
+
 func getStrokeWidth(ctx *canvas.Context) float64 {
 	_, canvasHeight := ctx.Size()
 	// return canvasHeight * 0.0023
@@ -89,7 +91,7 @@ func (fb FrameBasic) drawRezCost(ctx *canvas.Context, card *nrdb.Printing, fontS
 	if err != nil {
 		return nil, err
 	}
-	rezCostImage = rezCostImage.Transform(canvas.Identity.ReflectY()).Scale(0.1, 0.1)
+	rezCostImage = rezCostImage.Transform(canvas.Identity.ReflectY()).Scale(0.1, 0.1).Scale(ScaleFactor, ScaleFactor)
 
 	ctx.Push()
 	ctx.SetFillColor(fb.getColorBG())
@@ -130,7 +132,7 @@ func (fb FrameBasic) drawAgendaPoints(ctx *canvas.Context, card *nrdb.Printing, 
 	if err != nil {
 		return nil, err
 	}
-	icon = icon.Transform(canvas.Identity.ReflectY()).Scale(0.07, 0.07)
+	icon = icon.Transform(canvas.Identity.ReflectY()).Scale(0.07, 0.07).Scale(ScaleFactor, ScaleFactor)
 
 	iconX := canvasWidth * 0.085
 	iconY := fb.getTextBoxHeight(ctx) + icon.Bounds().H*1.8
@@ -238,7 +240,7 @@ func (fb FrameBasic) drawMU(ctx *canvas.Context, card *nrdb.Printing, drawBox bo
 	if err != nil {
 		panic(err)
 	}
-	muImage = muImage.Transform(canvas.Identity.ReflectY()).Scale(0.05, 0.05)
+	muImage = muImage.Transform(canvas.Identity.ReflectY()).Scale(0.05, 0.05).Scale(ScaleFactor, ScaleFactor)
 
 	muBoxX := canvasWidth * 0.0853
 	muBoxY := (getTitleBoxTop(ctx) - getTitleBoxHeight(ctx)) - (muImage.Bounds().H * 0.8)
@@ -305,7 +307,7 @@ func (fb FrameBasic) drawLink(ctx *canvas.Context, card *nrdb.Printing) {
 	if err != nil {
 		panic(err)
 	}
-	icon = icon.Transform(canvas.Identity.ReflectY()).Scale(0.015, 0.015)
+	icon = icon.Transform(canvas.Identity.ReflectY()).Scale(0.015, 0.015).Scale(ScaleFactor, ScaleFactor)
 
 	boxX := canvasWidth * 0.1
 	boxY := getTitleBoxTop(ctx) - getTitleBoxHeight(ctx)*0.6
