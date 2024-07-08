@@ -43,12 +43,12 @@ import (
 var (
 	canvasWidth, canvasHeight, cardWidth, cardHeight, safeWidth, safeHeight float64 = 3264.0, 4450.0, 2976.0, 4152.0, 2736.0, 3924.0
 
-	drawMarginLines, makeBack                             bool
-	outputDir                                             string
-	baseColor, altColor1, altColor2, altColor3, altColor4 string
-	skipFlavor                                            bool
-	flavorText, flavorAttribution                         string
-	textBoxFactor, scaleFactor                            float64
+	drawMarginLines, makeBack                                           bool
+	outputDir                                                           string
+	baseColor, altColor1, altColor2, altColor3, altColor4, overlayColor string
+	skipFlavor                                                          bool
+	flavorText, flavorAttribution                                       string
+	textBoxFactor, scaleFactor                                          float64
 
 	frame, frameColorBackground, frameColorBorder, frameColorText,
 	frameColorTextStrength, frameColorInfluencePips,
@@ -125,13 +125,12 @@ If set to "faction", it will use the faction color regardless of the base color`
 	trackerCmd.Flags().StringVarP(&altColor2, "ring-color-2", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
 	trackerCmd.Flags().StringVarP(&altColor3, "ring-color-3", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
 	trackerCmd.Flags().StringVarP(&altColor4, "ring-color-4", "", "", `Alternate ring color for the card, defaults to faction color made more transparent`)
+	trackerCmd.Flags().StringVarP(&overlayColor, "ring-color-overlay", "", "", `Overlay ring color, defaults to white at 0x22 alpha`)
 	trackerCmd.Flags().StringVarP(&colorBG, "color-bg", "", "", `Background color for the generated art, defaults to a darkened --base-color value`)
-
 
 	reflectionCmd.Flags().StringVarP(&colorBG, "color-bg", "", "", `Background color for the generated art, defaults to a darkened --base-color value`)
 
 	pnpCmd.Flags().IntVarP(&startRow, "start-row", "m", 2, `Row to start generating from, defaults to 1 (this assumes the CSV contains a header row)`)
-
 
 	rootCmd.AddCommand(netwalkerCmd)
 	rootCmd.AddCommand(emptyCmd)

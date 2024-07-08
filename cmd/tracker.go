@@ -48,12 +48,13 @@ func generateCardTracker(cardName string) error {
 	}
 
 	ns := tracker.Tracker{
-		Color:      parseColor(baseColor),
-		ColorBG:    parseColor(colorBG),
-		RingColor1: parseColor(altColor1),
-		RingColor2: parseColor(altColor2),
-		RingColor3: parseColor(altColor3),
-		RingColor4: parseColor(altColor4),
+		Color:            parseColor(baseColor),
+		ColorBG:          parseColor(colorBG),
+		OverlayRingColor: parseColor(overlayColor),
+		RingColor1:       parseColor(altColor1),
+		RingColor2:       parseColor(altColor2),
+		RingColor3:       parseColor(altColor3),
+		RingColor4:       parseColor(altColor4),
 	}
 
 	// set the frame to be "tracker" specifically

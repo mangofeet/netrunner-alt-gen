@@ -12,6 +12,7 @@ import (
 type Tracker struct {
 	Color, ColorBG                                 *color.RGBA
 	RingColor1, RingColor2, RingColor3, RingColor4 *color.RGBA
+	OverlayRingColor                               *color.RGBA
 }
 
 func (drawer Tracker) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
@@ -39,7 +40,11 @@ func (drawer Tracker) Draw(ctx *canvas.Context, card *nrdb.Printing) error {
 		B: baseColor.B,
 		A: 0xdd,
 	}
+
 	overlayRingColor := color.RGBA{R: 0xff, G: 0xff, B: 0xff, A: 0x22}
+	if drawer.OverlayRingColor != nil {
+		overlayRingColor = *drawer.OverlayRingColor
+	}
 
 	var ringColor1 *color.RGBA
 	if drawer.RingColor1 != nil {
