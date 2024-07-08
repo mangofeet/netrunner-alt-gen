@@ -3,16 +3,16 @@ package cmd
 import (
 	"encoding/csv"
 	"fmt"
+	"log"
+	"os"
+	"strconv"
+	"strings"
+
 	"github.com/mangofeet/nrdb-go"
 	"github.com/spf13/cobra"
 	"github.com/tdewolff/canvas"
 	"github.com/tdewolff/canvas/renderers/pdf"
 	"github.com/tdewolff/canvas/renderers/rasterizer"
-	"log"
-	"os"
-	"regexp"
-	"strconv"
-	"strings"
 )
 
 var pnpCmd = &cobra.Command{
