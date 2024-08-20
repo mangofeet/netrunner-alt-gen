@@ -37,8 +37,8 @@ github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 h1:DACJavvAHhabrF0
 github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0/go.mod h1:E/TSTwGwJL78qG/PmXZO1EjYhfJinVAhrmmHX6Z8B9k=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
-github.com/mangofeet/nrdb-go v0.1.1 h1:mJieKhA1jP1Q6pEeXiNzSTURZDefAYlxudka39yh1Lw=
-github.com/mangofeet/nrdb-go v0.1.1/go.mod h1:g90VzQd5ypfs2mwKskxKNFpeP63MtB4wJ+VYikeG6v0=
+github.com/mangofeet/nrdb-go v0.2.0 h1:A+FWo4ZTQjrvr6fV0jkoJ2BLL4fFansyd2kSkMezTII=
+github.com/mangofeet/nrdb-go v0.2.0/go.mod h1:g90VzQd5ypfs2mwKskxKNFpeP63MtB4wJ+VYikeG6v0=
 github.com/ojrac/opensimplex-go v1.0.2 h1:l4vs0D+JCakcu5OV0kJ99oEaWJfggSc9jiLpxaWvSzs=
 github.com/ojrac/opensimplex-go v1.0.2/go.mod h1:NwbXFFbXcdGgIFdiA7/REME+7n/lOf1TuEbLiZYOWnM=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRIccs7FGNTlIRMkT8wgtp5eCXdBlqhYGL6U=

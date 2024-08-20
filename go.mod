@@ -6,10 +6,11 @@ toolchain go1.22.2
 
 require (
 	github.com/crazy3lf/colorconv v1.2.0
-	github.com/mangofeet/nrdb-go v0.1.1
+	github.com/mangofeet/nrdb-go v0.2.0
 	github.com/ojrac/opensimplex-go v1.0.2
 	github.com/spf13/cobra v1.8.0
 	github.com/tdewolff/canvas v0.0.0-20240420213651-d5a04e36ef50
+	golang.org/x/text v0.14.0
 )
 
 require (
@@ -30,7 +31,6 @@ require (
 	github.com/wcharczuk/go-chart/v2 v2.1.1 // indirect
 	golang.org/x/image v0.15.0 // indirect
 	golang.org/x/net v0.24.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
 	gonum.org/v1/plot v0.14.0 // indirect
 	star-tex.org/x/tex v0.4.0 // indirect
 )

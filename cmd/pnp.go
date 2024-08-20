@@ -186,9 +186,9 @@ func buildCard(record []string, cardID int) *nrdb.Printing {
 		val, _ := strconv.Atoi(tokens[1])
 		switch tokens[0] {
 		case "Advancements":
-			card.Attributes.AdvancementRequirement = &val
+			card.Attributes.AdvancementRequirement = &tokens[1]
 		case "Cost":
-			card.Attributes.Cost = &val
+			card.Attributes.Cost = &tokens[1]
 		case "Deck":
 			card.Attributes.MinimumDeckSize = &val
 		case "Influence":
