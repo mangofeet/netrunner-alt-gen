@@ -58,16 +58,16 @@ func (fb FrameBasic) getFittedTextWithFont(ctx *canvas.Context, title string, fo
 		return fb.getHorizontalFittedText(ctx, title, fontSize, maxWidth, maxHeight, align)
 	}
 
-	text := fb.getCardText(title, fontSize, maxWidth*2, maxHeight*2, align)
+	text := fb.getCardTextWithFont(title, fontSize, maxWidth*2, maxHeight*2, align, font)
 
 	strokeWidth := getStrokeWidth(ctx)
 
-	for text.Bounds().W > maxWidth || text.Bounds().H > maxHeight {
+	for (text.Bounds().W > maxWidth || text.Bounds().H > maxHeight) && fontSize > 0 {
 		fontSize -= strokeWidth
-		text = fb.getCardText(title, fontSize, maxWidth*2, maxHeight*2, align)
+		text = fb.getCardTextWithFont(title, fontSize, maxWidth*2, maxHeight*2, align, font)
 	}
 
-	return fb.getCardText(title, fontSize, maxWidth, maxHeight, align)
+	return fb.getCardTextWithFont(title, fontSize, maxWidth, maxHeight, align, font)
 
 }
 
@@ -77,7 +77,7 @@ func (fb FrameBasic) getHorizontalFittedText(ctx *canvas.Context, title string, 
 
 func (fb FrameBasic) getHorizontalFittedTextWithFont(ctx *canvas.Context, title string, fontSize, maxWidth, height float64, align canvas.TextAlign, font *canvas.FontFace) *canvas.Text {
 
-	text := fb.getCardText(title, fontSize, maxWidth*2, height, align)
+	text := fb.getCardTextWithFont(title, fontSize, maxWidth*2, height, align, font)
 
 	strokeWidth := getStrokeWidth(ctx)
 
@@ -98,7 +98,7 @@ func (fb FrameBasic) getVerticalFittedText(ctx *canvas.Context, title string, fo
 
 func (fb FrameBasic) getVerticalFittedTextWithFont(ctx *canvas.Context, title string, fontSize, width, maxHeight float64, align canvas.TextAlign, font *canvas.FontFace) *canvas.Text {
 
-	text := fb.getCardText(title, fontSize, width, maxHeight*2, align)
+	text := fb.getCardTextWithFont(title, fontSize, width, maxHeight*2, align, font)
 
 	strokeWidth := getStrokeWidth(ctx)
 
@@ -120,6 +120,7 @@ func (fb FrameBasic) getCardText(text string, fontSize, cardTextBoxW, cardTextBo
 
 func (fb FrameBasic) getCardTextWithFont(text string, fontSize, cardTextBoxW, cardTextBoxH float64, align canvas.TextAlign, font *canvas.FontFace) *canvas.Text {
 
+	regFace := fontFamily.Face(fontSize, font.Fill.Color, font.Style)
 	boldFace := fb.getFont(fontSize, canvas.FontBold)
 	italicFace := fb.getFont(fontSize, canvas.FontItalic)
 	arrowFace := fb.getFont(fontSize, canvas.FontExtraBold)
@@ -138,19 +139,19 @@ func (fb FrameBasic) getCardTextWithFont(text string, fontSize, cardTextBoxW, ca
 
 		if strings.Contains(part, "→") {
 			subParts := strings.Split(part, "→")
-			fb.writeTextPart(rt, subParts[0], font, boldFace, italicFace)
+			fb.writeTextPart(rt, subParts[0], regFace, boldFace, italicFace)
 			rt.WriteFace(arrowFace, "→")
 			part = subParts[1]
 		}
 
 		if strings.Contains(part, "♦") {
 			subParts := strings.Split(part, "♦")
-			fb.writeTextPart(rt, subParts[0], font, boldFace, italicFace)
+			fb.writeTextPart(rt, subParts[0], regFace, boldFace, italicFace)
 			rt.WriteFace(uniqueFace, "♦")
 			part = subParts[1]
 		}
 
-		fb.writeTextPart(rt, part, font, boldFace, italicFace)
+		fb.writeTextPart(rt, part, regFace, boldFace, italicFace)
 	}
 
 	return rt.ToText(
@@ -421,9 +422,9 @@ func (fb FrameBasic) getTypeText(ctx *canvas.Context, card *nrdb.Printing, fontS
 	typeName := getTypeName(card.Attributes.CardTypeID)
 
 	if card.Attributes.DisplaySubtypes != nil {
-		tText = fb.getHorizontalFittedText(ctx, fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSize, w, h, align)
+		tText = fb.getFittedText(ctx, fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSize, w, h, align)
 	} else {
-		tText = fb.getHorizontalFittedText(ctx, fmt.Sprintf("<strong>%s</strong>", typeName), fontSize, w, h, align)
+		tText = fb.getFittedText(ctx, fmt.Sprintf("<strong>%s</strong>", typeName), fontSize, w, h, align)
 	}
 
 	return tText
