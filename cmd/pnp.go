@@ -8,29 +8,31 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mangofeet/netrunner-alt-gen/art"
 	"github.com/mangofeet/nrdb-go"
 	"github.com/spf13/cobra"
 	"github.com/tdewolff/canvas"
+	"github.com/tdewolff/canvas/renderers"
 	"github.com/tdewolff/canvas/renderers/pdf"
 	"github.com/tdewolff/canvas/renderers/rasterizer"
 )
 
 var pnpCmd = &cobra.Command{
-	Use:   "pnp [CSV file]",
-	Args:  cobra.MinimumNArgs(1),
-	Short: "Generate a print & play file containing cards from a CSV",
+	Use:   "pnp [CSV file] [Prefix]",
+	Args:  cobra.MinimumNArgs(2),
+	Short: "Generate a print & play file containing cards from a CSV. Card Titles can be prepended with a prefix for version tracking",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := generatePnPFile(args[0]); err != nil {
+		if err := generatePnPFile(args[0], args[1]); err != nil {
 			log.Println("error:", err)
 			os.Exit(1)
 		}
 	},
 }
 
-func generatePnPFile(csvPath string) error {
+func generatePnPFile(csvPath string, prefix string) error {
 	const (
-		PAGE_WIDTH_MM  = 210
-		PAGE_HEIGHT_MM = 297
+		PAGE_WIDTH_MM  = 216
+		PAGE_HEIGHT_MM = 279
 		CARD_WIDTH_MM  = 60.0
 	)
 
@@ -53,18 +55,30 @@ func generatePnPFile(csvPath string) error {
 	}
 
 	// Open PDF file
-	pdfFilePath := fmt.Sprintf("%s/pnp.pdf", outputDir)
-	log.Printf("Generating print & play file at %s", pdfFilePath)
-	pdfFile, err := os.Create(pdfFilePath)
+	pdfFilePath_three := fmt.Sprintf("%s/pnp_3x.pdf", outputDir)
+	log.Printf("Generating print & play file at %s", pdfFilePath_three)
+	pdfFile_three, err := os.Create(pdfFilePath_three)
 	if err != nil {
 		return err
 	}
-	defer pdfFile.Close()
-
+	defer pdfFile_three.Close()
 	// Instantiate variables
-	p := pdf.New(pdfFile, PAGE_WIDTH_MM, PAGE_HEIGHT_MM, nil)
-	pdfCanvas := canvas.New(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
-	pdfContext := canvas.NewContext(pdfCanvas)
+	p_three := pdf.New(pdfFile_three, PAGE_WIDTH_MM, PAGE_HEIGHT_MM, nil)
+	pdfCanvas_three := canvas.New(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
+	pdfContext_three := canvas.NewContext(pdfCanvas_three)
+
+	pdfFilePath_one := fmt.Sprintf("%s/pnp_1x.pdf", outputDir)
+	log.Printf("Generating print & play file at %s", pdfFilePath_one)
+	pdfFile_one, err := os.Create(pdfFilePath_one)
+	if err != nil {
+		return err
+	}
+	defer pdfFile_one.Close()
+	// Instantiate variables
+	p_one := pdf.New(pdfFile_one, PAGE_WIDTH_MM, PAGE_HEIGHT_MM, nil)
+	pdfCanvas_one := canvas.New(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
+	pdfContext_one := canvas.NewContext(pdfCanvas_one)
+
 	pageMarginX := (PAGE_WIDTH_MM - (CARD_WIDTH_MM * 3)) / 2
 	pageMarginY := -1.0
 
@@ -80,11 +94,29 @@ func generatePnPFile(csvPath string) error {
 	frameColorText = "000000"
 
 	cardID := startRow
+	imageCount_one := 0
+	imageCount_three := 0
 	for i, record := range records[startRow-1:] {
+		if i == 0 {
+			imageCount_three = i
+			imageCount_one = i
+		}
 		card := buildCard(record, cardID)
 
+		// prepend 'Dev 8.2' etc
+		card.Attributes.Title = fmt.Sprintf("%s %s", prefix, card.Attributes.Title)
 		// Generate card image
-		cnv, err := generateCardCanvas(emptyDrawer{}, card, "", "")
+
+		imgPath := fmt.Sprintf("piggybank_images/%d.png", cardID)
+		_, imgFileErr := os.Stat(imgPath)
+		var drawer art.Drawer
+		drawer = emptyDrawer{}
+		if imgFileErr == nil {
+			drawer = imageDrawer{
+				filename: imgPath,
+			}
+		}
+		cnv, err := generateCardCanvas(drawer, card, "", "")
 		if err != nil {
 			return err
 		}
@@ -99,32 +131,84 @@ func generatePnPFile(csvPath string) error {
 		}
 
 		// Draw image
-		imageIndex := i % 9
-		pageX := pageMarginX + (float64(i%3) * imgWidth)
-		pageY := PAGE_HEIGHT_MM - (float64((imageIndex/3)+1) * imgHeight) - pageMarginY
-		pdfContext.DrawImage(pageX, pageY, cardImg, canvas.DPMM(imgDPMM))
+		// print 3x non IDs
+		if card.Attributes.CardTypeID == "runner_identity" || card.Attributes.CardTypeID == "corp_identity" {
+			imageIndex := imageCount_three % 9
+			pageX := pageMarginX + (float64(imageCount_three%3) * imgWidth)
+			pageY := PAGE_HEIGHT_MM - (float64((imageIndex/3)+1) * imgHeight) - pageMarginY
+			pdfContext_three.DrawImage(pageX, pageY, cardImg, canvas.DPMM(imgDPMM))
+			imageCount_three++
 
+			if imageCount_three%9 == 8 {
+				pdfCanvas_three.RenderTo(p_three)
+				p_three.NewPage(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
+				pdfCanvas_three = canvas.New(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
+				pdfContext_three = canvas.NewContext(pdfCanvas_three)
+			}
+
+		} else {
+			for j := 0; j < 3; j++ {
+				imageIndex := imageCount_three % 9
+				pageX := pageMarginX + (float64(imageCount_three%3) * imgWidth)
+				pageY := PAGE_HEIGHT_MM - (float64((imageIndex/3)+1) * imgHeight) - pageMarginY
+				pdfContext_three.DrawImage(pageX, pageY, cardImg, canvas.DPMM(imgDPMM))
+				imageCount_three++
+				// need to handle after each image or else we cna miss a page accidentally
+				if imageCount_three%9 == 8 {
+					pdfCanvas_three.RenderTo(p_three)
+					p_three.NewPage(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
+					pdfCanvas_three = canvas.New(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
+					pdfContext_three = canvas.NewContext(pdfCanvas_three)
+				}
+			}
+		}
+
+		imageIndex := imageCount_one % 9
+		pageX := pageMarginX + (float64(imageCount_one%3) * imgWidth)
+		pageY := PAGE_HEIGHT_MM - (float64((imageIndex/3)+1) * imgHeight) - pageMarginY
+		pdfContext_one.DrawImage(pageX, pageY, cardImg, canvas.DPMM(imgDPMM))
+		imageCount_one++
+
+		if imageCount_one%9 == 8 {
+			pdfCanvas_one.RenderTo(p_one)
+			p_one.NewPage(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
+			pdfCanvas_one = canvas.New(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
+			pdfContext_one = canvas.NewContext(pdfCanvas_one)
+		}
+
+		cardName := card.Attributes.Title
+		cardImgFilePath := fmt.Sprintf("%s/%d_%s.png", outputDir, cardID, cardName)
+		imgFile, err := os.Create(cardImgFilePath)
+		if err != nil {
+			return err
+		}
+
+		cardCanvas := canvas.New(60, 88)
+		cardContext := canvas.NewContext(cardCanvas)
+		cardContext.DrawImage(0, 0, cardImg, canvas.DPMM(imgDPMM))
+		renderers.PNG(canvas.DPMM(imgDPMM))(imgFile, cardCanvas)
+		imgFile.Close()
 		cardID += 1
 
 		// Quit if we reached the last record
-		if i == len(records)-startRow-1 {
-			break
-		}
+		//if i == len(records)-startRow-1 {
+		//	break
+		//}
 
 		// Render the page and create a new one
-		if i%9 == 8 {
-			pdfCanvas.RenderTo(p)
 
-			p.NewPage(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
-			pdfCanvas = canvas.New(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
-			pdfContext = canvas.NewContext(pdfCanvas)
-		}
 	}
 
 	// Render the last page
-	pdfCanvas.RenderTo(p)
+	pdfCanvas_three.RenderTo(p_three)
 
-	if err := p.Close(); err != nil {
+	if err := p_three.Close(); err != nil {
+		return err
+	}
+
+	pdfCanvas_one.RenderTo(p_one)
+
+	if err := p_one.Close(); err != nil {
 		return err
 	}
 
@@ -140,7 +224,7 @@ func buildCard(record []string, cardID int) *nrdb.Printing {
 	titleStripper := strings.NewReplacer(" ", "", ".", "", ",", "", "-", "", "!", "", "◆", "")
 
 	// Split summary into sections for ease of use
-	summary_sections := strings.Split(record[5], "====")
+	summary_sections := strings.Split(record[4], "====")
 	lower_sections := summary_sections[1]
 	summary_sections = []string{summary_sections[0]}
 	summary_sections = append(summary_sections, strings.Split(lower_sections, "----")...)
@@ -151,21 +235,21 @@ func buildCard(record []string, cardID int) *nrdb.Printing {
 	// Set ID, faction, name, and type
 	card.ID = strconv.Itoa(cardID)
 	card.Attributes.PositionInSet = cardID
-	if record[1] == "Weyland" {
+	if record[3] == "Weyland" {
 		card.Attributes.FactionID = "weyland_consortium"
 	} else {
-		card.Attributes.FactionID = strings.ReplaceAll(strings.ToLower(record[1]), "-", "_")
+		card.Attributes.FactionID = strings.ReplaceAll(strings.ToLower(record[3]), "-", "_")
 	}
-	card.Attributes.Title = strings.ReplaceAll(record[3], "\n", "")
-	card.Attributes.StrippedTitle = titleStripper.Replace(record[3])
+	card.Attributes.Title = strings.ReplaceAll(record[2], "\n", "")
+	card.Attributes.StrippedTitle = titleStripper.Replace(record[2])
 	card.Attributes.IsUnique = strings.Contains(summary_sections[0], "◆")
-	if record[4] == "Runner-ID" {
+	if record[1] == "Runner-ID" {
 		card.Attributes.CardTypeID = "runner_identity"
 		card.Attributes.CardAbilities.MUProvided = nil
-	} else if record[4] == "Corp-ID" {
+	} else if record[1] == "Corp-ID" {
 		card.Attributes.CardTypeID = "corp_identity"
 	} else {
-		card.Attributes.CardTypeID = strings.ToLower(record[4])
+		card.Attributes.CardTypeID = strings.ToLower(record[1])
 	}
 
 	// Set subtypes
@@ -201,7 +285,7 @@ func buildCard(record []string, cardID int) *nrdb.Printing {
 		case "Strength":
 			card.Attributes.Strength = &val
 		case "Trash":
-			card.Attributes.MinimumDeckSize = &val
+			card.Attributes.TrashCost = &val
 		}
 	}
 

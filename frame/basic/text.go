@@ -163,8 +163,12 @@ func (fb FrameBasic) getCardTextWithFont(text string, fontSize, cardTextBoxW, ca
 
 func (fb FrameBasic) writeTextPart(rt *canvas.RichText, text string, regFace, boldFace, italicFace *canvas.FontFace) {
 
-	text = strings.ReplaceAll(text, "\n", "\n\n")
+	text = strings.ReplaceAll(text, "\n", "\n") // used to be replace text "\n" "\n\n"
 	text = strings.ReplaceAll(text, "<BR>", "\n")
+	text = strings.Replace(text, "</li>", "", -1)
+	text = strings.Replace(text, "</ul>", "", -1)
+	text = strings.Replace(text, "<ul>", "", -1)
+	text = strings.Replace(text, "<li>", "\n •", -1)
 
 	if strings.Contains(text, "</strong>") {
 		subParts := strings.Split(text, "</strong>")
@@ -277,7 +281,7 @@ func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, font
 	_, canvasHeight := ctx.Size()
 
 	originalFontSize := fontSize
-	extraFontSize := originalFontSize * 0.8
+	extraFontSize := originalFontSize * 0.7
 	maxExtraFontSize := extraFontSize
 	textBottom := canvasHeight * 0.0592
 
@@ -421,8 +425,12 @@ func (fb FrameBasic) getTypeText(ctx *canvas.Context, card *nrdb.Printing, fontS
 	var tText *canvas.Text
 	typeName := getTypeName(card.Attributes.CardTypeID)
 
-	if card.Attributes.DisplaySubtypes != nil {
+	if card.Attributes.DisplaySubtypes != nil && card.Attributes.TrashCost != nil {
+		tText = fb.getFittedText(ctx, fmt.Sprintf("<strong>%s</strong> - %s - Trash: %d", typeName, *card.Attributes.DisplaySubtypes, *card.Attributes.TrashCost), fontSize, w, h, align)
+	} else if card.Attributes.DisplaySubtypes != nil && card.Attributes.TrashCost == nil {
 		tText = fb.getFittedText(ctx, fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSize, w, h, align)
+	} else if card.Attributes.TrashCost != nil {
+		tText = fb.getFittedText(ctx, fmt.Sprintf("<strong>%s</strong> - Trash: %d", typeName, *card.Attributes.TrashCost), fontSize, w, h, align)
 	} else {
 		tText = fb.getFittedText(ctx, fmt.Sprintf("<strong>%s</strong>", typeName), fontSize, w, h, align)
 	}
