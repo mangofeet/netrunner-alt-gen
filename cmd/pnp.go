@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/csv"
 	"fmt"
+	"image"
 	"log"
 	"os"
 	"strconv"
@@ -17,6 +18,30 @@ import (
 	"github.com/tdewolff/canvas/renderers/rasterizer"
 )
 
+const (
+	PAGE_WIDTH_MM  = 216
+	PAGE_HEIGHT_MM = 279
+	CARD_WIDTH_MM  = 60.0
+)
+
+type cardImage struct {
+	Width  float64
+	Height float64
+	DPMM   float64
+	Data   *image.RGBA
+}
+
+func newCardImage(data *image.RGBA) cardImage {
+	imgDPMM := float64(data.Bounds().Max.X) / CARD_WIDTH_MM
+
+	return cardImage{
+		Width:  float64(data.Bounds().Max.X) / imgDPMM,
+		Height: float64(data.Bounds().Max.Y) / imgDPMM,
+		DPMM:   imgDPMM,
+		Data:   data,
+	}
+}
+
 var pnpCmd = &cobra.Command{
 	Use:   "pnp [CSV file] [Prefix]",
 	Args:  cobra.MinimumNArgs(2),
@@ -30,12 +55,6 @@ var pnpCmd = &cobra.Command{
 }
 
 func generatePnPFile(csvPath string, prefix string) error {
-	const (
-		PAGE_WIDTH_MM  = 216
-		PAGE_HEIGHT_MM = 279
-		CARD_WIDTH_MM  = 60.0
-	)
-
 	// Load CSV file
 	csvFile, err := os.Open(csvPath)
 	if err != nil {
@@ -54,7 +73,7 @@ func generatePnPFile(csvPath string, prefix string) error {
 		return err
 	}
 
-	// Open PDF file
+	// Open 3x PDF file
 	pdfFilePath_three := fmt.Sprintf("%s/pnp_3x.pdf", outputDir)
 	log.Printf("Generating print & play file at %s", pdfFilePath_three)
 	pdfFile_three, err := os.Create(pdfFilePath_three)
@@ -62,11 +81,14 @@ func generatePnPFile(csvPath string, prefix string) error {
 		return err
 	}
 	defer pdfFile_three.Close()
-	// Instantiate variables
+
+	// Instantiate 3x variables
 	p_three := pdf.New(pdfFile_three, PAGE_WIDTH_MM, PAGE_HEIGHT_MM, nil)
 	pdfCanvas_three := canvas.New(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
 	pdfContext_three := canvas.NewContext(pdfCanvas_three)
+	imageCount_three := 0
 
+	// Open 1x PDF file
 	pdfFilePath_one := fmt.Sprintf("%s/pnp_1x.pdf", outputDir)
 	log.Printf("Generating print & play file at %s", pdfFilePath_one)
 	pdfFile_one, err := os.Create(pdfFilePath_one)
@@ -74,13 +96,33 @@ func generatePnPFile(csvPath string, prefix string) error {
 		return err
 	}
 	defer pdfFile_one.Close()
-	// Instantiate variables
+
+	// Instantiate 1x variables
 	p_one := pdf.New(pdfFile_one, PAGE_WIDTH_MM, PAGE_HEIGHT_MM, nil)
 	pdfCanvas_one := canvas.New(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
 	pdfContext_one := canvas.NewContext(pdfCanvas_one)
+	imageCount_one := 0
 
 	pageMarginX := (PAGE_WIDTH_MM - (CARD_WIDTH_MM * 3)) / 2
 	pageMarginY := -1.0
+
+	// Helper func that draws a card to a PDF file
+	var addCardToPage = func(imageCount *int, img cardImage, canv *canvas.Canvas, ctx *canvas.Context, p *pdf.PDF) (*canvas.Canvas, *canvas.Context) {
+		imageIndex := *imageCount % 9
+		pageX := pageMarginX + (float64(*imageCount%3) * img.Width)
+		pageY := PAGE_HEIGHT_MM - (float64((imageIndex/3)+1) * img.Height) - pageMarginY
+		ctx.DrawImage(pageX, pageY, img.Data, canvas.DPMM(img.DPMM))
+		*imageCount++
+
+		if *imageCount%9 == 8 {
+			canv.RenderTo(p)
+			p.NewPage(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
+			canv = canvas.New(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
+			ctx = canvas.NewContext(canv)
+		}
+
+		return canv, ctx
+	}
 
 	// Override colors to black & white
 	baseColor = "ffffff"
@@ -94,8 +136,6 @@ func generatePnPFile(csvPath string, prefix string) error {
 	frameColorText = "000000"
 
 	cardID := startRow
-	imageCount_one := 0
-	imageCount_three := 0
 	for i, record := range records[startRow-1:] {
 		if i == 0 {
 			imageCount_three = i
@@ -105,8 +145,8 @@ func generatePnPFile(csvPath string, prefix string) error {
 
 		// prepend 'Dev 8.2' etc
 		card.Attributes.Title = fmt.Sprintf("%s %s", prefix, card.Attributes.Title)
-		// Generate card image
 
+		// Generate card image
 		imgPath := fmt.Sprintf("piggybank_images/%d.png", cardID)
 		_, imgFileErr := os.Stat(imgPath)
 		var drawer art.Drawer
@@ -121,93 +161,49 @@ func generatePnPFile(csvPath string, prefix string) error {
 			return err
 		}
 
-		// Calculate card dimensions
-		cardImg := rasterizer.Draw(cnv, canvas.DPMM(1), canvas.DefaultColorSpace)
-		imgDPMM := float64(cardImg.Bounds().Max.X) / CARD_WIDTH_MM
-		imgWidth := float64(cardImg.Bounds().Max.X) / imgDPMM
-		imgHeight := float64(cardImg.Bounds().Max.Y) / imgDPMM
+		// Create new card image
+		cardImg := newCardImage(rasterizer.Draw(cnv, canvas.DPMM(1), canvas.DefaultColorSpace))
+
 		if pageMarginY == -1 {
-			pageMarginY = (PAGE_HEIGHT_MM - (imgHeight * 3)) / 2
+			pageMarginY = (PAGE_HEIGHT_MM - (cardImg.Height * 3)) / 2
 		}
 
-		// Draw image
-		// print 3x non IDs
+		// Draw to 3x PDF (only 1x for identities)
 		if card.Attributes.CardTypeID == "runner_identity" || card.Attributes.CardTypeID == "corp_identity" {
-			imageIndex := imageCount_three % 9
-			pageX := pageMarginX + (float64(imageCount_three%3) * imgWidth)
-			pageY := PAGE_HEIGHT_MM - (float64((imageIndex/3)+1) * imgHeight) - pageMarginY
-			pdfContext_three.DrawImage(pageX, pageY, cardImg, canvas.DPMM(imgDPMM))
-			imageCount_three++
-
-			if imageCount_three%9 == 8 {
-				pdfCanvas_three.RenderTo(p_three)
-				p_three.NewPage(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
-				pdfCanvas_three = canvas.New(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
-				pdfContext_three = canvas.NewContext(pdfCanvas_three)
-			}
-
+			pdfCanvas_three, pdfContext_three = addCardToPage(&imageCount_three, cardImg, pdfCanvas_three, pdfContext_three, p_three)
 		} else {
 			for j := 0; j < 3; j++ {
-				imageIndex := imageCount_three % 9
-				pageX := pageMarginX + (float64(imageCount_three%3) * imgWidth)
-				pageY := PAGE_HEIGHT_MM - (float64((imageIndex/3)+1) * imgHeight) - pageMarginY
-				pdfContext_three.DrawImage(pageX, pageY, cardImg, canvas.DPMM(imgDPMM))
-				imageCount_three++
-				// need to handle after each image or else we cna miss a page accidentally
-				if imageCount_three%9 == 8 {
-					pdfCanvas_three.RenderTo(p_three)
-					p_three.NewPage(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
-					pdfCanvas_three = canvas.New(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
-					pdfContext_three = canvas.NewContext(pdfCanvas_three)
-				}
+				pdfCanvas_three, pdfContext_three = addCardToPage(&imageCount_three, cardImg, pdfCanvas_three, pdfContext_three, p_three)
 			}
 		}
 
-		imageIndex := imageCount_one % 9
-		pageX := pageMarginX + (float64(imageCount_one%3) * imgWidth)
-		pageY := PAGE_HEIGHT_MM - (float64((imageIndex/3)+1) * imgHeight) - pageMarginY
-		pdfContext_one.DrawImage(pageX, pageY, cardImg, canvas.DPMM(imgDPMM))
-		imageCount_one++
+		// Draw to 1x PDF
+		pdfCanvas_one, pdfContext_one = addCardToPage(&imageCount_one, cardImg, pdfCanvas_one, pdfContext_one, p_one)
 
-		if imageCount_one%9 == 8 {
-			pdfCanvas_one.RenderTo(p_one)
-			p_one.NewPage(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
-			pdfCanvas_one = canvas.New(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
-			pdfContext_one = canvas.NewContext(pdfCanvas_one)
-		}
-
+		// Create individual card file
 		cardName := card.Attributes.Title
 		cardImgFilePath := fmt.Sprintf("%s/%d_%s.png", outputDir, cardID, cardName)
 		imgFile, err := os.Create(cardImgFilePath)
 		if err != nil {
 			return err
 		}
-
 		cardCanvas := canvas.New(60, 88)
 		cardContext := canvas.NewContext(cardCanvas)
-		cardContext.DrawImage(0, 0, cardImg, canvas.DPMM(imgDPMM))
-		renderers.PNG(canvas.DPMM(imgDPMM))(imgFile, cardCanvas)
+		cardContext.DrawImage(0, 0, cardImg.Data, canvas.DPMM(cardImg.DPMM))
+		renderers.PNG(canvas.DPMM(cardImg.DPMM))(imgFile, cardCanvas)
 		imgFile.Close()
+
 		cardID += 1
-
-		// Quit if we reached the last record
-		//if i == len(records)-startRow-1 {
-		//	break
-		//}
-
-		// Render the page and create a new one
-
 	}
 
-	// Render the last page
+	// Render the last 3x PDF page
 	pdfCanvas_three.RenderTo(p_three)
-
 	if err := p_three.Close(); err != nil {
 		return err
 	}
 
+	// Render the last 1x PDF page
 	pdfCanvas_one.RenderTo(p_one)
-
 	if err := p_one.Close(); err != nil {
 		return err
 	}
