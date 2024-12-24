@@ -190,10 +190,12 @@ var replacementCheck = regexp.MustCompile(`\[[a-z-]+\]`)
 
 func (fb FrameBasic) replaceSymbol(rt *canvas.RichText, symbol, svgName, text string, face *canvas.FontFace, scaleFactor, translateFactor float64) string {
 	if strings.Contains(text, symbol) {
+		fontScale := face.Size * scaleFactor
+
 		subParts := strings.Split(text, symbol)
 		for _, chunk := range subParts[:len(subParts)-1] {
 			fb.writeChunk(rt, chunk, face)
-			path := mustLoadGameAsset(svgName).Scale(face.Size*scaleFactor, face.Size*scaleFactor).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1*translateFactor))
+			path := mustLoadGameAsset(svgName).Scale(fontScale, fontScale).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1*translateFactor))
 			rt.WritePath(path, fb.getColorText(), canvas.FontMiddle)
 		}
 		text = subParts[len(subParts)-1]
@@ -203,7 +205,6 @@ func (fb FrameBasic) replaceSymbol(rt *canvas.RichText, symbol, svgName, text st
 	}
 
 	return text
-
 }
 
 func (fb FrameBasic) writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
@@ -425,12 +426,8 @@ func (fb FrameBasic) getTypeText(ctx *canvas.Context, card *nrdb.Printing, fontS
 	var tText *canvas.Text
 	typeName := getTypeName(card.Attributes.CardTypeID)
 
-	if card.Attributes.DisplaySubtypes != nil && card.Attributes.TrashCost != nil {
-		tText = fb.getFittedText(ctx, fmt.Sprintf("<strong>%s</strong> - %s - Trash: %d", typeName, *card.Attributes.DisplaySubtypes, *card.Attributes.TrashCost), fontSize, w, h, align)
-	} else if card.Attributes.DisplaySubtypes != nil && card.Attributes.TrashCost == nil {
+	if card.Attributes.DisplaySubtypes != nil {
 		tText = fb.getFittedText(ctx, fmt.Sprintf("<strong>%s</strong> - %s", typeName, *card.Attributes.DisplaySubtypes), fontSize, w, h, align)
-	} else if card.Attributes.TrashCost != nil {
-		tText = fb.getFittedText(ctx, fmt.Sprintf("<strong>%s</strong> - Trash: %d", typeName, *card.Attributes.TrashCost), fontSize, w, h, align)
 	} else {
 		tText = fb.getFittedText(ctx, fmt.Sprintf("<strong>%s</strong>", typeName), fontSize, w, h, align)
 	}

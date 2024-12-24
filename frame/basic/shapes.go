@@ -82,8 +82,9 @@ func (fb FrameBasic) drawCostCircle(ctx *canvas.Context, bgColor color.Color) {
 }
 
 func (fb FrameBasic) drawRezCost(ctx *canvas.Context, card *nrdb.Printing, fontSize float64) (*textBoxDimensions, error) {
-	canvasWidth, canvasHeight := ctx.Size()
+	rezScale := 0.1 * ScaleFactor
 
+	canvasWidth, canvasHeight := ctx.Size()
 	strokeWidth := getStrokeWidth(ctx)
 
 	// res cost icon
@@ -91,7 +92,7 @@ func (fb FrameBasic) drawRezCost(ctx *canvas.Context, card *nrdb.Printing, fontS
 	if err != nil {
 		return nil, err
 	}
-	rezCostImage = rezCostImage.Transform(canvas.Identity.ReflectY()).Scale(0.1, 0.1).Scale(ScaleFactor, ScaleFactor)
+	rezCostImage = rezCostImage.Transform(canvas.Identity.ReflectY()).Scale(rezScale, rezScale)
 
 	ctx.Push()
 	ctx.SetFillColor(fb.getColorBG())
@@ -123,8 +124,9 @@ func (fb FrameBasic) drawRezCost(ctx *canvas.Context, card *nrdb.Printing, fontS
 }
 
 func (fb FrameBasic) drawAgendaPoints(ctx *canvas.Context, card *nrdb.Printing, fontSize float64) (*textBoxDimensions, error) {
-	canvasWidth, _ := ctx.Size()
+	agendaScale := 0.07 * ScaleFactor
 
+	canvasWidth, _ := ctx.Size()
 	strokeWidth := getStrokeWidth(ctx)
 
 	// res cost icon
@@ -132,7 +134,7 @@ func (fb FrameBasic) drawAgendaPoints(ctx *canvas.Context, card *nrdb.Printing, 
 	if err != nil {
 		return nil, err
 	}
-	icon = icon.Transform(canvas.Identity.ReflectY()).Scale(0.07, 0.07).Scale(ScaleFactor, ScaleFactor)
+	icon = icon.Transform(canvas.Identity.ReflectY()).Scale(agendaScale, agendaScale)
 
 	iconX := canvasWidth * 0.085
 	iconY := fb.getTextBoxHeight(ctx) + icon.Bounds().H*1.8
@@ -176,8 +178,8 @@ func (fb FrameBasic) drawAgendaPoints(ctx *canvas.Context, card *nrdb.Printing, 
 }
 
 func loadTrashCostPath() *canvas.Path {
+	trashScale := 0.005 * ScaleFactor
 
-	trashScale := 0.005
 	paths := make([]*canvas.Path, 5)
 	for i := range 5 {
 		path := mustLoadGameAsset(fmt.Sprintf("TRASH_COST_%d", i))
@@ -186,7 +188,6 @@ func loadTrashCostPath() *canvas.Path {
 	}
 
 	return paths[0].Join(paths[1]).Join(paths[2]).Join(paths[3]).Join(paths[4])
-
 }
 
 func (fb FrameBasic) drawTrashCost(ctx *canvas.Context, card *nrdb.Printing) (*textBoxDimensions, error) {
@@ -231,8 +232,9 @@ func (fb FrameBasic) drawTrashCost(ctx *canvas.Context, card *nrdb.Printing) (*t
 }
 
 func (fb FrameBasic) drawMU(ctx *canvas.Context, card *nrdb.Printing, drawBox bool) {
-	canvasWidth, _ := ctx.Size()
+	muScale := 0.05 * ScaleFactor
 
+	canvasWidth, _ := ctx.Size()
 	strokeWidth := getStrokeWidth(ctx)
 
 	// mu icon
@@ -240,7 +242,7 @@ func (fb FrameBasic) drawMU(ctx *canvas.Context, card *nrdb.Printing, drawBox bo
 	if err != nil {
 		panic(err)
 	}
-	muImage = muImage.Transform(canvas.Identity.ReflectY()).Scale(0.05, 0.05).Scale(ScaleFactor, ScaleFactor)
+	muImage = muImage.Transform(canvas.Identity.ReflectY()).Scale(muScale, muScale)
 
 	muBoxX := canvasWidth * 0.0853
 	muBoxY := (getTitleBoxTop(ctx) - getTitleBoxHeight(ctx)) - (muImage.Bounds().H * 0.8)
@@ -300,6 +302,8 @@ func (fb FrameBasic) drawMU(ctx *canvas.Context, card *nrdb.Printing, drawBox bo
 }
 
 func (fb FrameBasic) drawLink(ctx *canvas.Context, card *nrdb.Printing) {
+	linkScale := 0.015 * ScaleFactor
+
 	canvasWidth, _ := ctx.Size()
 
 	// link icon
@@ -307,7 +311,7 @@ func (fb FrameBasic) drawLink(ctx *canvas.Context, card *nrdb.Printing) {
 	if err != nil {
 		panic(err)
 	}
-	icon = icon.Transform(canvas.Identity.ReflectY()).Scale(0.015, 0.015).Scale(ScaleFactor, ScaleFactor)
+	icon = icon.Transform(canvas.Identity.ReflectY()).Scale(linkScale, linkScale)
 
 	boxX := canvasWidth * 0.1
 	boxY := getTitleBoxTop(ctx) - getTitleBoxHeight(ctx)*0.6
