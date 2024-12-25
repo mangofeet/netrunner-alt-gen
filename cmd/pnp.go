@@ -43,18 +43,18 @@ func newCardImage(data *image.RGBA) cardImage {
 }
 
 var pnpCmd = &cobra.Command{
-	Use:   "pnp [CSV file] [Prefix]",
-	Args:  cobra.MinimumNArgs(2),
-	Short: "Generate a print & play file containing cards from a CSV. Card Titles can be prepended with a prefix for version tracking",
+	Use:   "pnp [CSV file]",
+	Args:  cobra.MinimumNArgs(1),
+	Short: "Generate a print & play file containing cards from a CSV.",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := generatePnPFile(args[0], args[1]); err != nil {
+		if err := generatePnPFile(args[0]); err != nil {
 			log.Println("error:", err)
 			os.Exit(1)
 		}
 	},
 }
 
-func generatePnPFile(csvPath string, prefix string) error {
+func generatePnPFile(csvPath string) error {
 	// Load CSV file
 	csvFile, err := os.Open(csvPath)
 	if err != nil {
@@ -143,8 +143,10 @@ func generatePnPFile(csvPath string, prefix string) error {
 		}
 		card := buildCard(record, cardID)
 
-		// prepend 'Dev 8.2' etc
-		card.Attributes.Title = fmt.Sprintf("%s %s", prefix, card.Attributes.Title)
+		// Prepend card name prefix
+		if cardNamePrefix != "" {
+			card.Attributes.Title = fmt.Sprintf("%s %s", cardNamePrefix, card.Attributes.Title)
+		}
 
 		// Generate card image
 		imgPath := fmt.Sprintf("piggybank_images/%d.png", cardID)
