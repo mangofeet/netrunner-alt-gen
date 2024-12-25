@@ -181,17 +181,19 @@ func generatePnPFile(csvPath string, prefix string) error {
 		pdfCanvas_one, pdfContext_one = addCardToPage(&imageCount_one, cardImg, pdfCanvas_one, pdfContext_one, p_one)
 
 		// Create individual card file
-		cardName := card.Attributes.Title
-		cardImgFilePath := fmt.Sprintf("%s/%d_%s.png", outputDir, cardID, cardName)
-		imgFile, err := os.Create(cardImgFilePath)
-		if err != nil {
-			return err
+		if genIndividualImages {
+			cardName := card.Attributes.Title
+			cardImgFilePath := fmt.Sprintf("%s/%d_%s.png", outputDir, cardID, cardName)
+			imgFile, err := os.Create(cardImgFilePath)
+			if err != nil {
+				return err
+			}
+			cardCanvas := canvas.New(60, 88)
+			cardContext := canvas.NewContext(cardCanvas)
+			cardContext.DrawImage(0, 0, cardImg.Data, canvas.DPMM(cardImg.DPMM))
+			renderers.PNG(canvas.DPMM(cardImg.DPMM))(imgFile, cardCanvas)
+			imgFile.Close()
 		}
-		cardCanvas := canvas.New(60, 88)
-		cardContext := canvas.NewContext(cardCanvas)
-		cardContext.DrawImage(0, 0, cardImg.Data, canvas.DPMM(cardImg.DPMM))
-		renderers.PNG(canvas.DPMM(cardImg.DPMM))(imgFile, cardCanvas)
-		imgFile.Close()
 
 		cardID += 1
 	}
