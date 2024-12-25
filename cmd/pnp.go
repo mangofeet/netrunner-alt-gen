@@ -148,8 +148,8 @@ func generatePnPFile(csvPath string) error {
 			card.Attributes.Title = fmt.Sprintf("%s %s", cardNamePrefix, card.Attributes.Title)
 		}
 
-		// Generate card image
-		imgPath := fmt.Sprintf("piggybank_images/%d.png", cardID)
+		// Create image drawer
+		imgPath := fmt.Sprintf("%s/%d.png", imageDir, cardID)
 		_, imgFileErr := os.Stat(imgPath)
 		var drawer art.Drawer
 		drawer = emptyDrawer{}
@@ -158,6 +158,8 @@ func generatePnPFile(csvPath string) error {
 				filename: imgPath,
 			}
 		}
+
+		// Create canvas
 		cnv, err := generateCardCanvas(drawer, card, "", "")
 		if err != nil {
 			return err
