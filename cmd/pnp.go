@@ -19,9 +19,11 @@ import (
 )
 
 const (
-	PAGE_WIDTH_MM  = 216
-	PAGE_HEIGHT_MM = 279
-	CARD_WIDTH_MM  = 60.0
+	PAGE_WIDTH_MM    = 216
+	PAGE_HEIGHT_MM   = 279
+	CARD_WIDTH_MM    = 60.0
+	TRIM_MARK_LENGTH = 2.0
+	TRIM_MARK_WIDTH  = 0.3
 )
 
 type cardImage struct {
@@ -108,12 +110,30 @@ func generatePnPFile(csvPath string) error {
 
 	// Helper func that draws a card to a PDF file
 	var addCardToPage = func(imageCount *int, img cardImage, canv *canvas.Canvas, ctx *canvas.Context, p *pdf.PDF) (*canvas.Canvas, *canvas.Context) {
+		// Draw the card
 		imageIndex := *imageCount % 9
 		pageX := pageMarginX + (float64(*imageCount%3) * img.Width)
 		pageY := PAGE_HEIGHT_MM - (float64((imageIndex/3)+1) * img.Height) - pageMarginY
 		ctx.DrawImage(pageX, pageY, img.Data, canvas.DPMM(img.DPMM))
+
+		// Draw trim marks
+		ctx.Push()
+		ctx.SetStrokeColor(parseColor("000000"))
+		ctx.SetStrokeWidth(TRIM_MARK_WIDTH)
+		trimMarkPath := &canvas.Path{}
+		trimMarkPath.MoveTo(0, -TRIM_MARK_LENGTH)
+		trimMarkPath.LineTo(0, TRIM_MARK_LENGTH)
+		trimMarkPath.MoveTo(-TRIM_MARK_LENGTH, 0)
+		trimMarkPath.LineTo(TRIM_MARK_LENGTH, 0)
+		ctx.DrawPath(pageX, pageY, trimMarkPath)
+		ctx.DrawPath(pageX+img.Width, pageY, trimMarkPath)
+		ctx.DrawPath(pageX, pageY+img.Height, trimMarkPath)
+		ctx.DrawPath(pageX+img.Width, pageY+img.Height, trimMarkPath)
+		ctx.Pop()
+
 		*imageCount++
 
+		// Create a new page if necessary
 		if *imageCount%9 == 8 {
 			canv.RenderTo(p)
 			p.NewPage(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
