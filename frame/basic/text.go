@@ -273,7 +273,6 @@ type additionalText struct {
 }
 
 func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCutoff, indent float64, box textBoxDimensions, extra ...additionalText) {
-
 	if box.align == 0 {
 		box.align = canvas.Left
 	}
@@ -315,7 +314,7 @@ func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, font
 		lastLineH += extraH
 	}
 
-	for y-lastLineH < textBottom {
+	for y-lastLineH-paddingTB < textBottom {
 		fontSize -= strokeWidth
 		extraFontSize = math.Min(maxExtraFontSize, fontSize)
 
@@ -334,14 +333,12 @@ func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, font
 			extraH := txt.Bounds().H
 			lastLineH += extraH
 		}
-
 	}
 
 	i := 0
 	lastLineH = cText.Bounds().H
 
 	for y-lastLineH < indentCutoff {
-
 		i++
 
 		lines := strings.Split(card.Attributes.Text, "\n")
@@ -352,7 +349,6 @@ func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, font
 		cText = fb.getCardText(newText, fontSize, w, h, box.align)
 
 		lastLineH = cText.Bounds().H
-
 	}
 
 	ctx.DrawText(x, y, cText)
@@ -371,7 +367,7 @@ func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, font
 	}
 
 	newCardTextX += w * 0.08
-	y = y - (lastLineH + fontSize*0.4)
+	y -= lastLineH + fontSize*0.4
 	widestLine := 0.0
 	extraFontSize = math.Min(maxExtraFontSize, fontSize)
 	for _, ln := range extra {
@@ -388,7 +384,6 @@ func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, font
 		lastLineH = txt.Bounds().H
 		y = y - (lastLineH)
 	}
-
 }
 
 func getCardTextPadding(ctx *canvas.Context) (lr, tb float64) {
