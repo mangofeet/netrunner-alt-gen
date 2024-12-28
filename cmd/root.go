@@ -66,7 +66,9 @@ var (
 	designer string
 
 	// pnp
-	startRow int
+	startRow                 int
+	genIndividualImages      bool
+	cardNamePrefix, imageDir string
 
 	// set by ldflags
 	version string = "local"
@@ -131,6 +133,9 @@ If set to "faction", it will use the faction color regardless of the base color`
 	reflectionCmd.Flags().StringVarP(&colorBG, "color-bg", "", "", `Background color for the generated art, defaults to a darkened --base-color value`)
 
 	pnpCmd.Flags().IntVarP(&startRow, "start-row", "m", 2, `Row to start generating from, defaults to 1 (this assumes the CSV contains a header row)`)
+	pnpCmd.Flags().BoolVar(&genIndividualImages, "gen-individual-images", false, `Generate a separate image file for each card in addition to the PnP sheets`)
+	pnpCmd.Flags().StringVar(&cardNamePrefix, "card-name-prefix", "", `Text to prepend to card titles (e.g. version tracking)`)
+	pnpCmd.Flags().StringVar(&imageDir, "image-dir", "", `Path to directory containing card images (named [cardID].png)`)
 
 	rootCmd.AddCommand(netwalkerCmd)
 	rootCmd.AddCommand(emptyCmd)
