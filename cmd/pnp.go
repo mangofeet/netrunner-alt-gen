@@ -144,7 +144,7 @@ func generatePnPFile(csvPath string) error {
 			*imageCount++
 
 			// Create a new page if necessary
-			if *imageCount%9 == 8 {
+			if *imageCount%9 == 0 {
 				canv.RenderTo(p)
 				p.NewPage(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
 				canv = canvas.New(PAGE_WIDTH_MM, PAGE_HEIGHT_MM)
