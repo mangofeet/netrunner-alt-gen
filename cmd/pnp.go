@@ -186,6 +186,9 @@ func generatePnPFile(csvPath string) error {
 		}
 
 		for i, record := range records[startRow-1:] {
+			if record[text_idx] == "CUT FROM SET" {
+				continue
+			}
 			if i == 0 {
 				imageCount_three = i
 				imageCount_one = i
