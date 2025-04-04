@@ -6,6 +6,7 @@ import (
 	"image"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -203,13 +204,25 @@ func generatePnPFile(csvPath string) error {
 				pageMarginY = (PAGE_HEIGHT_MM - (cardImg.Height * 3)) / 2
 			}
 
-			// Draw to 3x PDF (only 1x for identities)
-			if card.Attributes.CardTypeID == "runner_identity" || card.Attributes.CardTypeID == "corp_identity" {
-				pdfCanvas_three, pdfContext_three = addCardToPage(&imageCount_three, cardImg, pdfCanvas_three, pdfContext_three, p_three)
-			} else {
-				for j := 0; j < 3; j++ {
-					pdfCanvas_three, pdfContext_three = addCardToPage(&imageCount_three, cardImg, pdfCanvas_three, pdfContext_three, p_three)
+			var card_count int
+			var re = regexp.MustCompile(`Limit (\d+) per deck`)
+			match := re.FindStringSubmatch(card.Attributes.Text)
+
+			// Check if there's a special limit per deck or if it's an ID
+			if match != nil {
+				card_count, err = strconv.Atoi(match[1])
+				if err != nil {
+					panic(err)
 				}
+			} else if card.Attributes.CardTypeID == "runner_identity" || card.Attributes.CardTypeID == "corp_identity" {
+				card_count = 1
+			} else {
+				card_count = 3
+			}
+
+			// Draw to 3x PDF
+			for j := 0; j < card_count; j++ {
+				pdfCanvas_three, pdfContext_three = addCardToPage(&imageCount_three, cardImg, pdfCanvas_three, pdfContext_three, p_three)
 			}
 
 			// Draw to 1x PDF
