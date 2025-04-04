@@ -39,6 +39,8 @@ type cardImage struct {
 	Data   *image.RGBA
 }
 
+var id_idx, type_idx, name_idx, faction_idx, text_idx int
+
 func newCardImage(data *image.RGBA) cardImage {
 	imgDPMM := float64(data.Bounds().Max.X) / CARD_WIDTH_MM
 
@@ -167,6 +169,22 @@ func generatePnPFile(csvPath string) error {
 		frameColorText = "000000"
 
 		cardID := startRow
+
+		// Autodetect columns
+		for i, col := range records[0] {
+			if strings.HasSuffix(col, "ID") {
+				id_idx = i
+			} else if col == "Card Type" {
+				type_idx = i
+			} else if col == "Card Name" {
+				name_idx = i
+			} else if col == "Faction" {
+				faction_idx = i
+			} else if strings.Contains(col, "Card Text") || strings.Contains(col, "Card Summary") {
+				text_idx = i
+			}
+		}
+
 		for i, record := range records[startRow-1:] {
 			if i == 0 {
 				imageCount_three = i
@@ -180,7 +198,7 @@ func generatePnPFile(csvPath string) error {
 			}
 
 			// Create image drawer
-			imgPath := fmt.Sprintf("%s/%s.png", imageDir, record[1])
+			imgPath := fmt.Sprintf("%s/%s.png", imageDir, record[id_idx])
 
 			_, imgFileErr := os.Stat(imgPath)
 			var drawer art.Drawer
@@ -270,7 +288,7 @@ func buildCard(record []string, cardID int) *nrdb.Printing {
 	titleStripper := strings.NewReplacer(" ", "", ".", "", ",", "", "-", "", "!", "", "◆", "")
 
 	// Split summary into sections for ease of use
-	summary_sections := strings.Split(record[4], "====")
+	summary_sections := strings.Split(record[text_idx], "====")
 	lower_sections := summary_sections[1]
 	summary_sections = []string{summary_sections[0]}
 	summary_sections = append(summary_sections, strings.Split(lower_sections, "----")...)
@@ -281,21 +299,21 @@ func buildCard(record []string, cardID int) *nrdb.Printing {
 	// Set ID, faction, name, and type
 	card.ID = strconv.Itoa(cardID)
 	card.Attributes.PositionInSet = cardID
-	if record[0] == "Weyland" {
+	if record[faction_idx] == "Weyland" {
 		card.Attributes.FactionID = "weyland_consortium"
 	} else {
-		card.Attributes.FactionID = strings.ReplaceAll(strings.ToLower(record[0]), "-", "_")
+		card.Attributes.FactionID = strings.ReplaceAll(strings.ToLower(record[faction_idx]), "-", "_")
 	}
-	card.Attributes.Title = strings.ReplaceAll(record[2], "\n", "")
-	card.Attributes.StrippedTitle = titleStripper.Replace(record[2])
+	card.Attributes.Title = strings.ReplaceAll(record[name_idx], "\n", "")
+	card.Attributes.StrippedTitle = titleStripper.Replace(record[name_idx])
 	card.Attributes.IsUnique = strings.Contains(summary_sections[0], "◆")
-	if record[3] == "Runner-ID" {
+	if record[type_idx] == "Runner-ID" {
 		card.Attributes.CardTypeID = "runner_identity"
 		card.Attributes.CardAbilities.MUProvided = nil
-	} else if record[3] == "Corp-ID" {
+	} else if record[type_idx] == "Corp-ID" {
 		card.Attributes.CardTypeID = "corp_identity"
 	} else {
-		card.Attributes.CardTypeID = strings.ToLower(record[3])
+		card.Attributes.CardTypeID = strings.ToLower(record[type_idx])
 	}
 
 	// Set subtypes
