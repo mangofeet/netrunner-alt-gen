@@ -334,6 +334,9 @@ func buildCard(record []string, cardID int) *nrdb.Printing {
 	cost_line := strings.Split(summary_sections[2], ", ")
 	for _, cost := range cost_line {
 		tokens := strings.Split(cost, ": ")
+		if len(tokens) <= 1 {
+			continue
+		}
 		val, _ := strconv.Atoi(tokens[1])
 		switch tokens[0] {
 		case "Advancements":
