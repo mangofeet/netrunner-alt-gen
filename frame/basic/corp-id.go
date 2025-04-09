@@ -54,7 +54,7 @@ func (fb FrameBasic) CorpID() art.Drawer {
 
 		// not sure how these sizes actually correlate to the weird
 		// pixel/mm setup I'm using, but these work
-		fontSizeTitle := titleBoxHeight * 2
+		fontSizeTitle := titleBoxHeight * 1.5
 		fontSizeSubtitle := fontSizeTitle * subtitleFactor
 		fontSizeCard := titleBoxHeight * 1.5
 

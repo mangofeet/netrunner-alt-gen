@@ -126,9 +126,9 @@ func (fb FrameBasic) Ice() art.Drawer {
 		influenceX := canvasWidth - (canvasWidth / 8)
 		fb.drawInfluenceAndOrFactionSymbol(ctx, card, influenceX)
 
-		fontSizeTitle := titleBoxHeight * 2
+		fontSizeTitle := titleBoxHeight * 1.5
 		fontSizeStr := titleBoxHeight * 4
-		fontSizeCard := titleBoxHeight * 1.5
+		fontSizeCard := titleBoxHeight * 1.0 // for long text ice
 
 		titleTextX := titleBoxLeft + titleBoxHeight*0.3
 		titleTextY := titleBoxTop - titleBoxHeight*0.1

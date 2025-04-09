@@ -163,8 +163,12 @@ func (fb FrameBasic) getCardTextWithFont(text string, fontSize, cardTextBoxW, ca
 
 func (fb FrameBasic) writeTextPart(rt *canvas.RichText, text string, regFace, boldFace, italicFace *canvas.FontFace) {
 
-	text = strings.ReplaceAll(text, "\n", "\n\n")
+	text = strings.ReplaceAll(text, "\n", "\n") // used to be replace text "\n" "\n\n"
 	text = strings.ReplaceAll(text, "<BR>", "\n")
+	text = strings.Replace(text, "</li>", "", -1)
+	text = strings.Replace(text, "</ul>", "", -1)
+	text = strings.Replace(text, "<ul>", "", -1)
+	text = strings.Replace(text, "<li>", "\n •", -1)
 
 	if strings.Contains(text, "</strong>") {
 		subParts := strings.Split(text, "</strong>")
@@ -186,10 +190,12 @@ var replacementCheck = regexp.MustCompile(`\[[a-z-]+\]`)
 
 func (fb FrameBasic) replaceSymbol(rt *canvas.RichText, symbol, svgName, text string, face *canvas.FontFace, scaleFactor, translateFactor float64) string {
 	if strings.Contains(text, symbol) {
+		fontScale := face.Size * scaleFactor
+
 		subParts := strings.Split(text, symbol)
 		for _, chunk := range subParts[:len(subParts)-1] {
 			fb.writeChunk(rt, chunk, face)
-			path := mustLoadGameAsset(svgName).Scale(face.Size*scaleFactor, face.Size*scaleFactor).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1*translateFactor))
+			path := mustLoadGameAsset(svgName).Scale(fontScale, fontScale).Transform(canvas.Identity.ReflectY().Translate(0, face.Size*-1*translateFactor))
 			rt.WritePath(path, fb.getColorText(), canvas.FontMiddle)
 		}
 		text = subParts[len(subParts)-1]
@@ -199,7 +205,6 @@ func (fb FrameBasic) replaceSymbol(rt *canvas.RichText, symbol, svgName, text st
 	}
 
 	return text
-
 }
 
 func (fb FrameBasic) writeChunk(rt *canvas.RichText, text string, face *canvas.FontFace) {
@@ -268,7 +273,6 @@ type additionalText struct {
 }
 
 func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, fontSize, indentCutoff, indent float64, box textBoxDimensions, extra ...additionalText) {
-
 	if box.align == 0 {
 		box.align = canvas.Left
 	}
@@ -277,7 +281,7 @@ func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, font
 	_, canvasHeight := ctx.Size()
 
 	originalFontSize := fontSize
-	extraFontSize := originalFontSize * 0.8
+	extraFontSize := originalFontSize * 0.7
 	maxExtraFontSize := extraFontSize
 	textBottom := canvasHeight * 0.0592
 
@@ -310,7 +314,7 @@ func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, font
 		lastLineH += extraH
 	}
 
-	for y-lastLineH < textBottom {
+	for y-lastLineH-paddingTB < textBottom {
 		fontSize -= strokeWidth
 		extraFontSize = math.Min(maxExtraFontSize, fontSize)
 
@@ -329,14 +333,12 @@ func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, font
 			extraH := txt.Bounds().H
 			lastLineH += extraH
 		}
-
 	}
 
 	i := 0
 	lastLineH = cText.Bounds().H
 
 	for y-lastLineH < indentCutoff {
-
 		i++
 
 		lines := strings.Split(card.Attributes.Text, "\n")
@@ -347,7 +349,6 @@ func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, font
 		cText = fb.getCardText(newText, fontSize, w, h, box.align)
 
 		lastLineH = cText.Bounds().H
-
 	}
 
 	ctx.DrawText(x, y, cText)
@@ -366,7 +367,7 @@ func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, font
 	}
 
 	newCardTextX += w * 0.08
-	y = y - (lastLineH + fontSize*0.4)
+	y -= lastLineH + fontSize*0.4
 	widestLine := 0.0
 	extraFontSize = math.Min(maxExtraFontSize, fontSize)
 	for _, ln := range extra {
@@ -383,7 +384,6 @@ func (fb FrameBasic) drawCardText(ctx *canvas.Context, card *nrdb.Printing, font
 		lastLineH = txt.Bounds().H
 		y = y - (lastLineH)
 	}
-
 }
 
 func getCardTextPadding(ctx *canvas.Context) (lr, tb float64) {
